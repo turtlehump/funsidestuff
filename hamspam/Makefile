@@ -8,4 +8,4 @@ sortinghat.o: sortinghat.h sortinghat.cpp
 	g++ -Wall -pedantic -g -c sortinghat.cpp
 
 clean:
-	rm -f *.o hamspam hamspam.exe
+	rm -f *.o hamspam hamspam.exe trained.data
