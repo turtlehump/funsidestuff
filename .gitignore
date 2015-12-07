@@ -1,0 +1,3 @@
+*.o
+hamspam/hamspam
+hamspam/trained.data
