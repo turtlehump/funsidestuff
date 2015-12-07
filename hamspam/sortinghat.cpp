@@ -23,7 +23,7 @@ void Sortinghat::train()
       input.open(filename.c_str());
       if(!input)
       {
-        cout << "Bad file name";
+        cout << "Bad file name" << endl;
         bad_input = true;
       }
     }while(bad_input);
@@ -34,6 +34,7 @@ void Sortinghat::train()
     cout << "Do you have more training? (Y/N) ";
     cin >> again;
   }while( again[0] == 'Y' || again[0] == 'y');
+  save();
 }
 
 

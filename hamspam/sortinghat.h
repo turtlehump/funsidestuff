@@ -19,13 +19,13 @@ class Sortinghat
   public:
     Sortinghat();
     void train();
-    void train_file(string catagory, string filename);
     void train_group(string catagory, string line);
     
-    void save();
     vector<double> find_catagory(string group);
 
   private:
+    void train_file(string catagory, string filename);
+    void save();
     map<string, map< string, int > > m_catagories;
     map<string, int > m_all_words;
     map<string, string > m_exact_groupings;
