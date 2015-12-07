@@ -1,3 +1,3 @@
 *.o
-hamspam/hamspam
-hamspam/trained.data
+/hamspam/hamspam
+/hamspam/trained.data
