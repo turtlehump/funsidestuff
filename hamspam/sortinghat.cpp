@@ -15,8 +15,9 @@ void Sortinghat::train()
   do{
     cout << "Give me a catagory: ";
     cin >> catagory;
-    bool bad_input = false;
+    bool bad_input;
     do{
+      bad_input = false;
       cout << "Give me a file for " << catagory << ": ";
       cin >> filename;
       input.open(filename.c_str());
