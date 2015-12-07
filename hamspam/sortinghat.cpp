@@ -26,10 +26,10 @@ void Sortinghat::train()
         cout << "Bad file name" << endl;
         bad_input = true;
       }
+      input.close();
     }while(bad_input);
     cout << "Mapping file " << filename << " to catagory " << catagory << endl;
     train_file(catagory, filename);
-    input.close();
 
     cout << "Do you have more training? (Y/N) ";
     cin >> again;
