@@ -20,6 +20,8 @@ class Sortinghat
     Sortinghat();
     void train();
     void train_group(string catagory, string line);
+
+    void train_from_training_file(char* filename);
     
     vector<double> find_catagory(string group);
 

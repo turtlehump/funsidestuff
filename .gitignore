@@ -1,4 +1,6 @@
 *.o
+*/tmp/
 /hamspam/hamspam
 /hamspam/trained.data
+/hamspam/training
 /matrix/matrix_multiply

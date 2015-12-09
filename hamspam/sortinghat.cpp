@@ -47,7 +47,6 @@ void Sortinghat::train_file(string catagory, string filename)
     //no_punc(line);
     //all_lower(line);
     train_group(catagory, line);
-    m_exact_groupings[catagory] = line;
   }
 }
 
@@ -57,11 +56,21 @@ void Sortinghat::train_group(string catagory, string line)
   stringstream group;
   group << line;
   string word;
+  int i = 0;
   while(group >> word)
   {
     m_catagories[catagory][word]++;
     m_all_words[word]++;
+    i++;
   }
+  if(i < 5);
+    m_exact_groupings[line] = catagory;
+  return;
+}
+
+
+void Sortinghat::train_from_training_file(char* filename)
+{
   return;
 }
 
