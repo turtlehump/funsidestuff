@@ -44,8 +44,7 @@ void Sortinghat::train_file(string catagory, string filename)
   string line;
   while(getline(input, line))
   {
-    //no_punc(line);
-    //all_lower(line);
+    line = good_line(line);
     train_group(catagory, line);
   }
   input.close();
@@ -129,7 +128,6 @@ void Sortinghat::display()
   }
 }
 
-//Needs to be implemented
 void Sortinghat::find_catagory(string group)
 {
   double max = 0, total_prob = 0;
@@ -210,4 +208,21 @@ double Sortinghat::prob_of_catagory(string catagory)
     total_groupings += it->second;
   }
   return (1.0 * m_groupings_in_catagory[catagory]) / total_groupings;
+}
+
+string Sortinghat::good_line(string line)
+{
+  for(unsigned int i = 0; i < line.size(); i++)
+  {
+    if(!isalpha(line[i]) && !isspace(line[i]))
+    {
+      string tmp1 = line.substr(0, i);
+      string tmp2 = line.substr(i + 1);
+      line = tmp1 + tmp2;
+      i--;
+    }
+    if(isalpha(line[i]))
+      line[i] = tolower(line[i]);
+  }
+  return line;
 }

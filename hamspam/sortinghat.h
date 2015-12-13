@@ -12,6 +12,7 @@
 #include <sstream>
 #include <fstream>
 #include <cstdlib>
+#include <locale>
 using namespace std;
 
 class Sortinghat
@@ -44,6 +45,8 @@ class Sortinghat
     double prob_of_group(string group);
     double group_given_catagory(string group, string catagory);
     double prob_of_catagory(string group);
+
+    string good_line(string line);
 
     map< string, map< string, int > > m_catagories;
     map< string, int > m_all_words;
