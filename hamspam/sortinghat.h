@@ -29,7 +29,7 @@ class Sortinghat
 
     void train_group(string catagory, string line);
 
-    void find_catagory(string group);
+    string find_catagory(string group);
 
     void display();
 

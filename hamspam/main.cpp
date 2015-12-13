@@ -33,7 +33,8 @@ int main(int argc, char* argv[])
     {
       sorter.train(argv[4]);
       string group = argv[2];
-      sorter.find_catagory(group);
+      string catagory = sorter.find_catagory(group);
+      cout << endl << "\"" << group << "\" is most likely " << catagory << endl;
     }
     if(argc == 6)
     {
@@ -41,10 +42,20 @@ int main(int argc, char* argv[])
 
       ifstream input(argv[3], ios::in);
       string group;
+      map<string, int> score;
       while(getline(input, group))
       {
-        sorter.find_catagory(group);
+        string catagory = sorter.find_catagory(group);
         cout << endl;
+        score[catagory]++;
+      }
+
+      cout << "***********************************************" << endl;
+      cout << "TOTALS" << endl;
+      map<string, int>::iterator it;
+      for(it = score.begin(); it != score.end(); it++)
+      {
+        cout << it->first << ": " << it->second << endl;
       }
     }
   }

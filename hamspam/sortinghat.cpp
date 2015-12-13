@@ -128,7 +128,7 @@ void Sortinghat::display()
   }
 }
 
-void Sortinghat::find_catagory(string group)
+string Sortinghat::find_catagory(string group)
 {
   double max = 0, total_prob = 0;
   int max_index, i = 0;
@@ -156,16 +156,22 @@ void Sortinghat::find_catagory(string group)
     i++;
   }
 
+  string catagory;
   cat_it = m_catagories.begin();
   cout << "Group: " << group << endl;
   for(unsigned int i = 0; i < probs.size(); i++)
   {
     cout << "Catagory: " << cat_it->first << "   ";
     cout << "Probability: " << probs[i] / total_prob; 
-    if( i == max_index) cout << "  ***MAX***";
+    if( i == max_index)
+    {
+       catagory = cat_it->first;
+       cout << "  ***MAX***";
+    }
     cout << endl;
     cat_it++;
   }
+  return catagory;
 }
 
 double Sortinghat::prob_of_group(string group)
