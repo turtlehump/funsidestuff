@@ -133,22 +133,21 @@ void Sortinghat::find_catagory(string group)
   double max = 0, total_prob = 0;
   int max_index, i = 0;
   vector<double> probs;
+
+  group = good_line(group);
+
   double prob_group = prob_of_group(group); 
-  cout << "prob (" << group << "): " << prob_group << endl << endl;
+
   map<string, map<string, int> >::iterator cat_it;
   for(cat_it = m_catagories.begin(); cat_it != m_catagories.end(); cat_it++)
   {
     double group_given_cat = group_given_catagory(group, cat_it->first);
-    cout << "(" << group << ") given (" << cat_it->first << "): " << group_given_cat << endl;
     double prob_cat = prob_of_catagory(cat_it->first);
-    cout << "prob (" << cat_it->first << "): " << prob_cat << endl;
 
     double cat_given_group = (group_given_cat * prob_cat) / prob_group;
 
     probs.push_back(cat_given_group);
     total_prob += cat_given_group;
-    cout << endl <<"(" << cat_it->first << ") given (" << group << "): " << cat_given_group << endl << endl;
-    cout << "total: " << total_prob << endl << endl << endl;
     if(cat_given_group > max)
     {
       max = cat_given_group;
