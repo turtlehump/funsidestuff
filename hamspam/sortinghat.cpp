@@ -48,6 +48,7 @@ void Sortinghat::train_file(string catagory, string filename)
     //all_lower(line);
     train_group(catagory, line);
   }
+  input.close();
 }
 
 
@@ -56,15 +57,11 @@ void Sortinghat::train_group(string catagory, string line)
   stringstream group;
   group << line;
   string word;
-//  int i = 0;
   while(group >> word)
   {
     m_catagories[catagory][word]++;
     m_all_words[word]++;
-//    i++;
   }
-//  if(i < 5)
-//    m_exact_groupings[line] = catagory;
   m_groupings_in_catagory[catagory]++;
   return;
 }
@@ -97,6 +94,7 @@ void Sortinghat::train(char* filename)
       m_groupings_in_catagory[catagory] = count; //catagories will still have old value
     }
   }
+  input.close();
   return;
 }
 
@@ -113,6 +111,7 @@ void Sortinghat::save()
     }
     output << "* " << m_groupings_in_catagory[cat_it->first] << endl;
   }
+  output.close();
 }
 
 
