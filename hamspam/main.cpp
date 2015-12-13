@@ -39,12 +39,13 @@ int main(int argc, char* argv[])
     {
       sorter.train(argv[5]);
 
-      /*
       ifstream input(argv[3], ios::in);
       string group;
       while(getline(input, group))
+      {
         sorter.find_catagory(group);
-        */
+        cout << endl;
+      }
     }
   }
 
@@ -79,9 +80,9 @@ bool Correct_usage(int argc, char* argv[])
       string tmp4 = argv[4];
       if(tmp2 == "-f")
       {
-        cout << "getting file as comparison input: " << tmp3 << endl;
         if(argc != 6)
           Usage();
+        cout << "Getting file as comparison input: " << tmp3 << endl << endl;
         string tmp5 = argv[5];
         ifstream cat_input;
         cat_input.open(argv[3]);
