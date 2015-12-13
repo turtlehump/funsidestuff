@@ -23,10 +23,29 @@ int main(int argc, char* argv[])
   should_train = Correct_usage(argc, argv);
 
   if(should_train)
+  {
     sorter.train();
+    sorter.display();
+  }
   else
   {
-//    sorter.catagorize();
+    if(argc == 5)
+    {
+      sorter.train(argv[4]);
+      string group = argv[2];
+      sorter.find_catagory(group);
+    }
+    if(argc == 6)
+    {
+      sorter.train(argv[5]);
+
+      /*
+      ifstream input(argv[3], ios::in);
+      string group;
+      while(getline(input, group))
+        sorter.find_catagory(group);
+        */
+    }
   }
 
   return 0;
@@ -40,7 +59,7 @@ bool Correct_usage(int argc, char* argv[])
 {
   if(argc < 2)
     Usage();
-  string tmp1 = argv[1];  //it doesnt work when I compare argv[i] == "-t"
+  string tmp1 = argv[1]; //it doesnt work when I compare argv[i] == "-t"
   if(tmp1 == "-t")
   {
     if(argc != 2)
@@ -106,4 +125,5 @@ bool Correct_usage(int argc, char* argv[])
   {
     Usage();
   }
+  exit(1);
 }

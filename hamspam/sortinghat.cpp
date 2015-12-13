@@ -56,21 +56,47 @@ void Sortinghat::train_group(string catagory, string line)
   stringstream group;
   group << line;
   string word;
-  int i = 0;
+//  int i = 0;
   while(group >> word)
   {
     m_catagories[catagory][word]++;
     m_all_words[word]++;
-    i++;
+//    i++;
   }
-  if(i < 5);
-    m_exact_groupings[line] = catagory;
+//  if(i < 5)
+//    m_exact_groupings[line] = catagory;
+  m_groupings_in_catagory[catagory]++;
   return;
 }
 
 
-void Sortinghat::train_from_training_file(char* filename)
+void Sortinghat::train(char* filename)
 {
+  ifstream input(filename, ios::in);
+  string line;
+  string catagory;
+  string word;
+  int count;
+  while(getline(input, line))
+  {
+    stringstream group;
+    group << line;
+    if(line[0] != '*')
+    {
+      group >> catagory;
+      group >> word;
+      group >> count;
+      m_catagories[catagory][word] = count;
+      m_all_words[word] += count;
+    }
+    else
+    {
+      char tmp;
+      group >> tmp; //consume the *
+      group >> count;
+      m_groupings_in_catagory[catagory] = count; //catagories will still have old value
+    }
+  }
   return;
 }
 
@@ -83,15 +109,106 @@ void Sortinghat::save()
     map<string, int>::iterator word_it;
     for(word_it = cat_it->second.begin(); word_it != cat_it->second.end(); word_it++)
     {
-      output << cat_it->first << ":" << word_it->first << ":" << word_it->second << endl;
-      cout << cat_it->first << ":" << word_it->first << ":" << word_it->second << endl;
+      output << cat_it->first << " " << word_it->first << " " << word_it->second << endl;
     }
+    output << "* " << m_groupings_in_catagory[cat_it->first] << endl;
   }
 }
 
-vector<double> Sortinghat::find_catagory(string group)
+
+void Sortinghat::display()
 {
+  map< string, map< string, int> >::iterator cat_it;
+  for(cat_it = m_catagories.begin(); cat_it != m_catagories.end(); cat_it++)
+  {
+    map<string, int>::iterator word_it;
+    for(word_it = cat_it->second.begin(); word_it != cat_it->second.end(); word_it++)
+    {
+      cout << cat_it->first << " : " << word_it->first << " : " << word_it->second << endl;
+    }
+    cout << "* " << m_groupings_in_catagory[cat_it->first] << endl;
+  }
+}
+
+//Needs to be implemented
+void Sortinghat::find_catagory(string group)
+{
+  double max = 0, total_prob = 0;
+  int max_index, i = 0;
   vector<double> probs;
-  probs.push_back(0.5);
-  return probs;
+  double prob_group = prob_of_group(group); 
+  cout << "prob (" << group << "): " << prob_group << endl << endl;
+  map<string, map<string, int> >::iterator cat_it;
+  for(cat_it = m_catagories.begin(); cat_it != m_catagories.end(); cat_it++)
+  {
+    double group_given_cat = group_given_catagory(group, cat_it->first);
+    cout << "(" << group << ") given (" << cat_it->first << "): " << group_given_cat << endl;
+    double prob_cat = prob_of_catagory(cat_it->first);
+    cout << "prob (" << cat_it->first << "): " << prob_cat << endl;
+
+    double cat_given_group = (group_given_cat * prob_cat) / prob_group;
+
+    probs.push_back(cat_given_group);
+    total_prob += cat_given_group;
+    cout << endl <<"(" << cat_it->first << ") given (" << group << "): " << cat_given_group << endl << endl;
+    cout << "total: " << total_prob << endl << endl << endl;
+    if(cat_given_group > max)
+    {
+      max = cat_given_group;
+      max_index = i;
+    }
+    i++;
+  }
+
+  cat_it = m_catagories.begin();
+  cout << "Group: " << group << endl;
+  for(unsigned int i = 0; i < probs.size(); i++)
+  {
+    cout << "Catagory: " << cat_it->first << "   ";
+    cout << "Probability: " << probs[i] / total_prob; 
+    if( i == max_index) cout << "  ***MAX***";
+    cout << endl;
+    cat_it++;
+  }
+}
+
+double Sortinghat::prob_of_group(string group)
+{
+  double total = 0;
+  map<string, map<string, int> >::iterator it;
+  for(it = m_catagories.begin(); it != m_catagories.end(); it++)
+  {
+    total += group_given_catagory(group, it->first);
+  }
+  return total;
+}
+
+double Sortinghat::group_given_catagory(string group, string catagory)
+{
+  int catagory_total_word_count = 0;
+  map<string, int>::iterator it;
+  for(it = m_catagories[catagory].begin(); it != m_catagories[catagory].end(); it++)
+  {
+    catagory_total_word_count += it->second;
+  }
+  stringstream message;
+  message << group;
+  double group_prob_running_total = 1; //init to one because we are multiplying
+  string word;
+  while(message >> word)
+  {
+    group_prob_running_total *= (1.0 * m_catagories[catagory][word]) / catagory_total_word_count;
+  }
+  return group_prob_running_total;
+}
+
+double Sortinghat::prob_of_catagory(string catagory)
+{
+  int total_groupings = 0;
+  map<string, int>::iterator it;
+  for(it = m_groupings_in_catagory.begin(); it != m_groupings_in_catagory.end(); it++)
+  {
+    total_groupings += it->second;
+  }
+  return (1.0 * m_groupings_in_catagory[catagory]) / total_groupings;
 }
