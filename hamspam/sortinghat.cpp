@@ -137,17 +137,17 @@ string Sortinghat::find_catagory(string group)
   group = good_line(group);
 
   double prob_group = prob_of_group(group); 
-  cout << "prob (" << group << "): " << prob_group << endl << endl;
+//  cout << "prob (" << group << "): " << prob_group << endl << endl;
 
 
   map<string, map<string, int> >::iterator cat_it;
   for(cat_it = m_catagories.begin(); cat_it != m_catagories.end(); cat_it++)
   {
     double group_given_cat = group_given_catagory(group, cat_it->first);
-    cout << "(" << group << ") given (" << cat_it->first << "): " << group_given_cat << endl;
+//    cout << "(" << group << ") given (" << cat_it->first << "): " << group_given_cat << endl;
 
     double prob_cat = prob_of_catagory(cat_it->first);
-    cout << "prob (" << cat_it->first << "): " << prob_cat << endl;
+//    cout << "prob (" << cat_it->first << "): " << prob_cat << endl;
 
     
 
@@ -155,8 +155,8 @@ string Sortinghat::find_catagory(string group)
 
     probs.push_back(cat_given_group);
     total_prob += cat_given_group;
-    cout << endl <<"(" << cat_it->first << ") given (" << group << "): " << cat_given_group << endl << endl;
-    cout << "total: " << total_prob << endl << endl << endl;
+//    cout << endl <<"(" << cat_it->first << ") given (" << group << "): " << cat_given_group << endl << endl;
+//    cout << "total: " << total_prob << endl << endl << endl;
     if(cat_given_group > max)
     {
       max = cat_given_group;
@@ -211,7 +211,7 @@ double Sortinghat::group_given_catagory(string group, string catagory)
   while(message >> word)
   {
     double this_word_prob = ((1.0 * m_catagories[catagory][word]) + laplace) / (catagory_total_word_count + (laplace * n));
-    cout << "(" << word << ") given (" << catagory << ": " << this_word_prob << endl;
+//    cout << "(" << word << ") given (" << catagory << "): " << this_word_prob << endl;
     group_prob_running_total *= this_word_prob;
   }
   return group_prob_running_total;
