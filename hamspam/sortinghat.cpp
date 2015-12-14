@@ -137,17 +137,26 @@ string Sortinghat::find_catagory(string group)
   group = good_line(group);
 
   double prob_group = prob_of_group(group); 
+  cout << "prob (" << group << "): " << prob_group << endl << endl;
+
 
   map<string, map<string, int> >::iterator cat_it;
   for(cat_it = m_catagories.begin(); cat_it != m_catagories.end(); cat_it++)
   {
     double group_given_cat = group_given_catagory(group, cat_it->first);
+    cout << "(" << group << ") given (" << cat_it->first << "): " << group_given_cat << endl;
+
     double prob_cat = prob_of_catagory(cat_it->first);
+    cout << "prob (" << cat_it->first << "): " << prob_cat << endl;
+
+    
 
     double cat_given_group = (group_given_cat * prob_cat) / prob_group;
 
     probs.push_back(cat_given_group);
     total_prob += cat_given_group;
+    cout << endl <<"(" << cat_it->first << ") given (" << group << "): " << cat_given_group << endl << endl;
+    cout << "total: " << total_prob << endl << endl << endl;
     if(cat_given_group > max)
     {
       max = cat_given_group;
@@ -193,13 +202,17 @@ double Sortinghat::group_given_catagory(string group, string catagory)
   {
     catagory_total_word_count += it->second;
   }
+
+  double group_prob_running_total = 1; //init to one because we are multiplying
   stringstream message;
   message << group;
-  double group_prob_running_total = 1; //init to one because we are multiplying
   string word;
+  int n = m_all_words.size(); //for laplace smoothing
   while(message >> word)
   {
-    group_prob_running_total *= (1.0 * m_catagories[catagory][word]) / catagory_total_word_count;
+    double this_word_prob = ((1.0 * m_catagories[catagory][word]) + laplace) / (catagory_total_word_count + (laplace * n));
+    cout << "(" << word << ") given (" << catagory << ": " << this_word_prob << endl;
+    group_prob_running_total *= this_word_prob;
   }
   return group_prob_running_total;
 }
@@ -207,12 +220,13 @@ double Sortinghat::group_given_catagory(string group, string catagory)
 double Sortinghat::prob_of_catagory(string catagory)
 {
   int total_groupings = 0;
+  int n = m_groupings_in_catagory.size();
   map<string, int>::iterator it;
   for(it = m_groupings_in_catagory.begin(); it != m_groupings_in_catagory.end(); it++)
   {
     total_groupings += it->second;
   }
-  return (1.0 * m_groupings_in_catagory[catagory]) / total_groupings;
+  return ((1.0 * m_groupings_in_catagory[catagory]) + laplace) / (total_groupings + (laplace * n));
 }
 
 string Sortinghat::good_line(string line)
