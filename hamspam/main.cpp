@@ -6,12 +6,13 @@ using namespace std;
 void Usage()
 {
   cout << "Usage:" << endl;
-  cout << "hamspam -t                                                                 (for training)" << endl;
-  cout << "hamspam -c (\"<string to catagorize>\" || -f <filename>) -s <training_file>  (for checking)" << endl;
+  cout << "hamspam -t                                                                                 (for training)" << endl;
+  cout << "hamspam -c (\"<string to catagorize>\" || -f <filename>) -s <training_file> -l <laplace_int> (for checking)" << endl;
   exit(0);
 }
 
 bool Correct_usage(int argc, char* argv[]);
+bool check_int(char* laplace);
 
 
 //**************************************************************************************************
@@ -29,16 +30,18 @@ int main(int argc, char* argv[])
   }
   else
   {
-    if(argc == 5)
+    if(argc == 7)
     {
       sorter.train(argv[4]);
+      sorter.set_laplace(atoi(argv[6]));
       string group = argv[2];
       string catagory = sorter.find_catagory(group);
       cout << endl << "\"" << group << "\" is most likely " << catagory << endl;
     }
-    if(argc == 6)
+    if(argc == 8)
     {
       sorter.train(argv[5]);
+      sorter.set_laplace(atoi(argv[7]));
 
       ifstream input(argv[3], ios::in);
       string group;
@@ -80,7 +83,7 @@ bool Correct_usage(int argc, char* argv[])
   }
   else if(tmp1 == "-c")
   {
-    if(argc != 5 && argc != 6)
+    if(argc != 7 && argc != 8)
     {
       Usage();
     }
@@ -91,10 +94,9 @@ bool Correct_usage(int argc, char* argv[])
       string tmp4 = argv[4];
       if(tmp2 == "-f")
       {
-        if(argc != 6)
+        if(argc != 8)
           Usage();
         cout << "Getting file as comparison input: " << tmp3 << endl << endl;
-        string tmp5 = argv[5];
         ifstream cat_input;
         cat_input.open(argv[3]);
         if(!cat_input)
@@ -106,6 +108,7 @@ bool Correct_usage(int argc, char* argv[])
           cat_input.close();
         if(tmp4 != "-s")
           Usage();
+        string tmp5 = argv[5];
         ifstream seed_input;
         seed_input.open(argv[5]);
         if(!seed_input)
@@ -114,10 +117,15 @@ bool Correct_usage(int argc, char* argv[])
           Usage();
         }
         seed_input.close();
+        string tmp6 = argv[6];
+        if(tmp6 != "-l")
+          Usage();
+        if(!check_int(argv[7]))
+          Usage();
       }
       else
       {
-        if(argc != 5)
+        if(argc != 7)
           Usage();
         if(tmp3 != "-s")
           Usage();
@@ -129,6 +137,11 @@ bool Correct_usage(int argc, char* argv[])
           Usage();
         }
         seed_input.close();
+        string tmp5 = argv[5];
+        if(tmp5 != "-l")
+          Usage();
+        if(!check_int(argv[6]))
+          Usage();
       }
     }
     return false;
@@ -138,4 +151,15 @@ bool Correct_usage(int argc, char* argv[])
     Usage();
   }
   exit(1);
+}
+
+bool check_int(char* laplace)
+{
+  bool good_int = true;
+  for(int i = 0; laplace[i] != '\0'; i++)
+  {
+    if(!isdigit(laplace[i]))
+      good_int = false;
+  }
+  return good_int;
 }

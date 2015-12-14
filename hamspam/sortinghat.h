@@ -28,6 +28,7 @@ class Sortinghat
     void train(char* filename);
 
     void train_group(string catagory, string line);
+    void set_laplace(int laplace);
 
     string find_catagory(string group);
 
@@ -52,6 +53,6 @@ class Sortinghat
     map< string, int > m_all_words;
     map< string, int > m_groupings_in_catagory;
 
-    int laplace = 1;
+    int laplace;
 };
 #endif

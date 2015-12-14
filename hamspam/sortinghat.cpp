@@ -245,3 +245,8 @@ string Sortinghat::good_line(string line)
   }
   return line;
 }
+
+void Sortinghat::set_laplace(int laplace)
+{
+  this->laplace = laplace;
+}
