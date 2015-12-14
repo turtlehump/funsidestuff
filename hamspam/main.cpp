@@ -155,11 +155,10 @@ bool Correct_usage(int argc, char* argv[])
 
 bool check_int(char* laplace)
 {
-  bool good_int = true;
   for(int i = 0; laplace[i] != '\0'; i++)
   {
     if(!isdigit(laplace[i]))
-      good_int = false;
+      return false;
   }
-  return good_int;
+  return true;
 }
