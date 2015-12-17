@@ -1,6 +1,8 @@
+*/a.out
 *.o
 */tmp/
 /hamspam/hamspam
 /hamspam/trained.data
 /hamspam/training
 /matrix/matrix_multiply
+/primes/list_of_primes.data
