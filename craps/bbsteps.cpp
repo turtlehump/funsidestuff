@@ -26,7 +26,7 @@ int main()
   ostringstream betstream;
   while(current_cash < goalCash && current_cash > 0)
   {
-    if(bet == STARTING_BET && just_won == true)
+    if(just_won == true)
     {
       cash_at_start_of_betting_seq = current_cash;
     }
@@ -66,7 +66,7 @@ int main()
       {
         bet = TABLE_MAX;
         losses++;
-        betstream << " *Couldnt double our bet, taking a loss* ";
+        betstream << " *Couldnt double our bet taking a loss*";
         maxed = true;  //to show that we have already made one bet in the current stream at the max value, should restart
       }
       if(bet > current_cash)
