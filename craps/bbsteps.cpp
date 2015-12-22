@@ -47,7 +47,6 @@ int main()
 
     if(roll >= 5 && roll <= 8) //lost
     {
-      bool loss_recorded = false;
       if(current_cash == 0) //we lost and have no more money
       {
         cout << betstream.str() << endl;
