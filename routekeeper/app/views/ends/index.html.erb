@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Ends</h1>
+
+<table cellpadding="3" border="1">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Address</th>
+      <th>Elevation</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @ends.each do |e| %>
+      <tr>
+        <td><%= e.name %></td>
+        <td><%= e.address %></td>
+        <td><%= e.elevation %></td>
+        <td><%= e.description %></td>
+        <td><%= link_to 'Show', e %></td>
+        <td><%= link_to 'Edit', edit_end_path(e) %></td>
+        <td><%= link_to 'Destroy', e, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New End', new_end_path %><br><br>
+<%= link_to 'Starts', starts_path %><br>
+<%= link_to 'Routes', routes_path %>

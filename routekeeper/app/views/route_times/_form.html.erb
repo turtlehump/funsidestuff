@@ -1,0 +1,25 @@
+<%= form_for([@route, @route_time]) do |f| %>
+  <% if @route_time.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@route_time.errors.count, "error") %> prohibited this route_time from being saved:</h2>
+
+      <ul>
+      <% @route_time.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :minutes %><br>
+    <%= f.number_field :minutes %>
+  </div>
+  <div class="field">
+    <%= f.label :seconds %><br>
+    <%= f.number_field :seconds %>
+  </div>
+  <div class="actions">
+    <%= f.submit "New Time" %>
+  </div>
+<% end %>

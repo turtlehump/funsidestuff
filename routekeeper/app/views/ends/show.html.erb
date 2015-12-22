@@ -1,0 +1,38 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @end.name %>
+</p>
+<p>
+  <strong>Description:</strong>
+  <%= @end.description %>
+</p>
+<p>
+  <strong>Address:</strong>
+  <%= @end.address %>
+</p>
+<p>
+  <strong>Elevation:</strong>
+  <%= @end.elevation %>
+</p>
+<p>
+  <strong>Latitude:</strong>
+  <%= @end.latitude %>
+</p>
+<p>
+  <strong>Longitude:</strong>
+  <%= @end.longitude %>
+</p>
+
+<br>
+<%= image_tag @map_str %>
+<br>
+
+<h4>Routes that end here</h4>
+<% @end.routes.each do |r| %>
+ <%= link_to "#{r.start.name}", r %><br>
+<% end %>
+<br>
+<%= link_to "Edit", edit_end_path(@end) %> |
+<%= link_to "Ends", ends_path %>

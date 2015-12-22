@@ -1,0 +1,46 @@
+<%= form_for(@end) do |f| %>
+  <% if @end.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@end.errors.count, "error") %> prohibited this end from being saved:</h2>
+
+      <ul>
+      <% @end.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :description %><br>
+    <%= f.text_field :description %>
+  </div>
+  <div class="field">
+    <%= f.label :address %><br>
+    <%= f.text_field :address %>
+  </div>
+  <div class="field">
+    <%= f.label :elevation %><br>
+    <%= f.text_field :elevation %>
+  </div>
+
+  <p>
+  The latitude and longitude will be automatically set if you input a complete and valid address. Only set the latitude and longitude of your end if it does not have a numbered address. On creation it will overwrite the given lat/long with the lat/long of the given address. Your address will be changed if you edit either the longitude or latitude.
+  </p>
+
+  <div class="field">
+    <%= f.label :latitude %><br>
+    <%= f.text_field :latitude %>
+  </div>
+  <div class="field">
+    <%= f.label :longitude %><br>
+    <%= f.text_field :longitude %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
