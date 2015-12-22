@@ -26,7 +26,7 @@ int main()
   ostringstream betstream;
   while(current_cash < goalCash && current_cash > 0)
   {
-    if(just_won == true)
+    if(just_won)
     {
       cash_at_start_of_betting_seq = current_cash;
     }
@@ -47,9 +47,11 @@ int main()
 
     if(roll >= 5 && roll <= 8) //lost
     {
+      bool loss_recorded = false;
       if(current_cash == 0) //we lost and have no more money
       {
         cout << betstream.str() << endl;
+        losses++;
         break;
       }
       if(maxed)
@@ -65,14 +67,12 @@ int main()
       if(bet > TABLE_MAX)
       {
         bet = TABLE_MAX;
-        losses++;
-        betstream << " *Couldnt double our bet taking a loss*";
+        betstream << " *Couldnt double our bet*";
         maxed = true;  //to show that we have already made one bet in the current stream at the max value, should restart
       }
-      if(bet > current_cash)
+      if(bet >= current_cash)
       {
         bet = current_cash;
-        losses++;
         betstream << " MAKE IT OR BREAK IT! -> ";
         maxed = true;  //to show that we have already made one bet in the current stream at the max value, should restart
       }
@@ -89,6 +89,7 @@ int main()
         tmp = current_cash - cash_at_start_of_betting_seq;
         if(tmp > 0)
           betstream << "+";
+        else losses++;
         betstream << tmp << " in " << segmentRolls << endl;
       }
       else if(roll == 2)
@@ -97,6 +98,7 @@ int main()
         tmp = current_cash - cash_at_start_of_betting_seq;
         if(tmp > 0)
           betstream << "+";
+        else losses++;
         betstream << tmp << " in " << segmentRolls << ", got double 1's\n";
       }
       else if(roll == 12)
