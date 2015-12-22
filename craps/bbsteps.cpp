@@ -79,7 +79,6 @@ int main()
     }
     else //win
     {
-      //these displaying of winnings are correct if maxed == false
       betstream << "\t";
       int tmp;
       if(roll == 3 || roll == 4 || (roll >= 9 && roll <= 11))
