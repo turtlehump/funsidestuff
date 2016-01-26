@@ -11,11 +11,13 @@ int main()
   srand(time(NULL));
   const int STARTING_BET = 10;
   const int TABLE_MAX = 2000;
-  int starting_cash = 5000, segmentRolls = 0, bet, roll, dice1, dice2, totalRolls = 0, losses = 0;
+  int starting_cash = 5000;
+  int goal_winnings = 500;
+  int segment_rolls = 0, bet, roll, dice1, dice2, total_rolls = 0, losses = 0;
   bool maxed = false;
   bool just_won = true;
   int current_cash = starting_cash;
-  int goalCash = starting_cash + 500;
+  int goal_cash = starting_cash + goal_winnings;
   int cash_at_start_of_betting_seq;
 
   bet = STARTING_BET;
@@ -24,7 +26,7 @@ int main()
   //20, 40, 80, 160, 320, 640, 1280, 2560, 5120, 10240, 20480   <- winnings
 
   ostringstream betstream;
-  while(current_cash < goalCash && current_cash > 0)
+  while(current_cash < goal_cash && current_cash > 0)
   {
     if(just_won)
     {
@@ -36,12 +38,12 @@ int main()
     dice1 = (rand() % 6) + 1;
     dice2 = (rand() % 6) + 1;
     roll = dice1 + dice2;      //roll
-    totalRolls++;
+    total_rolls++;
 
     if(bet == STARTING_BET) betstream << bet;        //record the bet
     else                    betstream << ", " << bet;
 
-    segmentRolls++;          //havent won our 10 yet
+    segment_rolls++;          //havent won our 10 yet
 
     betstream << ":" << roll;
 
@@ -88,7 +90,7 @@ int main()
         if(tmp > 0)
           betstream << "+";
         else losses++;
-        betstream << tmp << " in " << segmentRolls << endl;
+        betstream << tmp << " in " << segment_rolls << endl;
       }
       else if(roll == 2)
       {
@@ -97,7 +99,7 @@ int main()
         if(tmp > 0)
           betstream << "+";
         else losses++;
-        betstream << tmp << " in " << segmentRolls << ", got double 1's\n";
+        betstream << tmp << " in " << segment_rolls << ", got double 1's\n";
       }
       else if(roll == 12)
       {
@@ -105,11 +107,11 @@ int main()
         tmp = current_cash - cash_at_start_of_betting_seq;
         if(tmp > 0)
           betstream << "+";
-        betstream << tmp << " in " <<  segmentRolls << ", got double 6's\n";
+        betstream << tmp << " in " <<  segment_rolls << ", got double 6's\n";
       }
       cout << betstream.str();
       betstream.str("");    //clears out the betstream
-      segmentRolls = 0;
+      segment_rolls = 0;
       bet = STARTING_BET;
       maxed = false;        //we won this stream
       just_won = true;      //we won this stream
@@ -118,11 +120,11 @@ int main()
 
   int winnings = current_cash - starting_cash;
 
-  if(current_cash >= goalCash)
-    cout << "It took you " << totalRolls << " rolls to make " << winnings << ", and there were " << losses << " losses\n";
+  if(current_cash >= goal_cash)
+    cout << endl << "WINNER" << endl << "It took you " << total_rolls << " rolls to make " << winnings << ", and there were " << losses << " losses\n";
 
   if(current_cash == 0)
-    cout << "You are broke, it happened in " << totalRolls << " rolls, and there were " << losses << " losses\n";
+    cout << endl << "LOSER" << endl << "You are broke, it happened in " << total_rolls << " rolls, and there were " << losses << " losses\n";
 
   return 0;
 }
