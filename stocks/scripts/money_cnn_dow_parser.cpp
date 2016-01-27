@@ -8,8 +8,6 @@
 #include <stdlib.h>
 using namespace std;
 
-const string DOW_stocks[] = {"AAPL", "AXP", "BA", "CAT", "CSCO", "CVX", "DD", "DIS","GE", "GS", "HD", "IBM", "INTC", "JNJ", "JPM", "KO", "MCD", "MMM", "MRK", "MSFT", "NIKE", "PFE", "PG", "TRV", "UNH", "UTX", "V", "VZ", "WMT", "XOM"};
-
 string chomp(string str);
 string get_stock_nickname(string line);
 double get_stock_price(string line);
@@ -17,7 +15,7 @@ double get_stock_price(string line);
 int main()
 {
   ifstream web_source;
-  web_source.open("../DOW/dow.curdata");
+  web_source.open("/home/phil/funsidestuff/stocks/curdata/dow.curdata");
   if(!web_source)
   {
     cout << "Couldnt open input file :(" << endl;
@@ -53,7 +51,10 @@ int main()
   map<string, double>::iterator it;
   for(it = current_values.begin(); it != current_values.end(); it++)
   {
-    cout << it->first << " " << it->second << endl;
+    cout << it->first;
+//    for(int i = it->first.length(); i < 5; i++)
+//      cout << " ";
+    cout << " " << it->second << endl;
   }
 
   return 0;

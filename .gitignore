@@ -6,3 +6,5 @@
 /hamspam/training
 /matrix/matrix_multiply
 /primes/list_of_primes.data
+/stocks/*.curdata
+/stocks/DOW/
