@@ -7,4 +7,5 @@
 /matrix/matrix_multiply
 /primes/list_of_primes.data
 /stocks/curdata
-/stocks/DOW/
+/stocks/DOW/stocks
+/stocks/SP500/stocks
