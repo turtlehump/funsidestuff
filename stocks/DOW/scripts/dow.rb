@@ -11,12 +11,12 @@ dow_stocks.each { |stock|
 
 #we only want to get the intra-minute data when we write to ery1min or do a -r
 if(ARGV[0] == "-r" or ARGV[0] == "ery1min")
-  i = 0
+  i = 9
 else
-  i = 8
+  i = 1
 end 
 
-while i < 9 do
+while i > 0 do
   time = `date | awk '{print $4}'`.chomp.gsub(/[:]/, '') #replace : with nothing
   `curl http://money.cnn.com/data/dow30/ > #{root}/curdata/dow.curdata 2> #{root}/tmp/garb`
   dow = `#{root}/DOW/scripts/cnn_dow_web_parse`.split(/\n/)
@@ -46,17 +46,17 @@ while i < 9 do
         end
       }
 
-      `echo "#{time}#{String(price).center(12)}#{String(change.round(2)).center(8)}  i = #{i}" >> #{root}/DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data`
+      `echo "#{time}#{String(price).center(12)}#{String(change.round(2)).center(8)}" >> #{root}/DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data`
 
-      if(i == 8 and ARGV[0] == "ery1min")
+      if(i == 1 and ARGV[0] == "ery1min")
         `echo >> #{root}/DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data`
       end
       puts "#{nickname} updated @ #{day}:#{time}"
     } 
   end
-  if(i < 8)
+  if(i > 1)
     puts
     sleep 6
   end
-  i += 1
+  i -= 1
 end
