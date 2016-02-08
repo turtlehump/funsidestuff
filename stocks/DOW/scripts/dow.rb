@@ -31,16 +31,6 @@ while i < 9 do
       nickname = stk[0]
       price = stk[1]
 
-      if(`find #{root} | grep /DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}`.empty?)
-        if(`find #{root} | grep /DOW/stocks/#{nickname}/#{day}`.empty?)
-          if(`find #{root} | grep /DOW/stocks/#{nickname}`.empty?)
-            `mkdir #{root}/DOW/stocks/#{nickname}/`
-          end
-          `mkdir #{root}/DOW/stocks/#{nickname}/#{day}`
-        end
-        `echo > #{root}/DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data`
-      end
-
       change = 0.0
       intraminute_values.each { |ary|
         if(nickname == ary[0])
