@@ -18,3 +18,10 @@ dow.each { |stock|
     `mkdir #{root}/DOW/stocks/#{nickname}/#{day}`
   end
 }
+
+if(`find #{root} | grep /DOW/days/#{day}`.empty?)
+  if(`find #{root} | grep /DOW/days`.empty?)
+    `mkdir #{root}/DOW/days/`
+  end
+  `echo > #{root}/DOW/days/#{day}`
+end
