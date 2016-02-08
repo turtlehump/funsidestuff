@@ -6,6 +6,7 @@ stocks = `ls #{root}/DOW/stocks`.split(/\n/)
 if(!stocks.empty?)
   if(!`ls #{root}/DOW/stocks/#{stocks[0]}`.empty?)
     if(!`ls #{root}/DOW/stocks/#{stocks[0]}/#{day}`.empty?)
+      i = 0
       stocks.each {|stock|
         intraminute_values = `cat #{root}/DOW/stocks/#{stock}/#{day}/ery1min.data | awk '{print $2}'`.split(/\n/).compact.reject{ |e| e.empty? }
 
@@ -23,12 +24,28 @@ if(!stocks.empty?)
             high = value.to_f
           end
           total += value.to_f
-        }
+        } #intraminute_values.each
         average = (total/intraminute_values.size).round(2)
-        puts "#{stock.center(8)} Average = #{average.to_s.center(8)}   Low = #{low.to_s.center(8)}   High = #{high.to_s.center(8)}"
-        puts "         Open = #{open.to_s.center(8)}     Close = #{close.to_s.center(8)}  Change = #{change.to_s.center(8)}"
-        puts
-      }
+
+        if(ARGV[0] == "-save")
+          if(i == 0) #new file
+            `echo "#{stock.center(8)} Average = #{average.to_s.center(8)}   Low = #{low.to_s.center(8)}   High = #{high.to_s.center(8)}" > #{root}/DOW/days/#{day}`
+          else #append file
+            `echo "#{stock.center(8)} Average = #{average.to_s.center(8)}   Low = #{low.to_s.center(8)}   High = #{high.to_s.center(8)}" >> #{root}/DOW/days/#{day}`
+          end
+          `echo "         Open = #{open.to_s.center(8)}     Close = #{close.to_s.center(8)}  Change = #{change.to_s.center(8)}" >> #{root}/DOW/days/#{day}`
+          if(i < stocks.size - 1)
+            `echo >> #{root}/DOW/days/#{day}`
+          end
+        else
+          puts "#{stock.center(8)} Average = #{average.to_s.center(8)}   Low = #{low.to_s.center(8)}   High = #{high.to_s.center(8)}"
+          puts "         Open = #{open.to_s.center(8)}     Close = #{close.to_s.center(8)}  Change = #{change.to_s.center(8)}"
+          if(i < stocks.size - 1)
+            puts
+          end
+        end
+        i += 1
+      } #stocks.each
     else
       puts "Nothing for today"
     end
