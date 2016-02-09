@@ -37,9 +37,11 @@ while i > 0 do
           if(ary.size > 1) #has more than just the name, 1+ price
             change = price.to_f - ary[ary.size - 1].to_f
           else #yet to test
-            last_price = `cat #{root}/DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data | tail -n 1 | awk '{print $2}'`
-            if(last_price.to_f != 0)
-              change = price.to_f - last_price.to_f
+            if(!`find  #{root} | grep /DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data`.empty?)
+              last_price = `cat #{root}/DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data | tail -n 1 | awk '{print $2}'`
+              if(last_price.to_f != 0)
+                change = price.to_f - last_price.to_f
+              end
             end
           end
           ary.push(price)
