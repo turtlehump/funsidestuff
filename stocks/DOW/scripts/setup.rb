@@ -25,3 +25,6 @@ if(`find #{root} | grep /DOW/days/#{day}`.empty?)
   end
   `echo "Trading day hasn't closed yet" > #{root}/DOW/days/#{day}`
 end
+
+`mkdir #{root}/curdata`
+`mkdir #{root}/tmp`
