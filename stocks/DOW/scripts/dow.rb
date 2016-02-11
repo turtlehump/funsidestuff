@@ -57,7 +57,12 @@ while i > 0 do
         files_to_write.each { |file|
           change = 0.0
           if(!`find  #{root} | grep /DOW/stocks/#{nickname}/#{day}/#{file}.data`.empty?)
-            last_price = `cat #{root}/DOW/stocks/#{nickname}/#{day}/#{file}.data | tail -n 1 | awk '{print $2}'`.to_f
+            last_price = 0
+            if(file == "ery1min") #file ends with a newline
+              last_price = `cat #{root}/DOW/stocks/#{nickname}/#{day}/#{file}.data | tail -n 2 | head -n 2 | awk '{print $2}'`.to_f
+            else
+              last_price = `cat #{root}/DOW/stocks/#{nickname}/#{day}/#{file}.data | tail -n 1 | awk '{print $2}'`.to_f
+            end
             if(last_price != 0)
               change = price - last_price
             end
