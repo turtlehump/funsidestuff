@@ -2,15 +2,37 @@ root = "/home/phil/funsidestuff/stocks"
 day = `date | awk '{print $2"_"$3"_"$6}'`.chomp
 
 dow_stocks = `ls #{root}/DOW/stocks`.split(/\n/)
-intraminute_values = Array.new(dow_stocks.size)
-i = 0
+intraminute_values = Hash.new{ |hash, key| hash[key] = Array.new }
 dow_stocks.each { |stock|
-  intraminute_values[i] = [stock]
-  i += 1
+  intraminute_values[stock]
 }
 
-#we only want to get the intra-minute data when we write to ery1min or do a -r
-if(ARGV[0] == "-r" or ARGV[0] == "ery1min")
+files_to_write = Array.new
+mins = `date | awk '{print $4}'`.chomp.split(/:/)[1].to_i #date $4-> hour:min:sec
+files_to_write.push("ery1min") #always write to ery1min
+if((mins % 2) == 0)
+  files_to_write.push("ery2mins")
+end
+if((mins % 5) == 0)
+  files_to_write.push("ery5mins")
+end
+if((mins % 10) == 0)
+  files_to_write.push("ery10mins")
+end
+if((mins % 15) == 0)
+  files_to_write.push("ery15mins")
+end
+if((mins % 20) == 0)
+  files_to_write.push("ery20mins")
+end
+if((mins % 30) == 0)
+  files_to_write.push("ery30mins")
+end
+if(mins == 0)
+  files_to_write.push("ery60mins")
+end
+
+if(ARGV[0] == "-r" or ARGV[0] == "-save")
   i = 9
 else
   i = 1
@@ -29,36 +51,39 @@ while i > 0 do
     dow.each { |stock|
       stk = stock.split(/ /)
       nickname = stk[0]
-      price = stk[1]
+      price = stk[1].to_f
 
-      change = 0.0
-      intraminute_values.each { |ary|
-        if(nickname == ary[0])
-          if(ary.size > 1) #has more than just the name, 1+ price
-            change = price.to_f - ary[ary.size - 1].to_f
-          else #yet to test
-            if(!`find  #{root} | grep /DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data`.empty?)
-              last_price = `cat #{root}/DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data | tail -n 1 | awk '{print $2}'`
-              if(last_price.to_f != 0)
-                change = price.to_f - last_price.to_f
-              end
+      if(i == 9) #loop through all the files, else only do the ery1minute
+        files_to_write.each { |file|
+          change = 0.0
+          if(!`find  #{root} | grep /DOW/stocks/#{nickname}/#{day}/#{file}.data`.empty?)
+            last_price = `cat #{root}/DOW/stocks/#{nickname}/#{day}/#{file}.data | tail -n 1 | awk '{print $2}'`.to_f
+            if(last_price != 0)
+              change = price - last_price
             end
           end
-          ary.push(price)
+          `echo "#{String(time)}#{String(price).center(12)}#{String(change.round(2)).center(8)}" >> #{root}/DOW/stocks/#{nickname}/#{day}/#{file}.data`
+        }
+        intraminute_values[nickname].push(price)
+      else
+        last_price = intraminute_values[nickname][intraminute_values[nickname].length - 1]
+        change = price - last_price
+        `echo "#{String(time)}#{String(price).center(12)}#{String(change.round(2)).center(8)}" >> #{root}/DOW/stocks/#{nickname}/#{day}/ery1min.data`
+        if (i == 1)
+          `echo >> #{root}/DOW/stocks/#{nickname}/#{day}/ery1min.data`
         end
-      }
-
-      `echo "#{time}#{String(price).center(12)}#{String(change.round(2)).center(8)}" >> #{root}/DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data`
-
-      if(i == 1 and ARGV[0] == "ery1min")
-        `echo >> #{root}/DOW/stocks/#{nickname}/#{day}/#{ARGV[0]}.data`
+        intraminute_values[nickname].push(price)
       end
       puts "#{nickname} updated @ #{day}:#{time}"
     } 
   end
   if(i > 1)
     puts
-    sleep 6
+    if(i == 9)
+      sleep 5 #shorter sleep because we write to a bunch of files
+    else
+      sleep 6
+    end
   end
   i -= 1
 end

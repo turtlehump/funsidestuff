@@ -1,31 +1,9 @@
 ###### NEEDS EDITING ######
 # m     h    dom mon dow   command
- 29-59   6    *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery1min > /tmp/stock.log 2>&1 &
-  *     7-12  *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery1min > /tmp/stock.log 2>&1 &
- 0-10    13   *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery1min > /tmp/stock.log 2>&1 &
-
-
- */2    6-12  *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery2min > /tmp/stock.log 2>&1 &
- 0      13    *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery2min > /tmp/stock.log 2>&1 &
-
-
- */5    6-12  *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery5min > /tmp/stock.log 2>&1 &
- 0      13    *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery5min > /tmp/stock.log 2>&1 &
-
-
- */10   6-12  *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery10min > /tmp/stock.log 2>&1 &
- 0      13    *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery10min > /tmp/stock.log 2>&1 &
-
-
- */15   6-12  *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery15min > /tmp/stock.log 2>&1 &
- 0      13    *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery15min > /tmp/stock.log 2>&1 &
-
-
- */30   6-12  *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery30min > /tmp/stock.log 2>&1 &
- 0      13    *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery30min > /tmp/stock.log 2>&1 &
-
-
-  0     6-13  *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb ery60min > /tmp/stock.log 2>&1 &
-
   0     5     *   *  1-5   `which ruby` #{root}/DOW/scripts/setup.rb
+
+ 29-59   6    *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb -save > /tmp/stock.log 2>&1 &
+  *     7-12  *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb -save > /tmp/stock.log 2>&1 &
+ 0-10    13   *   *  1-5   `which ruby` #{root}/DOW/scripts/dow.rb -save > /tmp/stock.log 2>&1 &
+
   15    13    *   *  1-5   `which ruby` #{root}/DOW/scripts/analyze.rb -save
