@@ -33,6 +33,7 @@ if(mins == 0)
 end
 
 if(ARGV[0] == "-r" or ARGV[0] == "-save")
+  puts files_to_write
   i = 9
 else
   i = 1
