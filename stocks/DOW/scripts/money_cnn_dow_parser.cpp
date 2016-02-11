@@ -33,6 +33,9 @@ int main()
     //this website (http://money.cnn.com/data/dow30/) goes line by line after a <tr>
     {
       table_rows++;
+      //the first <tr> (on its own line) gives the table layout:
+      //Company, Price, Change, % Change, Volume, YTD Change
+      //Ignore it.
       if(table_rows > 1)
       {
         getline(web_source, line);
