@@ -53,7 +53,7 @@ int main()
   }
 
   ofstream primes;
-  primes.open ("list_of_primes.data", ios::out | ios::app);
+  primes.open ("list_of_primes.data", ios::out | ios::app); //WE ALWAYS WANT TO OPEN THE FILE
 
   if(first_time)                //add 2 and 3 to the file first because we will skip them in the for loop
   {
@@ -79,6 +79,7 @@ int main()
       }
     }
   }
+  primes.close();
   return 0;
 }
 
