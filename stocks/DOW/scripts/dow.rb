@@ -41,7 +41,7 @@ end
 
 while i > 0 do
   time = `date | awk '{print $4}'`.chomp.gsub(/[:]/, '') #replace : with nothing
-  `curl http://money.cnn.com/data/dow30/ > #{root}/curdata/dow.curdata 2> #{root}/tmp/garb`
+  `curl http://money.cnn.com/data/dow30/ > #{root}/curdata/dow.curdata 2> #{root}/tmp`
   dow = `#{root}/DOW/scripts/cnn_dow_web_parse`.split(/\n/)
 
   if(ARGV.size == 0 or ARGV[0] == "-r") 

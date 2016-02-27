@@ -1,7 +1,11 @@
 root = "/home/phil/funsidestuff/stocks"
 day = `date | awk '{print $2"_"$3"_"$6}'`.chomp
 
-`curl http://money.cnn.com/data/dow30/ > #{root}/curdata/dow.curdata 2> #{root}/tmp/garb`
+if(`find #{root} | grep curdata`.empty?)
+  `mkdir #{root}/curdata`
+end
+
+`curl http://money.cnn.com/data/dow30/ > #{root}/curdata/dow.curdata 2> #{root}/tmp`
 
 dow = `#{root}/DOW/scripts/cnn_dow_web_parse`.split(/\n/)
 dow.each { |stock|
@@ -26,5 +30,3 @@ if(`find #{root} | grep /DOW/days/#{day}`.empty?)
   `echo "Trading day hasn't closed yet" > #{root}/DOW/days/#{day}`
 end
 
-`mkdir #{root}/curdata`
-`mkdir #{root}/tmp`
