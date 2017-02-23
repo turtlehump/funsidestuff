@@ -32,7 +32,7 @@ void Player::print()
 }
 
 //This should only be called on the dealer player
-void Player::dealer_print(bool final_print)
+void Player::dealer_print()
 {
   cout << "Dealer:";
 
@@ -41,20 +41,26 @@ void Player::dealer_print(bool final_print)
     cout << endl;
     return;
   }
+  if(m_cards.size() == 1)
+  {
+    cout << " "; m_cards[0]->print(); cout << endl;
+    return;
+  }
 
-  if(final_print)
+  if(m_cards.size() == 2)
+  {
+    if(m_cur_playing){ //if its the dealers turn to play
+      cout << " "; m_cards[0]->print(); cout << ", "; m_cards[1]->print();}
+    else{
+      cout << " "; m_cards[0]->print(); cout << ", -";}
+  }
+  else //its obviously the dealers turn because they have more than 2 cards, just print the list
+  {
     for(unsigned int i = 0; i < m_cards.size(); i++)
     {
       cout << " "; m_cards[i]->print();
       if(i < (m_cards.size() - 1))
         cout << ",";
-    }
-  else
-  {
-    cout << " -";
-    for(unsigned int i = 1; i < m_cards.size(); i++)
-    {
-      cout << ", "; m_cards[i]->print();
     }
   }
   cout << endl;

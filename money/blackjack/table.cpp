@@ -2,11 +2,13 @@
 
 void Table::print(bool final_print)
 {
+  for(int i = 0; i < 59; i++)
+    cout << endl;
   cout << "****TABLE STATUS****" << endl;
 
   //Dealer is on top for display reasons
   //Dealer is the last to get a card (last index in the player vector)
-  m_players[m_num_players - 1]->dealer_print(final_print);
+  m_players[m_num_players - 1]->dealer_print();
 
   for(unsigned int i = 0; i < m_players.size() - 1; i++)
     m_players[i]->print();
