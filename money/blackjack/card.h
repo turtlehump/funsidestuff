@@ -11,7 +11,8 @@ class Card
         Card(int value, int suit);
         void     print();
         void     print_blackjack();
-        int      get_blackjack_value();
+        int      soft_blackjack_value();
+        int      hard_blackjack_value();
 
         enum CardValue{
             ACE = 1,

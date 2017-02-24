@@ -1,60 +1,97 @@
 #include "table.h"
 
+Table::~Table()
+{
+  delete m_dealer;
+  delete m_deck;
+  for(unsigned int i = 0; i < m_players.size(); i++)
+    delete m_players[i];
+}
+
+void Table::set_deck()
+{
+  int num_decks;
+  cout << "How many decks are we going to use? ";
+  cin >> num_decks;
+
+  Deck* deck = new Deck(num_decks * 52);
+
+  deck->shuffle();
+  deck->cut();
+
+  m_deck = deck;
+  return;
+}
+
+void Table::get_players()
+{
+  int num_players;
+  cout << "How many players are at the table? ";
+  cin >> num_players;
+  cout << endl;
+  for(int i = 0; i < num_players; i++)
+  {
+    string name;
+    cout << "Player " << i << "'s name: ";
+    cin.ignore();
+    getline(cin, name);
+    cin.unget();
+
+    Player* new_player = new Player(name);
+    m_players.push_back(new_player);
+  }
+  return;
+}
+
 void Table::print(bool final_print)
 {
   for(int i = 0; i < 59; i++)
     cout << endl;
-  cout << "****TABLE STATUS****" << endl;
+  cout << "****TABLE STATUS****" << endl << endl;
 
   //Dealer is on top for display reasons
-  //Dealer is the last to get a card (last index in the player vector)
-  m_players[m_num_players - 1]->dealer_print();
+  m_dealer->dealer_print();
 
-  for(unsigned int i = 0; i < m_players.size() - 1; i++)
+  for(unsigned int i = 0; i < m_players.size(); i++)
     m_players[i]->print();
 }
 
-void Table::add_player(Player* new_player)
+void Table::play_blackjack()
 {
-  m_num_players++;
-  m_players.push_back(new_player);
+  this->starting_deal();
+
+  for(unsigned int i = 0; i < m_players.size(); i++)
+  {
+    m_players[i]->play_blackjack(m_deck);
+  }
+
+  int dealer_hand_value = m_dealer->dealer_play_blackjack(m_deck);
+  this->print(true);
+  cout << "The dealer got " << dealer_hand_value << endl;
   return;
 }
 
-Player* Table::get_next_player()
-{
-  m_cur_player_index++;
-  return m_players[m_cur_player_index];
-}
-
-bool Table::set_deck(Deck* deck)
-{
-  if(!m_deck)
-  {
-    m_deck = deck;
-    return true;
-  }
-  else
-  {
-    cout << "The table already has a deck..." << endl;
-    return false;
-  }
-}
-  
 void Table::starting_deal()
 {
   //deal first cards to everyone, including the dealer
   for(unsigned int i = 0; i < m_players.size(); i++)
   {
-    m_players[i]->hit(m_deck->deal_top_card());
     sleep(1);
+    m_players[i]->hit(m_deck->deal_top_card());
     this->print(false);
   }
+  sleep(1);
+  m_dealer->hit(m_deck->deal_top_card()); 
+  this->print(false);
+
   //deal second card to everyone, including the dealer
   for(unsigned int i = 0; i < m_players.size(); i++)
   {
-    m_players[i]->hit(m_deck->deal_top_card());
     sleep(1);
+    m_players[i]->hit(m_deck->deal_top_card());
     this->print(false);
   }
+  sleep(1);
+  m_dealer->hit(m_deck->deal_top_card()); 
+  this->print(false);
 }

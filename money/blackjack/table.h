@@ -11,21 +11,22 @@ using namespace std;
 class Table
 {
     public:
-        Table() {m_num_players = 0; m_cur_player_index = 0; m_deck = NULL;}
+        Table() {m_deck = NULL; m_dealer = new Player("Dealer");}
         ~Table();
-        bool      set_deck(Deck* deck);
-        void      add_player(Player* new_player);
-        Player*   get_next_player();
 
-        void      starting_deal();
+        void      set_deck();
+        void      get_players();
 
         void      print(bool final_print);
 
+        void      play_blackjack();
+
     private:
+        void      starting_deal();
+
         Deck*           m_deck;
+        Player*         m_dealer;
         vector<Player*> m_players;
-        int             m_num_players;
-        int             m_cur_player_index;
 };
 #endif
 

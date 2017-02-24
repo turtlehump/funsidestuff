@@ -78,7 +78,29 @@ void Card::print_blackjack()
   return;
 }
 
-int Card::get_blackjack_value()
+int Card::soft_blackjack_value()
+{
+  int tmp;
+  switch(m_value)
+  {
+    case ACE:   tmp =  11;   break;
+    case TWO:   tmp =  2;   break;
+    case THREE: tmp =  3;   break;
+    case FOUR:  tmp =  4;   break;
+    case FIVE:  tmp =  5;   break;
+    case SIX:   tmp =  6;   break;
+    case SEVEN: tmp =  7;   break;
+    case EIGHT: tmp =  8;   break;
+    case NINE:  tmp =  9;   break;
+    case TEN:   tmp =  10;  break;
+    case JACK:  tmp =  10;  break;
+    case QUEEN: tmp =  10;  break;
+    case KING:  tmp =  10;  break;
+  }
+  return tmp;
+}
+
+int Card::hard_blackjack_value()
 {
   int tmp;
   switch(m_value)
