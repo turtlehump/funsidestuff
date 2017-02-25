@@ -43,17 +43,44 @@ void Table::get_players()
   return;
 }
 
-void Table::print(bool final_print)
+void Table::print()
 {
   for(int i = 0; i < 59; i++)
     cout << endl;
   cout << "****TABLE STATUS****" << endl << endl;
 
+  if(m_dealer->is_playing())
+    m_dealer->announce_playing();
+  else
+  {
+    for(unsigned int i = 0; i < m_players.size(); i++)
+    {
+      if(m_players[i]->is_playing())
+      {
+        m_players[i]->announce_playing();
+        break;
+      }
+    }
+  }
+
   //Dealer is on top for display reasons
   m_dealer->dealer_print();
-
   for(unsigned int i = 0; i < m_players.size(); i++)
     m_players[i]->print();
+}
+
+void Table::final_print()
+{
+  for(int i = 0; i < 59; i++)
+    cout << endl;
+  cout << "****END OF HAND****" << endl << endl;
+
+  //Dealer is on top for display reasons
+  m_dealer->print();
+  for(unsigned int i = 0; i < m_players.size(); i++)
+    m_players[i]->print();
+
+  return;
 }
 
 void Table::play_blackjack()
@@ -66,32 +93,32 @@ void Table::play_blackjack()
   }
 
   int dealer_hand_value = m_dealer->dealer_play_blackjack(m_deck);
-  this->print(true);
+
+  this->final_print(); 
   cout << "The dealer got " << dealer_hand_value << endl;
+
+  //reset all the hands
+  m_dealer->reset_hand();
+  for(unsigned int i = 0; i < m_players.size(); i++)
+    m_players[i]->reset_hand();
+
   return;
 }
 
 void Table::starting_deal()
 {
-  //deal first cards to everyone, including the dealer
-  for(unsigned int i = 0; i < m_players.size(); i++)
+  //deal two cards to everyone, including the dealer
+  for(int starting_cards = 0; starting_cards < 2; starting_cards++)
   {
+    for(unsigned int i = 0; i < m_players.size(); i++)
+    {
+      sleep(1);
+      m_players[i]->hit(m_deck->deal_top_card());
+      this->print();
+    }
     sleep(1);
-    m_players[i]->hit(m_deck->deal_top_card());
-    this->print(false);
+    m_dealer->hit(m_deck->deal_top_card()); 
+    this->print();
   }
-  sleep(1);
-  m_dealer->hit(m_deck->deal_top_card()); 
-  this->print(false);
-
-  //deal second card to everyone, including the dealer
-  for(unsigned int i = 0; i < m_players.size(); i++)
-  {
-    sleep(1);
-    m_players[i]->hit(m_deck->deal_top_card());
-    this->print(false);
-  }
-  sleep(1);
-  m_dealer->hit(m_deck->deal_top_card()); 
-  this->print(false);
+  return;
 }

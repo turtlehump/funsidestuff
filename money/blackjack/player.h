@@ -20,6 +20,9 @@ class Player
         int         play_blackjack(Deck* deck);
         int         dealer_play_blackjack(Deck* deck);
 
+        bool        is_playing();
+        void        announce_playing(); 
+
     private:
         vector<Card*> m_cards;
         string        m_name;

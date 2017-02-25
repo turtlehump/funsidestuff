@@ -3,10 +3,10 @@
 Player::~Player()
 {
   for(unsigned int i = 0; i < m_cards.size(); i++)
-  {
     delete m_cards[i];
-  }
+  return;
 }
+
 int Player::hit(Card* new_card)
 {
   m_cards.push_back(new_card);
@@ -21,9 +21,11 @@ int Player::hit(Card* new_card)
 
 void Player::reset_hand()
 {
-  m_cards.clear();
-  cout << m_name << " is waiting for a new hand" << endl;
-  m_cur_playing = false;
+  if(m_cards.size() > 0) //the hand hasnt been reset yet
+  {
+    m_cards.clear();
+    m_cur_playing = false;
+  }
   return;
 }
 
@@ -40,54 +42,48 @@ void Player::print()
   return;
 }
 
+//by the time this function is called the player should already have 2 cards
+int Player::play_blackjack(Deck* deck)
+{
+  cout << m_name << "'s turn to play." << endl;
+  m_cur_playing = true;
+
+  //some stuff here
+
+  m_cur_playing = false;
+  return this->soft_hand_value();
+}
+
 //This should only be called on the dealer player
 void Player::dealer_print()
 {
   cout << "Dealer:";
 
-  if(m_cards.size() == 0)
-  {
-    cout << endl;
-    return;
-  }
-  if(m_cards.size() == 1)
-  {
-    cout << " "; m_cards[0]->print(); cout << endl;
-    return;
-  }
-
-  if(m_cards.size() == 2)
-  {
-    if(m_cur_playing){ //if its the dealers turn to play
-      cout << " "; m_cards[0]->print(); cout << ", "; m_cards[1]->print();}
-    else{
-      cout << " "; m_cards[0]->print(); cout << ", -";}
-  }
-  else //its obviously the dealers turn because they have more than 2 cards, just print the list
+  if(m_cur_playing)
   {
     for(unsigned int i = 0; i < m_cards.size(); i++)
     {
       cout << " "; m_cards[i]->print();
-      if(i < (m_cards.size() - 1))
+      if(i < (m_cards.size() - 1)) //if not the last card
         cout << ",";
     }
+  }
+  else
+  {  
+    if(m_cards.size() == 1){
+      cout << " "; m_cards[0]->print();}
+    if(m_cards.size() == 2){
+      cout << " "; m_cards[0]->print(); cout << ", -";}
   }
   cout << endl;
   return;
 }
 
-int Player::play_blackjack(Deck* deck)
-{
-  //by the time this function is called the player should already have 2 cards
-  cout << m_name << "'s turn to play." << endl;
-  m_cur_playing = true;
-  return this->soft_hand_value();
-}
-
+//This should only be called on the dealer player
 int Player::dealer_play_blackjack(Deck* deck)
 {
   //by the time this function is called the dealer should already have 2 cards
-  cout << m_name << "'s turn to play." << endl;
+  cout << "Dealer's turn to play." << endl;
 
   while(this->soft_hand_value() < 17)
     this->hit(deck->deal_top_card());
@@ -121,3 +117,15 @@ int Player::hard_hand_value()
     hand_value += m_cards[i]->hard_blackjack_value();
   return hand_value;
 }
+
+bool Player::is_playing()
+{
+  return m_cur_playing;
+}
+
+void Player::announce_playing()
+{
+  cout << m_name << " is currenty playing." << endl << endl;
+  return;
+}
+

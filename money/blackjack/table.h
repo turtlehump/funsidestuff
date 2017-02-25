@@ -17,7 +17,8 @@ class Table
         void      set_deck();
         void      get_players();
 
-        void      print(bool final_print);
+        void      print();
+        void      final_print();
 
         void      play_blackjack();
 
