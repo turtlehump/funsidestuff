@@ -99,10 +99,10 @@ void Table::play_hand()
 
   for(unsigned int i = 0; i < m_players.size(); i++)
   {
-    this->play_blackjack(m_players[i]);
+    this->player_play(m_players[i]);
   }
 
-  int dealer_hand_value = m_dealer->dealer_play_blackjack(m_deck);
+  int dealer_hand_value = dealer_play();
 
   this->final_print(); 
   cout << "The dealer got " << dealer_hand_value << endl;
@@ -115,7 +115,7 @@ void Table::play_hand()
   return;
 }
 
-void Table::play_blackjack(Player* player)
+void Table::player_play(Player* player)
 {
   player->start_playing();
   this->playing_print(player);
@@ -123,6 +123,46 @@ void Table::play_blackjack(Player* player)
 
   player->stand();
   return;
+}
+
+int Table::dealer_play()
+{
+  m_dealer->start_playing();
+  this->playing_print(m_dealer);
+  sleep(1);
+
+  //by the time this function is called the dealer should already have 2 cards
+  while(m_dealer->soft_hand_value() < 17)
+  {
+    m_dealer->hit(m_deck->deal_top_card());
+    this->playing_print(m_dealer);
+    sleep(1);
+  }
+  //the soft hand is at least 17
+
+  if(m_dealer->soft_hand_value() == 17 && m_dealer->hard_hand_value() != 17)
+  {
+    m_dealer->hit(m_deck->deal_top_card()); //hit on soft 17
+    this->playing_print(m_dealer);
+    sleep(1);
+  }
+
+  if(m_dealer->soft_hand_value() >= 18 && m_dealer->soft_hand_value() <= 21)
+  {
+    m_dealer->stand();
+    return m_dealer->soft_hand_value();
+  }
+  else //if(m_dealer->soft_hand_value() > 21)
+  {
+    while(m_dealer->hard_hand_value() < 17)
+    {
+      m_dealer->hit(m_deck->deal_top_card());
+      this->playing_print(m_dealer);
+      sleep(1);
+    }
+    m_dealer->stand();
+    return m_dealer->hard_hand_value();
+  }
 }
 
 void Table::starting_deal()

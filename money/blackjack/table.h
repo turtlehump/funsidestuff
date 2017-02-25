@@ -23,7 +23,8 @@ class Table
 
         void      simulation();
         void      play_hand();
-        void      play_blackjack(Player* player);
+        int       dealer_play();
+        void      player_play(Player* player);
 
     private:
         void      starting_deal();
