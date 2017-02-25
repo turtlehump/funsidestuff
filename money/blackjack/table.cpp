@@ -43,25 +43,23 @@ void Table::get_players()
   return;
 }
 
-void Table::print()
+void Table::dealing_print()
 {
   for(int i = 0; i < 59; i++)
     cout << endl;
-  cout << "****TABLE STATUS****" << endl << endl;
+  cout << "****STARTING DEAL****" << endl << endl;
 
-  if(m_dealer->is_playing())
-    m_dealer->announce_playing();
-  else
-  {
-    for(unsigned int i = 0; i < m_players.size(); i++)
-    {
-      if(m_players[i]->is_playing())
-      {
-        m_players[i]->announce_playing();
-        break;
-      }
-    }
-  }
+  //Dealer is on top for display reasons
+  m_dealer->dealer_print();
+  for(unsigned int i = 0; i < m_players.size(); i++)
+    m_players[i]->print();
+}
+
+void Table::playing_print(Player* player)
+{
+  for(int i = 0; i < 59; i++)
+    cout << endl;
+  cout << "****" << player->get_name() << " IS PLAYING****" << endl << endl;
 
   //Dealer is on top for display reasons
   m_dealer->dealer_print();
@@ -83,13 +81,25 @@ void Table::final_print()
   return;
 }
 
-void Table::play_blackjack()
+void Table::simulation()
+{
+  char play_again;
+  do
+  {
+    this->play_hand();
+    cout << "Play again? (y/n) ";
+    cin >> play_again;
+  }while(play_again == 'y' || play_again == 'Y');
+  return;
+}
+
+void Table::play_hand()
 {
   this->starting_deal();
 
   for(unsigned int i = 0; i < m_players.size(); i++)
   {
-    m_players[i]->play_blackjack(m_deck);
+    this->play_blackjack(m_players[i]);
   }
 
   int dealer_hand_value = m_dealer->dealer_play_blackjack(m_deck);
@@ -105,6 +115,16 @@ void Table::play_blackjack()
   return;
 }
 
+void Table::play_blackjack(Player* player)
+{
+  player->start_playing();
+  this->playing_print(player);
+  sleep(1);
+
+  player->stand();
+  return;
+}
+
 void Table::starting_deal()
 {
   //deal two cards to everyone, including the dealer
@@ -114,11 +134,11 @@ void Table::starting_deal()
     {
       sleep(1);
       m_players[i]->hit(m_deck->deal_top_card());
-      this->print();
+      this->dealing_print();
     }
     sleep(1);
     m_dealer->hit(m_deck->deal_top_card()); 
-    this->print();
+    this->dealing_print();
   }
   return;
 }

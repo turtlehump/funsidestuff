@@ -13,7 +13,7 @@ int main()
 
   table->set_deck();
   table->get_players();
-  table->play_blackjack();
+  table->simulation();
 
   delete table;
   return 0;

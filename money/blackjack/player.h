@@ -15,13 +15,19 @@ class Player
         ~Player();
         int         hit(Card* new_card);
         void        reset_hand();
+
         void        print();
         void        dealer_print();
-        int         play_blackjack(Deck* deck);
+
         int         dealer_play_blackjack(Deck* deck);
 
         bool        is_playing();
         void        announce_playing(); 
+
+        string      get_name() {return m_name;}
+
+        void        start_playing() {m_cur_playing = true;}
+        void        stand() {m_cur_playing = false;}
 
     private:
         vector<Card*> m_cards;

@@ -17,10 +17,13 @@ class Table
         void      set_deck();
         void      get_players();
 
-        void      print();
+        void      dealing_print();
+        void      playing_print(Player* player);
         void      final_print();
 
-        void      play_blackjack();
+        void      simulation();
+        void      play_hand();
+        void      play_blackjack(Player* player);
 
     private:
         void      starting_deal();

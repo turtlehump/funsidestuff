@@ -31,6 +31,7 @@ void Player::reset_hand()
 
 void Player::print()
 {
+  (m_cur_playing)? cout << "*": cout << " ";
   cout << m_name << ":";
   for(unsigned int i = 0; i < m_cards.size(); i++)
   {
@@ -42,25 +43,13 @@ void Player::print()
   return;
 }
 
-//by the time this function is called the player should already have 2 cards
-int Player::play_blackjack(Deck* deck)
-{
-  cout << m_name << "'s turn to play." << endl;
-  m_cur_playing = true;
-
-  //some stuff here
-
-  m_cur_playing = false;
-  return this->soft_hand_value();
-}
-
 //This should only be called on the dealer player
 void Player::dealer_print()
 {
-  cout << "Dealer:";
 
   if(m_cur_playing)
   {
+    cout << "*Dealer:";
     for(unsigned int i = 0; i < m_cards.size(); i++)
     {
       cout << " "; m_cards[i]->print();
@@ -70,6 +59,7 @@ void Player::dealer_print()
   }
   else
   {  
+    cout << " Dealer:";
     if(m_cards.size() == 1){
       cout << " "; m_cards[0]->print();}
     if(m_cards.size() == 2){
