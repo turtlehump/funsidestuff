@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "card.h"
+#include "hand.h"
 #include "deck.h"
 #include <iostream>
 #include <string>
@@ -11,13 +12,15 @@ using namespace std;
 class Player
 {
     public:
-        Player(string name) {m_name = name; m_cur_playing = false;}
+        Player(string name) {m_name = name; m_cur_playing = false; m_next_hand = 0;}
         ~Player();
-        int         hit(Card* new_card);
-        void        reset_hand();
+
+        void        add_hand(Hand* new_hand) {m_hands.push_back(new_hand);}
+        void        reset_hands();
+        int         get_num_hands() {return m_hands.size();}
+        Hand*       get_next_hand();
 
         void        print();
-        void        dealer_print();
 
         bool        is_playing() {return m_cur_playing;}
 
@@ -26,11 +29,9 @@ class Player
         void        start_playing() {m_cur_playing = true;}
         void        stand() {m_cur_playing = false;}
 
-        int         soft_hand_value();
-        int         hard_hand_value();
-
     private:
-        vector<Card*> m_cards;
+        vector<Hand*> m_hands;
+        unsigned int  m_next_hand;
         string        m_name;
         int           m_money;
         bool          m_cur_playing;

@@ -2,30 +2,15 @@
 
 Player::~Player()
 {
-  for(unsigned int i = 0; i < m_cards.size(); i++)
-    delete m_cards[i];
-  return;
+  for(unsigned int i = 0; i < m_hands.size(); i++)
+    delete m_hands[i];
 }
 
-int Player::hit(Card* new_card)
+void Player::reset_hands()
 {
-  m_cards.push_back(new_card);
-  int hand_value = 0;
-/*
-  for(unsigned int i = 0; i < m_cards.size(); i++)
-    hand_value += m_cards[i]->get_blackjack_value();
-*/
-
-  return hand_value;
-}
-
-void Player::reset_hand()
-{
-  if(m_cards.size() > 0) //the hand hasnt been reset yet
-  {
-    m_cards.clear();
-    m_cur_playing = false;
-  }
+  for(unsigned int i = 0; i < m_hands.size(); i++)
+    delete m_hands[i];
+  m_hands.clear();
   return;
 }
 
@@ -33,54 +18,28 @@ void Player::print()
 {
   (m_cur_playing)? cout << "*": cout << " ";
   cout << m_name << ":";
-  for(unsigned int i = 0; i < m_cards.size(); i++)
+  for(unsigned int i = 0; i < m_hands.size(); i++)
   {
-    cout << " "; m_cards[i]->print();
-    if(i < (m_cards.size() - 1))
-      cout << ",";
-  }
-  cout << endl;
-  return;
-}
-
-//This should only be called on the dealer player
-void Player::dealer_print()
-{
-
-  if(m_cur_playing)
-  {
-    cout << "*Dealer:";
-    for(unsigned int i = 0; i < m_cards.size(); i++)
+    if(i > 0)
     {
-      cout << " "; m_cards[i]->print();
-      if(i < (m_cards.size() - 1)) //if not the last card
-        cout << ",";
+      cout << endl;
+      for(unsigned int j = 0; j < m_name.size() + 2; j++)
+      //starting space + name + ':'
+        cout << " ";
     }
-  }
-  else
-  {  
-    cout << " Dealer:";
-    if(m_cards.size() == 1){
-      cout << " "; m_cards[0]->print();}
-    if(m_cards.size() == 2){
-      cout << " "; m_cards[0]->print(); cout << ", -";}
+//    (m_hands[i]->is_playing())? cout << "*": cout << " ";
+    cout << i + 1 << " (" << m_hands[i]->get_bet() << "):";
+    m_hands[i]->print();
   }
   cout << endl;
   return;
 }
 
-int Player::soft_hand_value()
+Hand* Player::get_next_hand()
 {
-  int hand_value = 0;
-  for(unsigned int i = 0; i < m_cards.size(); i++)
-    hand_value += m_cards[i]->soft_blackjack_value();
-  return hand_value;
-}
-
-int Player::hard_hand_value()
-{
-  int hand_value = 0;
-  for(unsigned int i = 0; i < m_cards.size(); i++)
-    hand_value += m_cards[i]->hard_blackjack_value();
-  return hand_value;
+  Hand* tmp = m_hands[m_next_hand];
+  m_next_hand++;
+  if(m_next_hand == m_hands.size())
+    m_next_hand = 0;
+  return tmp;
 }
