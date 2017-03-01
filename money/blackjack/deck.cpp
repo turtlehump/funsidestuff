@@ -1,6 +1,4 @@
 #include "deck.h"
-#include <cstdlib>
-#include <ctime>
 
 Deck::Deck(int num_cards)
 {
@@ -50,15 +48,26 @@ vector<Card*> Deck::shuffle()
 
 void Deck::cut()
 {
-  //the cut should be somewhere between the last 10-40% of the deck (60-90% from the front)
-  m_cut = (m_original_card_count / 10) * (6 + (rand() % 4));
+  //the cut should be somewhere between the last 10-40% of the deck
+  //we deal from the back is put it somewhere between the first 10-40%
+  //integer division
+  m_cut = (m_original_card_count / 10) + (rand() % ((m_original_card_count / 10) * 3));
+  //      10%                          + 0-30%
+
   cout << "(the cut is just before " << m_cut << ")" << endl;
   return;
 }
 
 Card* Deck::deal_top_card()
 {
-  Card* top_card = m_deck[0];
-  m_deck.erase(m_deck.begin());
+  sleep(1);
+  Card* top_card = m_deck[m_deck.size() - 1];
+  /*
+  cout << endl << "got the top card";
+  top_card->print();
+  cout << endl << "printed top card";
+  */
+  m_deck.erase(m_deck.end() - 1);
+  //cout << endl << "erasd the end";
   return top_card;
 }

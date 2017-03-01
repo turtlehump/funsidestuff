@@ -11,6 +11,8 @@ Table::~Table()
 void Table::set_deck()
 {
   int num_decks;
+  for(int i = 0; i < 59; i++)
+    cout << endl;
   cout << "How many decks are we going to use? ";
   cin >> num_decks;
 
@@ -25,6 +27,8 @@ void Table::set_deck()
 void Table::get_players()
 {
   int num_players;
+  for(int i = 0; i < 59; i++)
+    cout << endl;
   cout << "How many players are at the table? ";
   cin >> num_players;
   cout << endl;
@@ -88,6 +92,8 @@ void Table::set_hands_for_players()
 {
   int num_hands;
   int bet;
+  for(int i = 0; i < 59; i++)
+    cout << endl;
   for(unsigned int i = 0; i < m_players.size(); i++)
   {
     cout << "How many hands does " << m_players[i]->get_name() << " want to play? ";
@@ -112,12 +118,10 @@ void Table::starting_deal()
       int num_hands_for_player = m_players[i]->get_num_hands();
       for(int j = 0; j < num_hands_for_player; j++)
       {
-        sleep(1);
         m_players[i]->get_next_hand()->hit(m_deck->deal_top_card());
         this->dealing_print();
       }
     }
-    sleep(1);
     m_dealer->hit(m_deck->deal_top_card()); 
     this->dealing_print();
   }
@@ -127,35 +131,59 @@ void Table::starting_deal()
 void Table::player_play(Player* player)
 {
   player->start_playing();
-  this->playing_print(player->get_name());
-  sleep(1);
 
-  //some stuff
-
+  int hand_num = 1;
+  Hand* playing_hand = player->get_next_hand();
+  while(playing_hand)
+  {
+    playing_hand->start_playing();
+    this->hand_play(playing_hand, player->get_name(), hand_num);
+    playing_hand = player->get_next_hand();
+    hand_num++;
+  }
   player->stand();
   return;
+}
+
+int Table::hand_play(Hand* hand, string player_name, int hand_num)
+{
+  int option = 0;
+  do
+  {
+    this->playing_print(player_name, hand_num);
+    sleep(1);
+    cout << endl;
+    cout << "What do you want to do? " << endl;
+    cout << "1) hit" << endl;
+    cout << "2) stand" << endl;
+
+    cin >> option;
+
+    if(option == 1)
+      hand->hit(m_deck->deal_top_card());
+
+  }while(option != 2);
+
+  return hand->stand();
 }
 
 int Table::dealer_play()
 {
   m_dealer->start_playing();
-  this->playing_print("Dealer");
-  sleep(1);
+  this->playing_print("Dealer", 1);
 
   //by the time this function is called the dealer should already have 2 cards
   while(m_dealer->soft_hand_value() < 17)
   {
     m_dealer->hit(m_deck->deal_top_card());
-    this->playing_print("Dealer");
-    sleep(1);
+    this->playing_print("Dealer", 1);
   }
   //the soft hand is at least 17
 
   if(m_dealer->soft_hand_value() == 17 && m_dealer->hard_hand_value() != 17)
   {
     m_dealer->hit(m_deck->deal_top_card()); //hit on soft 17
-    this->playing_print("Dealer");
-    sleep(1);
+    this->playing_print("Dealer", 1);
   }
 
   if(m_dealer->soft_hand_value() >= 18 && m_dealer->soft_hand_value() <= 21)
@@ -168,8 +196,7 @@ int Table::dealer_play()
     while(m_dealer->hard_hand_value() < 17)
     {
       m_dealer->hit(m_deck->deal_top_card());
-      this->playing_print("Dealer");
-      sleep(1);
+      this->playing_print("Dealer", 1);
     }
     m_dealer->done_playing();
     return m_dealer->hard_hand_value();
@@ -190,12 +217,12 @@ void Table::dealing_print()
     m_players[i]->print();
 }
 
-void Table::playing_print(string name)
+void Table::playing_print(string name, int hand_num)
 {
   bool final_print = false;
   for(int i = 0; i < 59; i++)
     cout << endl;
-  cout << "****" << name << " IS PLAYING****" << endl << endl;
+  cout << "****" << name << " IS PLAYING: HAND " << hand_num << "****" << endl << endl;
 
   //Dealer is on top for display reasons
   m_dealer->print(final_print);

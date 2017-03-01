@@ -27,6 +27,8 @@ int Hand::hit(Card* new_card)
 
 int Hand::stand()
 {
+  m_cur_playing = false;
+  m_completed = true;
   int soft_value = this->soft_value();
 
   if(soft_value > 21)
@@ -54,6 +56,7 @@ void Hand::print()
     if(i < (m_cards.size() - 1)) //if not the last card
       cout << ",";
   }
+
   return;
 }
 
@@ -87,6 +90,7 @@ int Hand::hard_value()
     hand_value += m_cards[i]->hard_blackjack_value();
   return hand_value;
 }
+
 
 int Hand::determine_payout(int dealers_hand_value)
 {

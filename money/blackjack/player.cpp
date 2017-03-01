@@ -8,6 +8,7 @@ Player::~Player()
 
 void Player::reset_hands()
 {
+  m_next_hand = 0;
   for(unsigned int i = 0; i < m_hands.size(); i++)
     delete m_hands[i];
   m_hands.clear();
@@ -27,7 +28,7 @@ void Player::print()
       //starting space + name + ':'
         cout << " ";
     }
-//    (m_hands[i]->is_playing())? cout << "*": cout << " ";
+    (m_hands[i]->is_playing())? cout << "*": cout << " ";
     cout << i + 1 << " (" << m_hands[i]->get_bet() << "):";
     m_hands[i]->print();
   }
@@ -37,9 +38,14 @@ void Player::print()
 
 Hand* Player::get_next_hand()
 {
+  if(m_next_hand == m_hands.size())
+  {
+    if(m_hands[m_next_hand - 1]->is_completed())
+      return NULL;
+    else
+      m_next_hand = 0;
+  }
   Hand* tmp = m_hands[m_next_hand];
   m_next_hand++;
-  if(m_next_hand == m_hands.size())
-    m_next_hand = 0;
   return tmp;
 }
