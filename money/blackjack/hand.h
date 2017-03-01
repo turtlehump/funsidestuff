@@ -23,13 +23,16 @@ class Hand
         void    print();
         void    dealer_print(bool is_playing, bool final_print);
 
+        int     value();
         int     soft_value();
         int     hard_value();
 
         int     determine_payout(int dealers_hand_value);
 
+
         int     get_bet()       {return m_bet;}
         bool    is_playing()    {return m_cur_playing;}
+        bool    has_bust()      {return m_bust;}
         bool    is_completed()  {return m_completed;}
         void    start_playing() {m_cur_playing = true;}
 

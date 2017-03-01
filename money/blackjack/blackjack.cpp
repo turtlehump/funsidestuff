@@ -11,8 +11,7 @@ int main()
 {
   Table* table = new Table();
 
-  table->set_deck();
-  table->get_players();
+  table->setup_game();
   table->simulation();
 
   delete table;

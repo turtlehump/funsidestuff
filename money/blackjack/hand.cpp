@@ -18,9 +18,10 @@ int Hand::hit(Card* new_card)
     if(hard_value > 21)
     {
       m_bust = true;
-      return 0;
+      m_cur_playing = false;
+      m_completed = true;
     }
-    else return hard_value;
+    return hard_value;
   }
   else return soft_value;
 } 
@@ -29,12 +30,7 @@ int Hand::stand()
 {
   m_cur_playing = false;
   m_completed = true;
-  int soft_value = this->soft_value();
-
-  if(soft_value > 21)
-    return this->hard_value();
-
-  else return soft_value;
+  return this->value();
 }
 
 //you can only split as your first action
@@ -56,6 +52,7 @@ void Hand::print()
     if(i < (m_cards.size() - 1)) //if not the last card
       cout << ",";
   }
+  (m_bust)? cout << "\t[BUST]": cout << "\t[" << this->value() << "]" << endl;
 
   return;
 }
@@ -73,6 +70,14 @@ void Hand::dealer_print(bool is_playing, bool final_print)
       cout << " "; m_cards[0]->print(); cout << ", -";}
   }
   return;
+}
+
+int Hand::value()
+{
+  int soft_value = this->soft_value();
+
+  if(soft_value > 21) return this->hard_value();
+  else                return soft_value;
 }
 
 int Hand::soft_value()
