@@ -6,6 +6,7 @@ Player::Player(string name)
   m_cur_playing = false;
   m_next_hand = 0;
   m_money = 300;
+  return;
 }
 
 Player::Player(string name, int money)
@@ -14,12 +15,14 @@ Player::Player(string name, int money)
   m_cur_playing = false;
   m_next_hand = 0;
   m_money = money;
+  return;
 }
 
 Player::~Player()
 {
   for(unsigned int i = 0; i < m_hands.size(); i++)
     delete m_hands[i];
+  return;
 }
 
 void Player::reset_hands()
@@ -52,6 +55,13 @@ void Player::print()
   return;
 }
 
+void Player::add_hand(Hand* new_hand)
+{
+  this->take_money(new_hand->get_bet());
+  m_hands.push_back(new_hand);
+  return;
+}
+
 Hand* Player::get_next_hand()
 {
   if(m_next_hand == m_hands.size())
@@ -64,4 +74,25 @@ Hand* Player::get_next_hand()
   Hand* tmp = m_hands[m_next_hand];
   m_next_hand++;
   return tmp;
+}
+
+int Player::determine_payout(int dealers_hand_value)
+{
+  int total_payout = 0;
+  for(unsigned int i = 0; i < m_hands.size(); i++)
+  {
+    if(m_hands[i]->has_bust()) cout << m_name << ": Hand " << i + 1 << ": BUST";
+    else
+    {
+      int hand_value = m_hands[i]->value();
+
+      if(hand_value > dealers_hand_value) cout << m_name << ": Hand " << i + 1 << ": WON";
+      if(hand_value == dealers_hand_value) cout << m_name << ": Hand " << i + 1 << ": PUSHED";
+      if(hand_value < dealers_hand_value) cout << m_name << ": Hand " << i + 1 << ": LOST";
+    }
+
+    cout << endl;
+    total_payout += m_hands[i]->determine_payout(dealers_hand_value);
+  }
+  return total_payout;
 }

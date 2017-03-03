@@ -33,6 +33,8 @@ class Table
 
         int       dealer_play();
 
+        void      pay_winners(int dealer_hand_value);
+
         void      dealing_print();
         void      playing_print(string name, int hand_num);
         void      final_print(int dealer_hand_value);

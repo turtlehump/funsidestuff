@@ -118,13 +118,12 @@ void Table::play_an_entire_hand()
   for(unsigned int i = 0; i < m_players.size(); i++)
     this->player_play(m_players[i]);
 
-  this->final_print(dealer_play()); 
-
-  cout << endl;
+  int dealer_hand_value = this->dealer_play();
+  this->final_print(dealer_hand_value); 
 
   //determine winners and pay them
+  this->pay_winners(dealer_hand_value);
 
-  //reset all the hands
   m_dealer->reset_hand();
   for(unsigned int i = 0; i < m_players.size(); i++)
     m_players[i]->reset_hands();
@@ -138,6 +137,11 @@ void Table::set_hands_for_players()
   int bet = 0;
   for(int i = 0; i < 59; i++)
     cout << endl;
+  for(unsigned int i = 0; i < m_players.size(); i++)
+    cout << m_players[i]->get_name() << ": $" << m_players[i]->get_money_count() << endl;
+
+  cout << endl;
+
   for(unsigned int i = 0; i < m_players.size(); i++)
   {
     do{
@@ -334,6 +338,14 @@ void Table::dealing_print()
 
   //this is to kkep it aligned throughout all prints so its easier to track
   cout << endl << endl << endl << endl;
+
+  return;
+}
+
+void Table::pay_winners(int dealer_hand_value)
+{
+  for(unsigned int i = 0; i < m_players.size(); i++)
+    m_players[i]->give_money(m_players[i]->determine_payout(dealer_hand_value));
 
   return;
 }

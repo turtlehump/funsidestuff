@@ -72,7 +72,7 @@ void Hand::print()
     if(i < (m_cards.size() - 1)) //if not the last card
       cout << ",";
   }
-  (m_bust)? cout << "\t[BUST]": cout << "\t[" << this->value() << "]" << endl;
+  (m_bust)? cout << "\t[BUST]": cout << "\t[" << this->value() << "]";
 
   return;
 }
@@ -119,9 +119,17 @@ int Hand::hard_value()
   return hand_value;
 }
 
+//This should be called after the hand has been played and we have a real value
 int Hand::determine_payout(int dealers_hand_value)
 {
-  int payout;
-  (m_bust)? payout = 0 : payout = m_bet;
-  return payout;
+  if(m_bust) return 0;
+  if(dealers_hand_value > 21) return 2 * m_bet;
+
+  int value = this->value();
+  if(value > dealers_hand_value)
+    return 2 * m_bet;
+  else if(value == dealers_hand_value)
+    return m_bet;
+  else //if(value < dealer_hand_value)
+    return 0;
 }

@@ -30,12 +30,14 @@ class Player
 
         bool        can_match_bet(int bet)   {return (m_money > bet);}
 
-        void        add_hand(Hand* new_hand) {m_hands.push_back(new_hand);}
+        void        add_hand(Hand* new_hand);
         void        reset_hands();
+
+        void        print();
 
         Hand*       get_next_hand();
 
-        void        print();
+        int         determine_payout(int dealers_hand_value);
 
     private:
         vector<Hand*> m_hands;
