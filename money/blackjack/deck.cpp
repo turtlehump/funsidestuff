@@ -27,7 +27,7 @@ void Deck::print()
     if(i == m_cut)
       cout << "CUT------------CUT" << endl;
 
-    cout << i << ": "; m_deck[i]->print(); cout << endl;
+    cout << i << ": " << m_deck[i]->print() << endl;
   }
   return;
 }

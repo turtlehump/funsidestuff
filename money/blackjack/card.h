@@ -2,15 +2,15 @@
 #define CARD_H
 
 #include <iostream>
-
+#include <string>
 using namespace std;
 
 class Card
 {
     public:
         Card(int value, int suit);
-        void     print();
-        void     print_blackjack();
+        string   print();
+        string   print_blackjack();
         int      soft_blackjack_value();
         int      hard_blackjack_value();
 

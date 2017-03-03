@@ -40,12 +40,17 @@ int Hand::double_down(Card* new_card)
   return this->stand();
 }
 
+//you can only split as your first action
+//you are guaranteed to have 2 cards
 bool Hand::can_split()
 {
-  if(m_cards.size() != 2)
+  if(m_cards.size() == 2)
+  {
+    if(m_cards[0]->print_blackjack() == m_cards[1]->print_blackjack())
+    return true;
+  }
+  //else
     return false;
-  
-  return true;
 }
 
 //you can only split as your first action
@@ -68,7 +73,7 @@ void Hand::print()
 {
   for(unsigned int i = 0; i < m_cards.size(); i++)
   {
-    cout << " "; m_cards[i]->print();
+    cout << " " << m_cards[i]->print();
     if(i < (m_cards.size() - 1)) //if not the last card
       cout << ",";
   }
@@ -85,9 +90,9 @@ void Hand::dealer_print(bool is_playing, bool final_print)
     //if(m_cards.size() == 0)
     //  do nothing;
     if(m_cards.size() == 1){
-      cout << " "; m_cards[0]->print();}
+      cout << " " << m_cards[0]->print();}
     if(m_cards.size() == 2){
-      cout << " "; m_cards[0]->print(); cout << ", -";}
+      cout << " " << m_cards[0]->print() << ", -";}
   }
   return;
 }
@@ -122,7 +127,7 @@ int Hand::hard_value()
 //This should be called after the hand has been played and we have a real value
 int Hand::determine_payout(int dealers_hand_value)
 {
-  if(m_bust) return 0;
+  if(m_bust) return 0; //you would have busted before the dealer
   if(dealers_hand_value > 21) return 2 * m_bet;
 
   int value = this->value();

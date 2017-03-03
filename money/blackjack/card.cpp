@@ -29,53 +29,55 @@ Card::Card(int value, int suit)
   }
 }
 
-void Card::print()
+string Card::print()
 {
+  string tmp;
   switch(m_value)
   {
-    case ACE:   cout << "A";  break;
-    case TWO:   cout << "2";  break;
-    case THREE: cout << "3";  break;
-    case FOUR:  cout << "4";  break;
-    case FIVE:  cout << "5";  break;
-    case SIX:   cout << "6";  break;
-    case SEVEN: cout << "7";  break;
-    case EIGHT: cout << "8";  break;
-    case NINE:  cout << "9";  break;
-    case TEN:   cout << "10"; break;
-    case JACK:  cout << "J";  break;
-    case QUEEN: cout << "Q";  break;
-    case KING:  cout << "K";  break;
+    case ACE:   tmp = "A";  break;
+    case TWO:   tmp = "2";  break;
+    case THREE: tmp = "3";  break;
+    case FOUR:  tmp = "4";  break;
+    case FIVE:  tmp = "5";  break;
+    case SIX:   tmp = "6";  break;
+    case SEVEN: tmp = "7";  break;
+    case EIGHT: tmp = "8";  break;
+    case NINE:  tmp = "9";  break;
+    case TEN:   tmp = "10"; break;
+    case JACK:  tmp = "J";  break;
+    case QUEEN: tmp = "Q";  break;
+    case KING:  tmp = "K";  break;
   }
   switch(m_suit)
   {
-    case SPADES: cout << "s";   break;
-    case DIAMONDS: cout << "d"; break;
-    case CLUBS: cout << "c";    break;
-    case HEARTS: cout << "h";   break;
+    case SPADES:   tmp += "s"; break;
+    case DIAMONDS: tmp += "d"; break;
+    case CLUBS:    tmp += "c"; break;
+    case HEARTS:   tmp += "h"; break;
   }
-  return;
+  return tmp;
 }
 
-void Card::print_blackjack()
+string Card::print_blackjack()
 {
+  string tmp;
   switch(m_value)
   {
-    case ACE:   cout << "A";  break;
-    case TWO:   cout << "2";  break;
-    case THREE: cout << "3";  break;
-    case FOUR:  cout << "4";  break;
-    case FIVE:  cout << "5";  break;
-    case SIX:   cout << "6";  break;
-    case SEVEN: cout << "7";  break;
-    case EIGHT: cout << "8";  break;
-    case NINE:  cout << "9";  break;
-    case TEN:   cout << "10"; break;
-    case JACK:  cout << "J";  break;
-    case QUEEN: cout << "Q";  break;
-    case KING:  cout << "K";  break;
+    case ACE:   tmp = "A";  break;
+    case TWO:   tmp = "2";  break;
+    case THREE: tmp = "3";  break;
+    case FOUR:  tmp = "4";  break;
+    case FIVE:  tmp = "5";  break;
+    case SIX:   tmp = "6";  break;
+    case SEVEN: tmp = "7";  break;
+    case EIGHT: tmp = "8";  break;
+    case NINE:  tmp = "9";  break;
+    case TEN:   tmp = "10"; break;
+    case JACK:  tmp = "J";  break;
+    case QUEEN: tmp = "Q";  break;
+    case KING:  tmp = "K";  break;
   }
-  return;
+  return tmp;
 }
 
 int Card::soft_blackjack_value()

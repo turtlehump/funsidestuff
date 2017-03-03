@@ -86,9 +86,12 @@ int Player::determine_payout(int dealers_hand_value)
     {
       int hand_value = m_hands[i]->value();
 
-      if(hand_value > dealers_hand_value) cout << m_name << ": Hand " << i + 1 << ": WON";
-      if(hand_value == dealers_hand_value) cout << m_name << ": Hand " << i + 1 << ": PUSHED";
-      if(hand_value < dealers_hand_value) cout << m_name << ": Hand " << i + 1 << ": LOST";
+      if(dealers_hand_value > 21 || hand_value > dealers_hand_value)  
+        cout << m_name << ": Hand " << i + 1 << ": WON";
+      else if(hand_value == dealers_hand_value)
+        cout << m_name << ": Hand " << i + 1 << ": PUSHED";
+      else if(hand_value < dealers_hand_value)
+        cout << m_name << ": Hand " << i + 1 << ": LOST";
     }
 
     cout << endl;
