@@ -24,6 +24,15 @@ void Table::simulation()
     cout << "Play again? (y/n) ";
     cin >> play_again;
   }while(play_again == "y" || play_again == "Y");
+
+  cout << endl;
+  for(unsigned int i = 0; i < m_players.size(); i++)
+  {
+    cout << m_players[i]->get_name() << " ended with " << m_players[i]->get_money_count();
+    cout << endl;
+  }
+  cout << endl;
+
   return;
 }
 
@@ -264,8 +273,15 @@ int Table::hand_play(Hand* hand, Player* player, int hand_num)
       case 4:
         if(hand->can_split())
         {
-          cout << endl << "not implemented yet" << endl << endl;
-          sleep(1);
+          int bet = hand->get_bet();
+          if(player->can_match_bet(bet))
+            player->add_hand(hand->split(m_deck));
+          else
+          {
+            cout << endl << "You do not have enough to split on this bet (";
+            cout << bet << ")." << endl << endl;
+            sleep(1);
+          }
         }
         else
         {

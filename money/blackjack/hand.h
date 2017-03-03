@@ -2,6 +2,7 @@
 #define HAND_H
 
 #include "card.h"
+#include "deck.h"
 #include <iostream>
 #include <vector>
 #include <unistd.h>
@@ -21,7 +22,7 @@ class Hand
         //you can only split as your first action
         //you are guaranteed to have 2 cards
         bool    can_split();
-        Hand*   split();
+        Hand*   split(Deck* deck);
 
         void    print();
         void    dealer_print(bool is_playing, bool final_print);

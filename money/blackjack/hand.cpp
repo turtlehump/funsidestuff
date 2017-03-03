@@ -57,7 +57,7 @@ bool Hand::can_split()
 //you are guaranteed to have 2 cards
 //the 2 cards are guaranteed to have the same value
 //take a card from current hand and make a new hand with it.
-Hand* Hand::split()
+Hand* Hand::split(Deck* deck)
 {
   Hand* new_hand = new Hand(m_bet);
 
@@ -65,6 +65,9 @@ Hand* Hand::split()
   m_cards.erase(m_cards.begin() + 1);
 
   new_hand->hit(tmp);
+
+  this->hit(deck->deal_top_card());
+  new_hand->hit(deck->deal_top_card());
 
   return new_hand;
 }
