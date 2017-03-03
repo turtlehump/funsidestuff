@@ -23,13 +23,13 @@ class Table
         void      set_deck();
         void      get_players();
 
-        void      play_a_hand();
+        void      play_an_entire_hand();
 
         void      set_hands_for_players();
         void      starting_deal();
 
         void      player_play(Player* player);
-        int       hand_play(Hand* hand, string player_name, int hand_num);
+        int       hand_play(Hand* hand, Player* player, int hand_num);
 
         int       dealer_play();
 

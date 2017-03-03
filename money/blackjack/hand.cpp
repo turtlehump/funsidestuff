@@ -33,15 +33,35 @@ int Hand::stand()
   return this->value();
 }
 
+int Hand::double_down(Card* new_card)
+{
+  m_bet *= 2;
+  m_cards.push_back(new_card);
+  return this->stand();
+}
+
+bool Hand::can_split()
+{
+  if(m_cards.size() != 2)
+    return false;
+  
+  return true;
+}
+
 //you can only split as your first action
 //you are guaranteed to have 2 cards
 //the 2 cards are guaranteed to have the same value
-//take a card from current hand and return it so you cam make a new hand with it.
-Card* Hand::split()
+//take a card from current hand and make a new hand with it.
+Hand* Hand::split()
 {
+  Hand* new_hand = new Hand(m_bet);
+
   Card* tmp = m_cards[1];
   m_cards.erase(m_cards.begin() + 1);
-  return tmp;
+
+  new_hand->hit(tmp);
+
+  return new_hand;
 }
 
 void Hand::print()
@@ -76,8 +96,10 @@ int Hand::value()
 {
   int soft_value = this->soft_value();
 
-  if(soft_value > 21) return this->hard_value();
-  else                return soft_value;
+  if(soft_value > 21)
+    return this->hard_value();
+  else
+    return soft_value;
 }
 
 int Hand::soft_value()
@@ -93,9 +115,9 @@ int Hand::hard_value()
   int hand_value = 0;
   for(unsigned int i = 0; i < m_cards.size(); i++)
     hand_value += m_cards[i]->hard_blackjack_value();
+  if(hand_value > 21) m_bust = true;
   return hand_value;
 }
-
 
 int Hand::determine_payout(int dealers_hand_value)
 {

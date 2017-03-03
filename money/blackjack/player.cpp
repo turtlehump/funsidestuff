@@ -1,5 +1,21 @@
 #include "player.h"
 
+Player::Player(string name)
+{
+  m_name = name;
+  m_cur_playing = false;
+  m_next_hand = 0;
+  m_money = 300;
+}
+
+Player::Player(string name, int money)
+{
+  m_name = name;
+  m_cur_playing = false;
+  m_next_hand = 0;
+  m_money = money;
+}
+
 Player::~Player()
 {
   for(unsigned int i = 0; i < m_hands.size(); i++)

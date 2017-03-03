@@ -16,9 +16,12 @@ class Hand
 
         int     hit(Card* new_card);
         int     stand();
+        bool    can_double_down()  {return (m_cards.size() < 3);}
+        int     double_down(Card* new_card);
         //you can only split as your first action
         //you are guaranteed to have 2 cards
-        Card*   split();
+        bool    can_split();
+        Hand*   split();
 
         void    print();
         void    dealer_print(bool is_playing, bool final_print);
