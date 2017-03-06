@@ -35,9 +35,11 @@ class Table
 
         void      pay_winners(int dealer_hand_value);
 
-        void      dealing_print();
-        void      playing_print(string name, int hand_num);
-        void      final_print(int dealer_hand_value);
+        void      table_dealing_print();
+        void      table_playing_print(string name, int hand_num);
+        void      table_final_print(int dealer_hand_value);
+
+        void      player_ending_money_print();
 
         int             m_min_bet;
         int             m_max_bet;
