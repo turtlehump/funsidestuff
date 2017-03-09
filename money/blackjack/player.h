@@ -13,7 +13,7 @@ class Player
 {
     public:
         Player(string name);
-        Player(string name, int money);
+        Player(string name, double money);
         ~Player();
 
         string      get_name()               {return m_name;}
@@ -24,26 +24,30 @@ class Player
 
         int         get_num_hands()          {return m_hands.size();}
 
-        int         get_money_count()        {return m_money;}
-        void        take_money(int money)    {m_money -= money;}
-        void        give_money(int money)    {m_money += money;}
+        double      get_money_count()        {return m_money;}
+        void        take_money(double money) {m_money -= money;}
+        void        give_money(double money) {m_money += money;}
 
-        bool        can_match_bet(int bet)   {return (m_money > bet);}
+        bool        can_match_bet(double bet) {return (m_money > bet);}
 
         void        add_hand(Hand* new_hand);
         void        reset_hands();
+
+        void        set_insurance();
+        double      get_insurance() {return m_insurance;}
 
         void        print();
 
         Hand*       get_next_hand();
 
-        int         determine_payout(int dealers_hand_value);
+        double      determine_payout(int dealers_hand_value);
 
     private:
         vector<Hand*> m_hands;
         unsigned int  m_next_hand;
         string        m_name;
-        int           m_money;
+        double        m_money;
+        double        m_insurance;
         bool          m_cur_playing;
 };
 #endif

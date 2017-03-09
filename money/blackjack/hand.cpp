@@ -141,3 +141,17 @@ int Hand::determine_payout(int dealers_hand_value)
   else //if(value < dealer_hand_value)
     return 0;
 }
+
+bool Hand::is_first_card_ace()
+{
+  if(m_cards.size() == 0 || m_cards[0]->get_value() != ACE)
+    return false;
+  return true;
+}
+
+bool Hand::is_blackjack()
+{
+  if(m_cards.size() == 2 && this->soft_value() == 21)
+    return true;
+  return false;
+}

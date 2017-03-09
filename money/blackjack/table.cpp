@@ -115,11 +115,34 @@ void Table::get_players()
   return;
 }
 
+/*vvvvvvvvv THE BEEF vvvvvvvvv*/
 void Table::play_an_entire_hand()
 {
   this->set_hands_for_players();
 
   this->starting_deal();
+
+  if(m_dealer->should_offer_insurance())
+  {
+    for(unsigned int i = 0; i < m_players.size(); i++)
+      m_players[i]->set_insurance();
+
+    if(m_dealer->got_blackjack())
+    {
+      this->table_final_print(21);
+
+      //payout insurance (2:1 plus the bet back)
+      for(unsigned int i = 0; i < m_players.size(); i++)
+        m_players[i]->give_money(3 * m_players[i]->get_insurance());
+
+      //new hand right away
+      m_dealer->reset_hand();
+      for(unsigned int i = 0; i < m_players.size(); i++)
+        m_players[i]->reset_hands();
+
+      return;
+    }
+  }
 
   for(unsigned int i = 0; i < m_players.size(); i++)
     this->player_play(m_players[i]);
@@ -136,6 +159,7 @@ void Table::play_an_entire_hand()
 
   return;
 }
+/*^^^^^^^^^ THE BEEF ^^^^^^^^^*/
 
 void Table::set_hands_for_players()
 {
@@ -407,7 +431,7 @@ void Table::table_final_print(int dealer_hand_value)
   if(dealer_hand_value > 21)
     cout << " (BUST!)";
 
-  //this is to kkep it aligned throughout all prints so its easier to track
+  //this is to keep it aligned throughout all prints so its easier to track
   cout << endl << endl;
 
   return;

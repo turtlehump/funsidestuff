@@ -33,12 +33,14 @@ class Hand
 
         int     determine_payout(int dealers_hand_value);
 
-
         int     get_bet()       {return m_bet;}
         bool    is_playing()    {return m_cur_playing;}
         bool    has_bust()      {return m_bust;}
         bool    is_completed()  {return m_completed;}
         void    start_playing() {m_cur_playing = true;}
+
+        bool    is_first_card_ace();
+        bool    is_blackjack();
 
     private:
         int           m_bet;

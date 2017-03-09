@@ -15,8 +15,3 @@ void Dealer::print(bool final_print)
 
   return;
 }
-
-int Dealer::hit(Card* new_card)
-{
-  return m_hand->hit(new_card);
-}
