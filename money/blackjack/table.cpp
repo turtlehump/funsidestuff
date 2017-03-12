@@ -227,8 +227,11 @@ void Table::player_play(Player* player)
   Hand* playing_hand = player->get_next_hand();
   while(playing_hand)
   {
-    playing_hand->start_playing();
-    this->hand_play(playing_hand, player, hand_num);
+    if(!playing_hand->is_blackjack()) 
+    {
+      playing_hand->start_playing();
+      this->hand_play(playing_hand, player, hand_num);
+    }
     playing_hand = player->get_next_hand();
     hand_num++;
   }
@@ -319,7 +322,7 @@ int Table::hand_play(Hand* hand, Player* player, int hand_num)
         sleep(1);
      }
 
-  }while(!hand->has_bust());
+  }while(!hand->has_bust() && hand->value() != 21);
 
   this->table_playing_print(player->get_name(), hand_num);
 
