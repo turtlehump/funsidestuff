@@ -211,7 +211,7 @@ void Table::starting_deal()
       int num_hands_for_player = m_players[i]->get_num_hands();
       for(int j = 0; j < num_hands_for_player; j++)
       {
-        m_players[i]->get_next_hand()->hit(m_deck->deal_top_card());
+        m_players[i]->get_next_hand(true)->hit(m_deck->deal_top_card());
         this->table_dealing_print();
       }
     }
@@ -227,7 +227,11 @@ void Table::player_play(Player* player)
   player->start_playing();
 
   int hand_num = 1; //used for anouncing
-  Hand* playing_hand = player->get_next_hand();
+
+  Hand* playing_hand = player->get_next_hand(true);
+  //need to revert back to the starting hand,
+  //just like we were still dealing the starting cards
+
   while(playing_hand)
   {
     if(!playing_hand->is_blackjack()) 
@@ -235,7 +239,7 @@ void Table::player_play(Player* player)
       playing_hand->start_playing();
       this->hand_play(playing_hand, player, hand_num);
     }
-    playing_hand = player->get_next_hand();
+    playing_hand = player->get_next_hand(false);
     hand_num++;
   }
   player->stand();

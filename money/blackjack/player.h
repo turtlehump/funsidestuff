@@ -31,7 +31,7 @@ class Player
         bool        can_match_bet(double bet) {return (m_money > bet);}
 
         void        add_hand(Hand* new_hand);
-        Hand*       get_next_hand();
+        Hand*       get_next_hand(bool still_dealing_starting_cards);
         bool        all_hands_are_bust();
         void        reset_hands();
 

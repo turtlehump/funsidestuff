@@ -32,16 +32,19 @@ void Player::add_hand(Hand* new_hand)
   return;
 }
 
-Hand* Player::get_next_hand()
+Hand* Player::get_next_hand(bool still_dealing_starting_cards)
 {
   if(m_hands.size() == 0)
     return NULL;
+
   if(m_next_hand == m_hands.size())
+  //because we store the index of the next-hand-we-should-return
+  //and valid indexes go to (size() - 1)
   {
-    if(m_hands[m_next_hand - 1]->is_completed())
-      return NULL;
-    else
+    if(still_dealing_starting_cards)
       m_next_hand = 0;
+    else
+      return NULL;
   }
   Hand* tmp = m_hands[m_next_hand];
   m_next_hand++;
