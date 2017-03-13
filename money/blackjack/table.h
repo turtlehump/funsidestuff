@@ -31,6 +31,7 @@ class Table
         void      player_play(Player* player);
         int       hand_play(Hand* hand, Player* player, int hand_num);
 
+        bool      dealer_should_play();
         int       dealer_play();
 
         void      pay_winners(int dealer_hand_value);

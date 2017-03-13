@@ -31,14 +31,14 @@ class Player
         bool        can_match_bet(double bet) {return (m_money > bet);}
 
         void        add_hand(Hand* new_hand);
+        Hand*       get_next_hand();
+        bool        all_hands_are_bust();
         void        reset_hands();
 
         void        set_insurance();
         double      get_insurance() {return m_insurance;}
 
         void        print();
-
-        Hand*       get_next_hand();
 
         double      determine_payout(int dealers_hand_value);
 

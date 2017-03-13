@@ -25,6 +25,41 @@ Player::~Player()
   return;
 }
 
+void Player::add_hand(Hand* new_hand)
+{
+  this->take_money(new_hand->get_bet());
+  m_hands.push_back(new_hand);
+  return;
+}
+
+Hand* Player::get_next_hand()
+{
+  if(m_hands.size() == 0)
+    return NULL;
+  if(m_next_hand == m_hands.size())
+  {
+    if(m_hands[m_next_hand - 1]->is_completed())
+      return NULL;
+    else
+      m_next_hand = 0;
+  }
+  Hand* tmp = m_hands[m_next_hand];
+  m_next_hand++;
+
+  return tmp;
+}
+
+bool Player::all_hands_are_bust()
+{
+  for(unsigned int i = 0; i < m_hands.size(); i++)
+  {
+    if(!m_hands[i]->has_bust())
+      return false;
+  }
+
+  return true;
+}
+
 void Player::reset_hands()
 {
   m_next_hand = 0;
@@ -89,29 +124,6 @@ void Player::print()
   return;
 }
 
-void Player::add_hand(Hand* new_hand)
-{
-  this->take_money(new_hand->get_bet());
-  m_hands.push_back(new_hand);
-  return;
-}
-
-Hand* Player::get_next_hand()
-{
-  if(m_hands.size() == 0)
-    return NULL;
-  if(m_next_hand == m_hands.size())
-  {
-    if(m_hands[m_next_hand - 1]->is_completed())
-      return NULL;
-    else
-      m_next_hand = 0;
-  }
-  Hand* tmp = m_hands[m_next_hand];
-  m_next_hand++;
-
-  return tmp;
-}
 
 double Player::determine_payout(int dealers_hand_value)
 {

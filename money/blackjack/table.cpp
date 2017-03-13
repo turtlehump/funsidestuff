@@ -147,7 +147,10 @@ void Table::play_an_entire_hand()
   for(unsigned int i = 0; i < m_players.size(); i++)
     this->player_play(m_players[i]);
 
-  int dealer_hand_value = this->dealer_play();
+  int dealer_hand_value = 0;
+  if(this->dealer_should_play())
+    dealer_hand_value = this->dealer_play();
+
   this->table_final_print(dealer_hand_value); 
 
   //determine winners and pay them
@@ -327,6 +330,18 @@ int Table::hand_play(Hand* hand, Player* player, int hand_num)
   this->table_playing_print(player->get_name(), hand_num);
 
   return 0;
+}
+
+bool Table::dealer_should_play()
+{
+  for(unsigned int i = 0; i < m_players.size(); i++)
+  {
+    if(!m_players[i]->all_hands_are_bust())
+    //if any hands are not bust
+      return true;
+  }
+  //if all hands by all players are bust
+  return false;
 }
 
 int Table::dealer_play()
