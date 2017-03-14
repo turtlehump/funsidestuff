@@ -34,8 +34,10 @@ class Card
         Card(int value, int suit);
         string   print();
         string   print_blackjack();
+
         int      soft_blackjack_value();
         int      hard_blackjack_value();
+
         CardValue  get_value() {return m_value;}
         CardSuit   get_suit()  {return m_suit;}
 

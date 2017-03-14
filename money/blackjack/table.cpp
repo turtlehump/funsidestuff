@@ -193,6 +193,8 @@ void Table::set_hands_for_players(bool repeat_last_hand)
   {
     this->clear_screen_print();
     this->player_money_print();
+    cout << "Count: " << m_deck->get_count() << endl;
+    cout << "Dealt: " << m_deck->get_cards_dealt() << endl;
     sleep(1);
 
     for(unsigned int i = 0; i < m_players.size(); i++)
@@ -203,6 +205,8 @@ void Table::set_hands_for_players(bool repeat_last_hand)
 
     this->clear_screen_print();
     this->player_money_print();
+    cout << "Count: " << m_deck->get_count() << endl;
+    cout << "Dealt: " << m_deck->get_cards_dealt() << endl;
     cout << endl;
 
     for(unsigned int i = 0; i < m_players.size(); i++)

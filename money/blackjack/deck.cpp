@@ -8,6 +8,10 @@ Deck::Deck(int num_cards)
     Card* new_card = new Card(i % 13, (i / 13) % 4);
     m_deck.push_back(new_card);
   }
+  m_count = 0;
+  m_cards_dealt = 0;
+
+  return;
 }
 
 Deck::~Deck()
@@ -15,6 +19,8 @@ Deck::~Deck()
   for(unsigned int i = 0; i < m_deck.size(); i++)
     delete m_deck[i];
   m_deck.clear();
+
+  return;
 }
 
 void Deck::print()
@@ -26,6 +32,7 @@ void Deck::print()
 
     cout << i << ": " << m_deck[i]->print() << endl;
   }
+
   return;
 }
 
@@ -41,6 +48,7 @@ vector<Card*> Deck::shuffle()
     m_deck.erase(m_deck.begin() + rand_card);
   }
   m_deck = new_deck;
+
   return m_deck;
 }
 
@@ -53,6 +61,7 @@ void Deck::cut()
 
   cout << "(the cut is just before " << m_cut << " cards left)" << endl;
   sleep(3); //to show the cut
+
   return;
 }
 
@@ -75,6 +84,8 @@ Card* Deck::deal_top_card()
       Card* new_card = new Card(i % 13, (i / 13) % 4);
       m_deck.push_back(new_card);
     }
+    m_count = 0;
+    m_cards_dealt = 0;
     cout << "Made new deck, now shuffling and cutting" << endl;
     this->shuffle();
     this->cut();
@@ -82,5 +93,25 @@ Card* Deck::deal_top_card()
 
   Card* top_card = m_deck[m_deck.size() - 1];
   m_deck.erase(m_deck.end() - 1);
+
+  CardValue top_card_value = top_card->get_value();
+  if(top_card_value == TWO   ||
+     top_card_value == THREE ||
+     top_card_value == FOUR  ||
+     top_card_value == FIVE  ||
+     top_card_value == SIX   ||
+     top_card_value == SEVEN)
+    m_count++;
+
+  if(top_card_value == EIGHT ||
+     top_card_value == NINE  ||
+     top_card_value == TEN   ||
+     top_card_value == JACK  ||
+     top_card_value == QUEEN ||
+     top_card_value == KING)
+    m_count--;
+
+  m_cards_dealt++;
+
   return top_card;
 }

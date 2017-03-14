@@ -16,6 +16,8 @@ class Deck
         ~Deck();
 
         void          print();
+        int           get_count()       {return m_count;}
+        int           get_cards_dealt() {return m_cards_dealt;}
 
         vector<Card*> shuffle();
         void          cut();
@@ -26,6 +28,8 @@ class Deck
         vector<Card*>  m_deck;
         int            m_original_card_count;
         unsigned int   m_cut;
+        int            m_count;
+        int            m_cards_dealt;
 };
 #endif
 
