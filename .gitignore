@@ -1,5 +1,6 @@
 */a.out
 *.o
+*.swp
 tmp*
 */tmp/
 /hamspam/hamspam
