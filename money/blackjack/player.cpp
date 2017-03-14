@@ -174,23 +174,35 @@ double Player::determine_payout(int  dealers_hand_value,
         cout << m_name << ": Hand " << i + 1 << ": WON (BLACKJACK)";
         total_payout += m_hands[i]->get_bet() * 2.5;
       }
-      else if(dealers_hand_value > 21 || hand_value > dealers_hand_value)  
-      {
-        cout << m_name << ": Hand " << i + 1 << ": WON";
-        total_payout += m_hands[i]->get_bet() * 2;
-      }
-      else if( (dealer_blackjack && is_blackjack) ||
-               (hand_value == dealers_hand_value))
+      else if(is_blackjack && dealer_blackjack)
       {
         cout << m_name << ": Hand " << i + 1 << ": PUSHED";
         total_payout += m_hands[i]->get_bet();
         //took the bet out of the players money when bet was placed
       }
-      else if( (dealer_blackjack && !is_blackjack) ||
-               (hand_value < dealers_hand_value))
+      else if(!is_blackjack && dealer_blackjack)
       {
         cout << m_name << ": Hand " << i + 1 << ": LOST";
         //total_payout += 0;
+      }
+      else
+      {
+        if(dealers_hand_value > 21 || hand_value > dealers_hand_value)  
+        {
+          cout << m_name << ": Hand " << i + 1 << ": WON";
+          total_payout += m_hands[i]->get_bet() * 2;
+        }
+        else if(hand_value == dealers_hand_value)
+        {
+          cout << m_name << ": Hand " << i + 1 << ": PUSHED";
+          total_payout += m_hands[i]->get_bet();
+          //took the bet out of the players money when bet was placed
+        }
+        else if(hand_value < dealers_hand_value)
+        {
+          cout << m_name << ": Hand " << i + 1 << ": LOST";
+          //total_payout += 0;
+        }
       }
     }
     cout << endl;
