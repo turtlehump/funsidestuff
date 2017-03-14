@@ -147,7 +147,7 @@ void Table::play_an_entire_hand(bool repeat_last_hand)
     for(unsigned int i = 0; i < m_players.size(); i++)
       m_players[i]->set_insurance();
 
-    if(m_dealer->got_blackjack())
+    if(m_dealer->has_blackjack())
     {
       this->table_final_print(21);
 
@@ -420,7 +420,7 @@ int Table::dealer_play()
 void Table::pay_winners(int dealer_hand_value)
 {
   for(unsigned int i = 0; i < m_players.size(); i++)
-    m_players[i]->give_money(m_players[i]->determine_payout(dealer_hand_value));
+    m_players[i]->give_money(m_players[i]->determine_payout(dealer_hand_value, m_dealer->has_blackjack()));
 
   return;
 }
@@ -478,9 +478,10 @@ void Table::table_final_print(int dealer_hand_value)
     m_players[i]->print();
 
   cout << endl;
-  cout << "The dealer got " << dealer_hand_value;
-  if(dealer_hand_value > 21)
-    cout << " (BUST!)";
+
+  cout << "The dealer got ";
+  if(m_dealer->has_blackjack()) cout << "a Blackjack.";
+  else                          cout << dealer_hand_value << ".";
 
   //this is to keep it aligned throughout all prints so its easier to track
   cout << endl << endl;

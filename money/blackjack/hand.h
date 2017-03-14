@@ -11,8 +11,7 @@ using namespace std;
 class Hand
 {
     public:
-        Hand(double bet)
-        {m_bet = bet; m_bust = false; m_cur_playing = false; m_completed = false;}
+        Hand(double bet);
         ~Hand();
 
         int     hit(Card* new_card);
@@ -32,8 +31,6 @@ class Hand
         int     soft_value();
         int     hard_value();
 
-        double  determine_payout(int dealers_hand_value);
-
         double  get_bet()       {return m_bet;}
         bool    is_playing()    {return m_cur_playing;}
         bool    has_bust()      {return m_bust;}
@@ -44,7 +41,8 @@ class Hand
         bool    is_blackjack();
 
         void    print();
-        void    dealer_print(bool is_playing, bool final_print);
+        void    dealer_print(bool is_playing,
+                             bool final_print);
 
     private:
         double        m_bet;

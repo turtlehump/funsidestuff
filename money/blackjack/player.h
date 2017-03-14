@@ -16,35 +16,37 @@ class Player
         Player(string name, double money);
         ~Player();
 
-        string      get_name()               {return m_name;}
+        string  get_name()                {return m_name;}
 
-        bool        is_playing()             {return m_cur_playing;}
-        void        start_playing()          {m_cur_playing = true;}
-        void        stand()                  {m_cur_playing = false;}
+        bool    is_playing()              {return m_cur_playing;}
+        void    start_playing()           {m_cur_playing = true;}
+        void    stand()                   {m_cur_playing = false;}
 
-        int         get_num_hands()          {return m_hands.size();}
+        int     get_num_hands()           {return m_hands.size();}
 
-        double      get_money_count()        {return m_money;}
-        void        take_money(double money) {m_money -= money;}
-        void        give_money(double money) {m_money += money;}
+        double  get_money_count()         {return m_money;}
+        void    take_money(double money)  {m_money -= money;}
+        void    give_money(double money)  {m_money += money;}
 
-        bool        can_match_bet(double bet) {return (m_money > bet);}
+        bool    can_match_bet(double bet) {return (m_money > bet);}
 
-        void        set_hands_and_bet(int num_hands, int bet);
+        void    set_hands_and_bet(int num_hands, 
+                                  int bet);
 
-        void        repeat_last_hand();
+        void    repeat_last_hand();
 
-        void        add_hand(Hand* new_hand);
-        Hand*       get_next_hand(bool still_dealing_starting_cards);
-        bool        all_hands_are_bust();
-        void        reset_hands();
+        void    add_hand(Hand* new_hand);
+        Hand*   get_next_hand(bool still_dealing_starting_cards);
+        bool    all_hands_are_bust();
+        void    reset_hands();
 
-        void        set_insurance();
-        double      get_insurance() {return m_insurance;}
+        void    set_insurance();
+        double  get_insurance() {return m_insurance;}
 
-        void        print();
+        void    print();
 
-        double      determine_payout(int dealers_hand_value);
+        double  determine_payout(int  dealers_hand_value,
+                                 bool dealer_blackjack);
 
     private:
         vector<Hand*> m_hands;

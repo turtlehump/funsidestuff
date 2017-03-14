@@ -29,7 +29,8 @@ Player::~Player()
   return;
 }
 
-void Player::set_hands_and_bet(int num_hands, int bet)
+void Player::set_hands_and_bet(int num_hands,
+                               int bet)
 {
   m_prev_num_hands = num_hands;
   m_prev_bet = bet;
@@ -149,26 +150,48 @@ void Player::print()
 }
 
 
-double Player::determine_payout(int dealers_hand_value)
+double Player::determine_payout(int  dealers_hand_value,
+                                bool dealer_blackjack)
 {
   double total_payout = 0;
   for(unsigned int i = 0; i < m_hands.size(); i++)
   {
-    if(m_hands[i]->has_bust()) cout << m_name << ": Hand " << i + 1 << ": BUST";
+    if(m_hands[i]->has_bust())
+    {
+      cout << m_name << ": Hand " << i + 1 << ": BUST";
+      //total_payout += 0;
+    }
     else
     {
       int hand_value = m_hands[i]->value();
+      bool is_blackjack = m_hands[i]->is_blackjack();
+      //so we dot have to calculate it a bunch of times
 
-      if(dealers_hand_value > 21 || hand_value > dealers_hand_value)  
+      if(is_blackjack && !dealer_blackjack)
+      {
+        cout << m_name << ": Hand " << i + 1 << ": WON (BLACKJACK)";
+        total_payout += m_hands[i]->get_bet() * 2.5;
+      }
+      else if(dealers_hand_value > 21 || hand_value > dealers_hand_value)  
+      {
         cout << m_name << ": Hand " << i + 1 << ": WON";
-      else if(hand_value == dealers_hand_value)
+        total_payout += m_hands[i]->get_bet() * 2;
+      }
+      else if( (dealer_blackjack && is_blackjack) ||
+               (hand_value == dealers_hand_value))
+      {
         cout << m_name << ": Hand " << i + 1 << ": PUSHED";
-      else if(hand_value < dealers_hand_value)
+        total_payout += m_hands[i]->get_bet();
+        //took the bet out of the players money when bet was placed
+      }
+      else if( (dealer_blackjack && !is_blackjack) ||
+               (hand_value < dealers_hand_value))
+      {
         cout << m_name << ": Hand " << i + 1 << ": LOST";
+        //total_payout += 0;
+      }
     }
-
     cout << endl;
-    total_payout += m_hands[i]->determine_payout(dealers_hand_value);
   }
 
   return total_payout;

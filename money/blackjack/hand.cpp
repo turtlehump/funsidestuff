@@ -1,14 +1,27 @@
 #include "hand.h"
 
+Hand::Hand(double bet)
+{
+  m_bet = bet;
+  m_bust = false;
+  m_cur_playing = false;
+  m_completed = false;
+
+  return;
+}
+
 Hand::~Hand()
 {
   for(unsigned int i = 0; i < m_cards.size(); i++)
     delete m_cards[i];
+
+  return;
 }
 
 int Hand::hit(Card* new_card)
 {
   m_cards.push_back(new_card);
+
   return this->value();
 } 
 
@@ -16,6 +29,7 @@ int Hand::stand()
 {
   m_cur_playing = false;
   m_completed = true;
+
   return this->value();
 }
 
@@ -23,6 +37,7 @@ int Hand::double_down(Card* new_card)
 {
   m_bet *= 2;
   m_cards.push_back(new_card);
+
   return this->stand();
 }
 
@@ -70,6 +85,7 @@ int Hand::value()
   {
     m_cur_playing = false;
     m_completed = true;
+
     return soft_value;
   }
 
@@ -86,6 +102,7 @@ int Hand::value()
       m_cur_playing = false;
       m_completed = true;
     }
+
     return hard_value;
   }
 }
@@ -95,6 +112,7 @@ int Hand::soft_value()
   int hand_value = 0;
   for(unsigned int i = 0; i < m_cards.size(); i++)
     hand_value += m_cards[i]->soft_blackjack_value();
+
   return hand_value;
 }
 
@@ -103,29 +121,15 @@ int Hand::hard_value()
   int hand_value = 0;
   for(unsigned int i = 0; i < m_cards.size(); i++)
     hand_value += m_cards[i]->hard_blackjack_value();
+
   return hand_value;
-}
-
-//This should be called after the hand has been played and we have a real value
-double Hand::determine_payout(int dealers_hand_value)
-{
-  if(m_bust) return 0; //you would have busted before the dealer
-  if(this->is_blackjack())    return 2.5 * m_bet;
-  if(dealers_hand_value > 21) return 2 * m_bet;
-
-  int value = this->value();
-  if(value > dealers_hand_value)       //you win
-    return 2 * m_bet;
-  else if(value == dealers_hand_value) //pushed
-    return m_bet;
-  else                                 //you lost
-    return 0;
 }
 
 bool Hand::is_first_card_ace()
 {
   if(m_cards.size() == 0 || m_cards[0]->get_value() != ACE)
     return false;
+
   return true;
 }
 
@@ -133,6 +137,7 @@ bool Hand::is_blackjack()
 {
   if(m_cards.size() == 2 && this->soft_value() == 21)
     return true;
+
   return false;
 }
 
@@ -163,5 +168,6 @@ void Hand::dealer_print(bool is_playing, bool final_print)
     if(m_cards.size() == 2){
       cout << " " << m_cards[0]->print() << ", -";}
   }
+
   return;
 }

@@ -29,7 +29,7 @@ class Dealer
         //this is called after the initial deal
         //gaurenteed to have 2 cards
         bool      should_offer_insurance() {return m_hand->is_first_card_ace();}
-        bool      got_blackjack() {return m_hand->is_blackjack();}
+        bool      has_blackjack() {return m_hand->is_blackjack();}
 
     private:
         Hand* m_hand;
