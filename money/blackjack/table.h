@@ -23,9 +23,9 @@ class Table
         void      set_deck();
         void      get_players();
 
-        void      play_an_entire_hand();
+        void      play_an_entire_hand(bool repeat_last_hand);
 
-        void      set_hands_for_players();
+        void      set_hands_for_players(bool repeat_last_hand);
         void      starting_deal();
 
         void      player_play(Player* player);
@@ -39,8 +39,9 @@ class Table
         void      table_dealing_print();
         void      table_playing_print(string name, int hand_num);
         void      table_final_print(int dealer_hand_value);
+        void      clear_screen_print();
 
-        void      player_ending_money_print();
+        void      player_money_print();
 
         int             m_min_bet;
         int             m_max_bet;

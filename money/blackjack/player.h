@@ -30,6 +30,10 @@ class Player
 
         bool        can_match_bet(double bet) {return (m_money > bet);}
 
+        void        set_hands_and_bet(int num_hands, int bet);
+
+        void        repeat_last_hand();
+
         void        add_hand(Hand* new_hand);
         Hand*       get_next_hand(bool still_dealing_starting_cards);
         bool        all_hands_are_bust();
@@ -44,6 +48,8 @@ class Player
 
     private:
         vector<Hand*> m_hands;
+        int           m_prev_num_hands;
+        int           m_prev_bet;
         unsigned int  m_next_hand;
         string        m_name;
         double        m_money;

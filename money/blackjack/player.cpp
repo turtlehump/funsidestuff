@@ -6,6 +6,8 @@ Player::Player(string name)
   m_cur_playing = false;
   m_next_hand = 0;
   m_money = 300;
+  m_prev_num_hands = 0;
+  m_prev_bet = 0;
   return;
 }
 
@@ -15,6 +17,8 @@ Player::Player(string name, double money)
   m_cur_playing = false;
   m_next_hand = 0;
   m_money = money;
+  m_prev_num_hands = 0;
+  m_prev_bet = 0;
   return;
 }
 
@@ -22,6 +26,21 @@ Player::~Player()
 {
   for(unsigned int i = 0; i < m_hands.size(); i++)
     delete m_hands[i];
+  return;
+}
+
+void Player::set_hands_and_bet(int num_hands, int bet)
+{
+  m_prev_num_hands = num_hands;
+  m_prev_bet = bet;
+  return;
+}
+
+void Player::repeat_last_hand()
+{
+  for(int i = 0; i < m_prev_num_hands; i++)
+    this->add_hand(new Hand(m_prev_bet));
+
   return;
 }
 
@@ -70,6 +89,7 @@ void Player::reset_hands()
     delete m_hands[i];
   m_hands.clear();
   m_insurance = 0;
+
   return;
 }
 
@@ -124,6 +144,7 @@ void Player::print()
     m_hands[i]->print();
   }
   cout << endl;
+
   return;
 }
 

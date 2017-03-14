@@ -20,13 +20,33 @@ void Table::setup_game()
 void Table::simulation()
 {
   string play_again;
-  do{
-    this->play_an_entire_hand();
-    cout << "Play again? (y/n) ";
-    cin >> play_again;
-  }while(play_again == "y" || play_again == "Y");
+  bool repeat_last_hand = false;
 
-  this->player_ending_money_print();
+  do{
+    this->play_an_entire_hand(repeat_last_hand);
+
+    do{
+      cout << "Play again? (y/n/r) ";
+      cin >> play_again;
+
+      if(play_again == "r" || play_again == "R")
+        repeat_last_hand = true;
+      else
+        repeat_last_hand = false;
+
+      if(play_again != "n" && play_again != "N" &&
+         play_again != "y" && play_again != "Y" &&
+         play_again != "r" && play_again != "R" )
+        cout << endl << "That is not a valid option." << endl << endl;
+
+    }while(play_again != "n" && play_again != "N" &&
+           play_again != "y" && play_again != "Y" &&
+           play_again != "r" && play_again != "R" );
+
+  }while(play_again == "y" || play_again == "Y" ||
+         play_again == "r" || play_again == "R" );
+
+  this->player_money_print();
 
   return;
 }
@@ -34,8 +54,8 @@ void Table::simulation()
 void Table::set_table_limits()
 {
   int min = 0, max = 0;
-  for(int i = 0; i < 59; i++)
-    cout << endl;
+
+  this->clear_screen_print();
 
   do{
     cout << "What is the table minimum bet? ";
@@ -64,8 +84,8 @@ void Table::set_table_limits()
 void Table::set_deck()
 {
   int num_decks = 0;
-  for(int i = 0; i < 59; i++)
-    cout << endl;
+
+  this->clear_screen_print();
 
   do{
     cout << "How many decks are we going to use? ";
@@ -85,9 +105,9 @@ void Table::set_deck()
 void Table::get_players()
 {
   int num_players = 0;
-  for(int i = 0; i < 59; i++)
-    cout << endl;
   
+  this->clear_screen_print();
+
   do{
     cout << "How many players are at the table? ";
     cin >> num_players;
@@ -116,9 +136,9 @@ void Table::get_players()
 }
 
 /*vvvvvvvvv THE BEEF vvvvvvvvv*/
-void Table::play_an_entire_hand()
+void Table::play_an_entire_hand(bool repeat_last_hand)
 {
-  this->set_hands_for_players();
+  this->set_hands_for_players(repeat_last_hand);
 
   this->starting_deal();
 
@@ -164,38 +184,50 @@ void Table::play_an_entire_hand()
 }
 /*^^^^^^^^^ THE BEEF ^^^^^^^^^*/
 
-void Table::set_hands_for_players()
+void Table::set_hands_for_players(bool repeat_last_hand)
 {
   int num_hands = 0;;
   int bet = 0;
-  for(int i = 0; i < 59; i++)
+
+  if(repeat_last_hand)
+  {
+    this->clear_screen_print();
+    this->player_money_print();
+    sleep(1);
+
+    for(unsigned int i = 0; i < m_players.size(); i++)
+      m_players[i]->repeat_last_hand();
+  }
+  else //if(!repeat_last_hand)
+  {
+
+    this->clear_screen_print();
+    this->player_money_print();
     cout << endl;
 
-  for(unsigned int i = 0; i < m_players.size(); i++)
-    cout << m_players[i]->get_name() << ": $" << m_players[i]->get_money_count() << endl;
+    for(unsigned int i = 0; i < m_players.size(); i++)
+    {
+      do{
+        cout << "How many hands does " << m_players[i]->get_name() << " want to play? ";
+        cin >> num_hands;
+        if(num_hands < 1)
+          cout << endl << "You must play a positive number of hands." << endl << endl;
+      }while(num_hands < 1);
 
-  cout << endl;
+      do{
+        cout << "And the bet (" << m_min_bet << "-" << m_max_bet << ")? ";
+        cin >> bet;
+        if(bet < m_min_bet)
+          cout << endl << "Table minimum is " << m_min_bet << endl << endl;
+        if(bet > m_max_bet)
+          cout << endl << "Table maximum is " << m_max_bet << endl << endl;
+      }while(bet < m_min_bet || bet > m_max_bet);
 
-  for(unsigned int i = 0; i < m_players.size(); i++)
-  {
-    do{
-      cout << "How many hands does " << m_players[i]->get_name() << " want to play? ";
-      cin >> num_hands;
-      if(num_hands < 1)
-        cout << endl << "You must play a positive number of hands." << endl << endl;
-    }while(num_hands < 1);
+      m_players[i]->set_hands_and_bet(num_hands, bet);
 
-    do{
-      cout << "And the bet (" << m_min_bet << "-" << m_max_bet << ")? ";
-      cin >> bet;
-      if(bet < m_min_bet)
-        cout << endl << "Table minimum is " << m_min_bet << endl << endl;
-      if(bet > m_max_bet)
-        cout << endl << "Table maximum is " << m_max_bet << endl << endl;
-    }while(bet < m_min_bet || bet > m_max_bet);
-
-    for(int j = 0; j < num_hands; j++)
-      m_players[i]->add_hand(new Hand(bet));
+      for(int j = 0; j < num_hands; j++)
+        m_players[i]->add_hand(new Hand(bet));
+    }
   }
 
   return;
@@ -396,8 +428,7 @@ void Table::pay_winners(int dealer_hand_value)
 void Table::table_dealing_print()
 {
   bool final_print = false;
-  for(int i = 0; i < 59; i++)
-    cout << endl;
+  this->clear_screen_print();
   cout << "****STARTING DEAL****" << endl << endl;
 
   //Dealer is on top for display reasons
@@ -415,8 +446,7 @@ void Table::table_dealing_print()
 void Table::table_playing_print(string name, int hand_num)
 {
   bool final_print = false;
-  for(int i = 0; i < 59; i++)
-    cout << endl;
+  this->clear_screen_print();
   if(name == "Dealer")
     cout << "****DEALER IS PLAYING****" << endl << endl;
   else
@@ -438,8 +468,7 @@ void Table::table_playing_print(string name, int hand_num)
 void Table::table_final_print(int dealer_hand_value)
 {
   bool final_print = true;
-  for(int i = 0; i < 59; i++)
-    cout << endl;
+  this->clear_screen_print();
   cout << "****END OF HAND****" << endl << endl;
 
   //Dealer is on top for display reasons
@@ -459,12 +488,20 @@ void Table::table_final_print(int dealer_hand_value)
   return;
 }
 
-void Table::player_ending_money_print()
+void Table::clear_screen_print()
+{
+  for(int i = 0; i < 59; i++)
+    cout << endl;
+
+  return;
+}
+
+void Table::player_money_print()
 {
   cout << endl;
   for(unsigned int i = 0; i < m_players.size(); i++)
   {
-    cout << m_players[i]->get_name() << " ended with " << m_players[i]->get_money_count();
+    cout << m_players[i]->get_name() << ": $" << m_players[i]->get_money_count();
     cout << endl;
   }
   cout << endl;
