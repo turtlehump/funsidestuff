@@ -72,11 +72,13 @@ Hand* Player::get_next_hand(bool still_dealing_starting_cards)
   return tmp;
 }
 
-bool Player::all_hands_are_bust()
+bool Player::all_hands_are_bust_or_blackjack()
 {
   for(unsigned int i = 0; i < m_hands.size(); i++)
   {
-    if(!m_hands[i]->has_bust())
+    if(!(m_hands[i]->has_bust() || m_hands[i]->is_blackjack()))
+  //if(!m_hands[i]->has_bust() && !m_hands[i]->is_blackjack())
+  //these are the same thing, pick whichever way your brain works
       return false;
   }
 

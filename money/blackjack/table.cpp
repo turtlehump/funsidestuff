@@ -376,11 +376,14 @@ bool Table::dealer_should_play()
 {
   for(unsigned int i = 0; i < m_players.size(); i++)
   {
-    if(!m_players[i]->all_hands_are_bust())
-    //if any hands are not bust
+    if(m_players[i]->all_hands_are_bust_or_blackjack());
+      //do nothing
+
+    else //at least 1 hand was not a bust or a blackjack
       return true;
   }
-  //if all hands by all players are bust
+
+  //every hand was either a bust or a blackjack
   return false;
 }
 

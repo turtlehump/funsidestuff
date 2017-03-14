@@ -37,7 +37,7 @@ class Player
 
         void    add_hand(Hand* new_hand);
         Hand*   get_next_hand(bool still_dealing_starting_cards);
-        bool    all_hands_are_bust();
+        bool    all_hands_are_bust_or_blackjack();
         void    reset_hands();
 
         void    set_insurance();
