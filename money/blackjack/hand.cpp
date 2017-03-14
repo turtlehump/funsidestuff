@@ -91,6 +91,12 @@ int Hand::value()
 
   else //if(soft_value > 21)
   {
+    if((soft_value - hard_value) > 10)
+    {
+      while(hard_value <= 11)
+        hard_value += 10;
+    }
+
     if(hard_value == 21)
     {
       m_cur_playing = false;
