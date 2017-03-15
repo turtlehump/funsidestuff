@@ -60,6 +60,14 @@ void Table::set_table_limits()
   do{
     cout << "What is the table minimum bet? ";
     cin >> min;
+    while(cin.fail())
+    {
+      cout << endl << "Expecting an int." << endl << endl;
+      cin.clear();
+      cin.ignore();
+      cout << "What is the table minimum bet? ";
+      cin >> min;
+    }
     if(min < 1)
       cout << endl << "The table must have a positive minimum bet." << endl << endl;
   }while(min < 1);
@@ -68,6 +76,14 @@ void Table::set_table_limits()
   do{
     cout << "And the maximum bet? ";
     cin >> max;
+    while(cin.fail())
+    {
+      cout << endl << "Expecting an int." << endl << endl;
+      cin.clear();
+      cin.ignore();
+      cout << "And the maximum bet? ";
+      cin >> max;
+    }
     if(max < (5 * min))
     {
       cout << endl << "The maximum must be at least 5x the minimum bet of ";
@@ -90,6 +106,14 @@ void Table::set_deck()
   do{
     cout << "How many decks are we going to use? ";
     cin >> num_decks;
+    while(cin.fail())
+    {
+      cout << endl << "Expecting an int." << endl << endl;
+      cin.clear();
+      cin.ignore();
+      cout << "How many decks are we going to use? ";
+      cin >> num_decks;
+    }
     if(num_decks < 1)
       cout << endl << "Number of decks must be positive." << endl << endl;
   }while(num_decks < 1);
@@ -111,6 +135,14 @@ void Table::get_players()
   do{
     cout << "How many players are at the table? ";
     cin >> num_players;
+    while(cin.fail())
+    {
+      cout << endl << "Expecting an int." << endl << endl;
+      cin.clear();
+      cin.ignore();
+      cout << "How many players are at the table? ";
+      cin >> num_players;
+    }
     if(num_players < 1)
       cout << endl << "Must have a positive number of players." << endl << endl;
   }while(num_players < 1);
@@ -214,6 +246,14 @@ void Table::set_hands_for_players(bool repeat_last_hand)
       do{
         cout << "How many hands does " << m_players[i]->get_name() << " want to play? ";
         cin >> num_hands;
+        while(cin.fail())
+        {
+          cout << endl << "Expecting an int." << endl << endl;
+          cin.clear();
+          cin.ignore();
+          cout << "How many hands does " << m_players[i]->get_name() << " want to play? ";
+          cin >> num_hands;
+        }
         if(num_hands < 1)
           cout << endl << "You must play a positive number of hands." << endl << endl;
       }while(num_hands < 1);
@@ -221,6 +261,14 @@ void Table::set_hands_for_players(bool repeat_last_hand)
       do{
         cout << "And the bet (" << m_min_bet << "-" << m_max_bet << ")? ";
         cin >> bet;
+        while(cin.fail())
+        {
+          cout << endl << "Expecting an int." << endl << endl;
+          cin.clear();
+          cin.ignore();
+          cout << "And the bet (" << m_min_bet << "-" << m_max_bet << ")? ";
+          cin >> bet;
+        }
         if(bet < m_min_bet)
           cout << endl << "Table minimum is " << m_min_bet << endl << endl;
         if(bet > m_max_bet)
@@ -300,6 +348,14 @@ int Table::hand_play(Hand* hand, Player* player, int hand_num)
     cout << endl;
 
     cin >> option;
+    while(cin.fail())
+    {
+      cout << endl << "Expecting an int." << endl << endl;
+      cin.clear();
+      cin.ignore();
+      cout << "What do you want to do? ";
+      cin >> option;
+    }
 
     switch(option)
     {
