@@ -19,34 +19,18 @@ void Table::setup_game()
 
 void Table::simulation()
 {
-  string play_again;
+  int play_again;
   bool repeat_last_hand = false;
 
   do
   {
     this->play_an_entire_hand(repeat_last_hand);
+    play_again = this->ask_play_again();
 
-    do
-    {
-      cout << "Play again? (y/n/r) ";
-      cin >> play_again;
+    if(play_again == 3) repeat_last_hand = true;
+    else                repeat_last_hand = false;
 
-      if(play_again == "r" || play_again == "R")
-        repeat_last_hand = true;
-      else
-        repeat_last_hand = false;
-
-      if(play_again != "n" && play_again != "N" &&
-         play_again != "y" && play_again != "Y" &&
-         play_again != "r" && play_again != "R" )
-        cout << endl << "That is not a valid option." << endl << endl;
-
-    }while(play_again != "n" && play_again != "N" &&
-           play_again != "y" && play_again != "Y" &&
-           play_again != "r" && play_again != "R" );
-
-  }while(play_again == "y" || play_again == "Y" ||
-         play_again == "r" || play_again == "R" );
+  }while(play_again == 1 || play_again == 3);
 
   this->player_money_print();
 
@@ -222,6 +206,54 @@ void Table::play_an_entire_hand(bool repeat_last_hand)
   return;
 }
 /*^^^^^^^^^ THE BEEF ^^^^^^^^^*/
+
+//return 0 if all players are broke
+//return 1 if yes play again
+//return 2 if no play again
+//return 3 if repeat last hand
+int Table::ask_play_again()
+{
+  if(this->all_players_are_broke())
+  {
+    cout << endl << "Holy smokes... That is an epic fail." << endl;
+    return 0;
+  }
+
+  string play_again;
+  bool good_input = true;
+
+  bool can_repeat = this->all_players_can_repeat();
+
+  do
+  {
+    if(can_repeat) cout << "Play again? (y/n/r) ";
+    else           cout << "Play again? (y/n) (no repeat) ";
+    cin >> play_again;
+
+    if(play_again == "y" || play_again == "Y")
+      return 1;
+    else if(play_again == "n" || play_again == "N")
+      return 2;
+    else if(play_again == "r" || play_again == "R")
+    {
+      if(can_repeat)
+        return 3;
+      else
+      {
+        good_input = false;
+        cout << endl << "That is not a valid option." << endl << endl;
+      }
+    }
+    else
+    {
+      good_input = false;
+      cout << endl << "That is not a valid option." << endl << endl;
+    }
+  }while(!good_input);
+  //control will never get out of the loop
+
+  return 420; // :D
+}
 
 void Table::set_hands_for_players(bool repeat_last_hand)
 {
@@ -592,4 +624,26 @@ void Table::player_money_print()
   cout << endl;
 
   return;
+}
+
+bool Table::all_players_are_broke()
+{
+  for(unsigned int i = 0; i < m_players.size(); i++)
+  {
+    if(m_players[i]->get_money_count() > 0)
+      return false;
+  }
+
+  return true;
+}
+
+bool Table::all_players_can_repeat()
+{
+  for(unsigned int i = 0; i < m_players.size(); i++)
+  {
+    if(!m_players[i]->can_repeat_last_play())
+      return false;
+  }
+
+  return true;
 }

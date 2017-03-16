@@ -24,6 +24,7 @@ class Table
         void      get_players();
 
         void      play_an_entire_hand(bool repeat_last_hand);
+        int       ask_play_again();
 
         void      set_hands_for_players(bool repeat_last_hand);
         void      starting_deal();
@@ -42,6 +43,8 @@ class Table
         void      clear_screen_print();
 
         void      player_money_print();
+        bool      all_players_are_broke();
+        bool      all_players_can_repeat();
 
         int             m_min_bet;
         int             m_max_bet;

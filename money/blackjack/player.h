@@ -32,6 +32,8 @@ class Player
 
         void    set_hands_and_bet_for_replay(int num_hands, 
                                              int bet);
+        bool    can_repeat_last_play() 
+                {return (m_money >= (m_prev_num_hands * m_prev_bet));}
 
         void    repeat_last_hand();
 
