@@ -29,8 +29,8 @@ Player::~Player()
   return;
 }
 
-void Player::set_hands_and_bet(int num_hands,
-                               int bet)
+void Player::set_hands_and_bet_for_replay(int num_hands,
+                                          int bet)
 {
   m_prev_num_hands = num_hands;
   m_prev_bet = bet;

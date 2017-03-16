@@ -28,10 +28,10 @@ class Player
         void    take_money(double money)  {m_money -= money;}
         void    give_money(double money)  {m_money += money;}
 
-        bool    can_match_bet(double bet) {return (m_money > bet);}
+        bool    can_afford(double bet) {return (m_money >= bet);}
 
-        void    set_hands_and_bet(int num_hands, 
-                                  int bet);
+        void    set_hands_and_bet_for_replay(int num_hands, 
+                                             int bet);
 
         void    repeat_last_hand();
 
