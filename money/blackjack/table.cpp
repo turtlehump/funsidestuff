@@ -27,6 +27,8 @@ void Table::simulation()
     this->play_an_entire_hand(repeat_last_hand);
     play_again = this->ask_play_again();
 
+    this->purge_broke_players();
+
     if(play_again == 3) repeat_last_hand = true;
     else                repeat_last_hand = false;
 
@@ -217,6 +219,14 @@ int Table::ask_play_again()
   {
     cout << endl << "Holy smokes... That is an epic fail." << endl;
     return 0;
+  }
+  else
+  {
+    for(unsigned int i = 0; i < m_players.size(); i++)
+    {
+      if(m_players[i]->get_money_count() == 0)
+        cout << endl << m_players[i]->get_name() << " IS BROKE" << endl << endl;
+    }
   }
 
   string play_again;
@@ -646,4 +656,18 @@ bool Table::all_players_can_repeat()
   }
 
   return true;
+}
+
+void Table::purge_broke_players()
+{
+  for(unsigned int i = 0; i < m_players.size(); i++)
+  {
+    if(m_players[i]->get_money_count() == 0)
+    {
+      delete m_players[i];
+      m_players.erase(m_players.begin() + i);
+    }
+  }
+
+  return;
 }

@@ -43,8 +43,11 @@ class Table
         void      clear_screen_print();
 
         void      player_money_print();
+
         bool      all_players_are_broke();
         bool      all_players_can_repeat();
+
+        void      purge_broke_players();
 
         int             m_min_bet;
         int             m_max_bet;
