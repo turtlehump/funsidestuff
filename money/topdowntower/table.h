@@ -2,6 +2,8 @@
 #define TABLE_H
 
 #include <iostream>
+#include <unistd.h>
+#include <string>
 #include "card.h"
 #include "deck.h"
 #include "player.h"
@@ -21,8 +23,12 @@ class Table
         void  ask_for_bet();
         void  fill_tower();
 
+        int   flip_and_evaluate_row(int row);
+        bool  ask_continue(int takehome_payment);
+
         void  print_tower();
 
+        void  flip_all_cards();
         bool  ask_play_again();
 
         int   m_bet_multiplier;

@@ -13,6 +13,8 @@ class Card
         int    get_value()    {return m_value;}
         bool   is_revealed()  {return m_revealed;}
 
+        void   flip()         {m_revealed = true;}
+
         string get_display_value();
         void   print();
 

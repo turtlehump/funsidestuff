@@ -29,9 +29,6 @@ void Table::set_player()
   cin >> name;
   m_player = new Player(name);
 
-  for(int i = 0; i < 59; i++)
-    cout << endl;
-
   return;
 }
 
@@ -46,6 +43,23 @@ void Table::simulation()
     m_deck->shuffle();
     this->fill_tower();
 
+    this->print_tower();
+
+    int i = 1; //rows 1-7
+    bool should_continue;
+    do
+    {
+      int takehome_payment = this->flip_and_evaluate_row(i);
+      sleep(1);
+      this->print_tower();
+      if(i < 7)
+        should_continue = this->ask_continue(takehome_payment);
+      else
+        should_continue = false;
+      i++;
+    }while(i <= 7 && should_continue);
+
+    this->flip_all_cards();
     this->print_tower();
 
     cout << endl;
@@ -112,7 +126,7 @@ void Table::ask_for_bet()
 
 void Table::fill_tower()
 {
-  for(int i = 1; i < 8; i++) //i will be the row (1-7)
+  for(int i = 1; i <= 7; i++) //i will be the row (1-7)
   {
     for(int j = 0; j < i; j++) //j will be the index (depends on row)
     {
@@ -146,12 +160,79 @@ void Table::fill_tower()
   return;
 }
 
+int Table::flip_and_evaluate_row(int row)
+{
+  int takehome_payment = 0;
+  for(int i = 0; i < row; i++)
+  {
+    if(row == 1)
+    {
+      takehome_payment += m_row1[i]->get_value();
+      m_row1[i]->flip();
+    }
+    else if(row == 2)
+    {
+      takehome_payment += m_row2[i]->get_value();
+      m_row2[i]->flip();
+    }
+    else if(row == 3)
+    {
+      takehome_payment += m_row3[i]->get_value();
+      m_row3[i]->flip();
+    }
+    else if(row == 4)
+    {
+      takehome_payment += m_row4[i]->get_value();
+      m_row4[i]->flip();
+    }
+    else if(row == 5)
+    {
+      takehome_payment += m_row5[i]->get_value();
+      m_row5[i]->flip();
+    }
+    else if(row == 6)
+    {
+      takehome_payment += m_row6[i]->get_value();
+      m_row6[i]->flip();
+    }
+    else if(row == 7)
+    {
+      takehome_payment += m_row7[i]->get_value();
+      m_row7[i]->flip();
+    }
+  }
+
+  return takehome_payment;
+}
+
+bool Table::ask_continue(int takehome_payment)
+{
+  string should_continue;
+  do
+  {
+    cout << "Continue or payout $" << takehome_payment << "? (c/p) ";
+    cin >> should_continue;
+  
+    if(should_continue == "c" || should_continue == "C")
+      return true;
+    else if(should_continue == "p" || should_continue == "P")
+      return false;
+    else
+      cout << endl << "That is an invalid option."  << endl << endl;
+
+  }while(!(should_continue == "c" || should_continue == "C" ||
+           should_continue == "p" || should_continue == "P"));
+
+  //we will never get out of the loop
+  return 420; //:D
+}
+
 void Table::print_tower()
 {
   for(int i = 0; i < 59; i++)
     cout << endl;
 
-  for(int i = 1; i < 8; i++) //rows 1-7
+  for(int i = 1; i <= 7; i++) //rows 1-7
   {
     for(int j = 0; j < 7 - i; j++)
       cout << "  ";
@@ -184,6 +265,33 @@ void Table::print_tower()
     cout << "  ";
   cout << "   "; 
   cout << m_savior_card->get_display_value() << endl;
+
+  return;
+}
+
+void Table::flip_all_cards()
+{
+  for(int i = 1; i <= 7; i++) //rows 1-7
+  {
+    for(int j = 0; j < i; j++)
+    {
+      if(i == 1)
+        m_row1[j]->flip();
+      if(i == 2)
+        m_row2[j]->flip();
+      if(i == 3)
+        m_row3[j]->flip();
+      if(i == 4)
+        m_row4[j]->flip();
+      if(i == 5)
+        m_row5[j]->flip();
+      if(i == 6)
+        m_row6[j]->flip();
+      if(i == 7)
+        m_row7[j]->flip();
+    }
+  }
+  m_savior_card->flip();
 
   return;
 }
