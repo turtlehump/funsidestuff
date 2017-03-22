@@ -19,7 +19,7 @@ player.o: player.h player.cpp
 table.o: table.h table.cpp
 	g++ -Wall -pedantic -g -c table.cpp
 
-blackjack.o: blackjack.cpp deck.h
+blackjack.o: blackjack.cpp
 	g++ -Wall -pedantic -g -c blackjack.cpp
 
 clean:
