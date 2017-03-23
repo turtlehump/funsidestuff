@@ -51,6 +51,7 @@ void Table::simulation()
       i++;
       sleep(1);
       takehome_payment = this->flip_and_evaluate_row(i);
+      takehome_payment *= m_bet_multiplier;
       this->print_tower();
       if(i < 7)
         should_continue = this->ask_continue(takehome_payment);
@@ -61,7 +62,6 @@ void Table::simulation()
           takehome_payment += 30;
         sleep(1);
       }
-      takehome_payment *= m_bet_multiplier;
     }while(i < 7 && should_continue);
 
     this->flip_all_cards();
