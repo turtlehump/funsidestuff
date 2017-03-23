@@ -43,11 +43,12 @@ void Table::simulation()
     m_deck->shuffle();
     this->fill_tower();
 
-    int i = 1; //rows 1-7
+    int i = 0; //increment on first loop for rows 1-7
     bool should_continue;
     int takehome_payment;
     do
     {
+      i++;
       sleep(1);
       takehome_payment = this->flip_and_evaluate_row(i);
       this->print_tower();
@@ -61,15 +62,14 @@ void Table::simulation()
         sleep(1);
       }
       takehome_payment *= m_bet_multiplier;
-      i++;
-    }while(i <= 7 && should_continue);
+    }while(i < 7 && should_continue);
 
     this->flip_all_cards();
     this->print_tower();
 
     cout << endl << "Payout of $" << takehome_payment;
-    cout << " from row " << i - 1;
-    if(m_savior_card)
+    cout << " from row " << i;
+    if(m_savior_card && i == 7)
       cout << " (including the +30 from the savior card)";
     cout << "." << endl << endl;
 
@@ -404,6 +404,7 @@ void Table::print_tower()
   cout << endl;
 
   //following the same format
+  cout << "s:";
   for(int i = 0; i < 6; i++)
     cout << "  ";
   cout << "   "; 
