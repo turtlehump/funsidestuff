@@ -180,59 +180,42 @@ int Table::flip_and_evaluate_row(int row)
     if(row == 1)
     {
       card_value = m_row1[i]->get_value();
-      if(card_value == 0)
-        card_value = this->joker_max_value(row, i);
-      takehome_payment += card_value;
       m_row1[i]->flip();
     }
     else if(row == 2)
     {
       card_value = m_row2[i]->get_value();
-      if(card_value == 0)
-        card_value = this->joker_max_value(row, i);
-      takehome_payment += card_value;
       m_row2[i]->flip();
     }
     else if(row == 3)
     {
       card_value = m_row3[i]->get_value();
-      if(card_value == 0)
-        card_value = this->joker_max_value(row, i);
-      takehome_payment += card_value;
       m_row3[i]->flip();
     }
     else if(row == 4)
     {
       card_value = m_row4[i]->get_value();
-      if(card_value == 0)
-        card_value = this->joker_max_value(row, i);
-      takehome_payment += card_value;
       m_row4[i]->flip();
     }
     else if(row == 5)
     {
       card_value = m_row5[i]->get_value();
-      if(card_value == 0)
-        card_value = this->joker_max_value(row, i);
-      takehome_payment += card_value;
       m_row5[i]->flip();
     }
     else if(row == 6)
     {
       card_value = m_row6[i]->get_value();
-      if(card_value == 0)
-        card_value = this->joker_max_value(row, i);
-      takehome_payment += card_value;
       m_row6[i]->flip();
     }
     else if(row == 7)
     {
       card_value = m_row7[i]->get_value();
-      if(card_value == 0)
-        card_value = this->joker_max_value(row, i);
-      takehome_payment += card_value;
       m_row7[i]->flip();
     }
+
+    if(card_value == 0)
+      card_value = this->joker_max_value(row, i);
+    takehome_payment += card_value;
   }
 
   return takehome_payment;
