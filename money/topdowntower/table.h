@@ -24,6 +24,7 @@ class Table
         void  fill_tower();
 
         int   flip_and_evaluate_row(int row);
+        int   joker_max_value(int row, int index);
         bool  ask_continue(int takehome_payment);
 
         void  print_tower();

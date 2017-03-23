@@ -43,26 +43,37 @@ void Table::simulation()
     m_deck->shuffle();
     this->fill_tower();
 
-    this->print_tower();
-
     int i = 1; //rows 1-7
     bool should_continue;
+    int takehome_payment;
     do
     {
-      int takehome_payment = this->flip_and_evaluate_row(i);
       sleep(1);
+      takehome_payment = this->flip_and_evaluate_row(i);
       this->print_tower();
       if(i < 7)
         should_continue = this->ask_continue(takehome_payment);
       else
+      {
         should_continue = false;
+        if(m_savior_card)
+          takehome_payment += 30;
+        sleep(1);
+      }
+      takehome_payment *= m_bet_multiplier;
       i++;
     }while(i <= 7 && should_continue);
 
     this->flip_all_cards();
     this->print_tower();
 
-    cout << endl;
+    cout << endl << "Payout of $" << takehome_payment;
+    cout << " from row " << i - 1;
+    if(m_savior_card)
+      cout << " (including the +30 from the savior card)";
+    cout << "." << endl << endl;
+
+    m_player->give_money(takehome_payment);
 
     should_play_again = ask_play_again();
 
@@ -165,44 +176,175 @@ int Table::flip_and_evaluate_row(int row)
   int takehome_payment = 0;
   for(int i = 0; i < row; i++)
   {
+    int card_value;
     if(row == 1)
     {
-      takehome_payment += m_row1[i]->get_value();
+      card_value = m_row1[i]->get_value();
+      if(card_value == 0)
+        card_value = this->joker_max_value(row, i);
+      takehome_payment += card_value;
       m_row1[i]->flip();
     }
     else if(row == 2)
     {
-      takehome_payment += m_row2[i]->get_value();
+      card_value = m_row2[i]->get_value();
+      if(card_value == 0)
+        card_value = this->joker_max_value(row, i);
+      takehome_payment += card_value;
       m_row2[i]->flip();
     }
     else if(row == 3)
     {
-      takehome_payment += m_row3[i]->get_value();
+      card_value = m_row3[i]->get_value();
+      if(card_value == 0)
+        card_value = this->joker_max_value(row, i);
+      takehome_payment += card_value;
       m_row3[i]->flip();
     }
     else if(row == 4)
     {
-      takehome_payment += m_row4[i]->get_value();
+      card_value = m_row4[i]->get_value();
+      if(card_value == 0)
+        card_value = this->joker_max_value(row, i);
+      takehome_payment += card_value;
       m_row4[i]->flip();
     }
     else if(row == 5)
     {
-      takehome_payment += m_row5[i]->get_value();
+      card_value = m_row5[i]->get_value();
+      if(card_value == 0)
+        card_value = this->joker_max_value(row, i);
+      takehome_payment += card_value;
       m_row5[i]->flip();
     }
     else if(row == 6)
     {
-      takehome_payment += m_row6[i]->get_value();
+      card_value = m_row6[i]->get_value();
+      if(card_value == 0)
+        card_value = this->joker_max_value(row, i);
+      takehome_payment += card_value;
       m_row6[i]->flip();
     }
     else if(row == 7)
     {
-      takehome_payment += m_row7[i]->get_value();
+      card_value = m_row7[i]->get_value();
+      if(card_value == 0)
+        card_value = this->joker_max_value(row, i);
+      takehome_payment += card_value;
       m_row7[i]->flip();
     }
   }
 
   return takehome_payment;
+}
+
+//row can be from 1-7
+//index can be from 0-6
+int Table::joker_max_value(int row, int index)
+{
+  int max_value = 7;
+  switch(row)
+  {
+    case 1:
+      break;
+
+    case 2: //only one card to check for row 2
+      if(m_row1[0]->get_value() == 7)
+        max_value = 6;
+      break;
+
+    case 3:
+      if(index == 0 && m_row2[0]->get_value() == 7)
+        max_value = 6;
+      else if(index == (row - 1) &&
+              m_row2[row - 1]->get_value() == 7)
+        max_value = 6;
+      else //middle index
+        if(m_row2[index - 1]->get_value() == 7 ||
+           m_row2[index]->get_value() == 7)
+        {
+          if(m_row2[index - 1]->get_value() == 6 ||
+             m_row2[index]->get_value() == 6)
+            max_value = 5;
+          else
+            max_value = 6;
+        }
+      break;
+
+    case 4:
+      if(index == 0 && m_row3[0]->get_value() == 7)
+        max_value = 6;
+      else if(index == (row - 1) &&
+              m_row3[row - 1]->get_value() == 7)
+        max_value = 6;
+      else //middle index
+        if(m_row3[index - 1]->get_value() == 7 ||
+           m_row3[index]->get_value() == 7)
+        {
+          if(m_row3[index - 1]->get_value() == 6 ||
+             m_row3[index]->get_value() == 6)
+            max_value = 5;
+          else
+            max_value = 6;
+        }
+      break;
+
+    case 5:
+      if(index == 0 && m_row4[0]->get_value() == 7)
+        max_value = 6;
+      else if(index == (row - 1) &&
+              m_row4[row - 1]->get_value() == 7)
+        max_value = 6;
+      else //middle index
+        if(m_row4[index - 1]->get_value() == 7 ||
+           m_row4[index]->get_value() == 7)
+        {
+          if(m_row4[index - 1]->get_value() == 6 ||
+             m_row4[index]->get_value() == 6)
+            max_value = 5;
+          else
+            max_value = 6;
+        }
+      break;
+
+    case 6:
+      if(index == 0 && m_row5[0]->get_value() == 7)
+        max_value = 6;
+      else if(index == (row - 1) &&
+              m_row5[row - 1]->get_value() == 7)
+        max_value = 6;
+      else //middle index
+        if(m_row5[index - 1]->get_value() == 7 ||
+           m_row5[index]->get_value() == 7)
+        {
+          if(m_row5[index - 1]->get_value() == 6 ||
+             m_row5[index]->get_value() == 6)
+            max_value = 5;
+          else
+            max_value = 6;
+        }
+      break;
+
+    case 7:
+      if(index == 0 && m_row6[0]->get_value() == 7)
+        max_value = 6;
+      else if(index == (row - 1) &&
+              m_row6[row - 1]->get_value() == 7)
+        max_value = 6;
+      else //middle index
+        if(m_row6[index - 1]->get_value() == 7 ||
+           m_row6[index]->get_value() == 7)
+        {
+          if(m_row6[index - 1]->get_value() == 6 ||
+             m_row6[index]->get_value() == 6)
+            max_value = 5;
+          else
+            max_value = 6;
+        }
+      break;
+  }
+
+  return max_value;
 }
 
 bool Table::ask_continue(int takehome_payment)
@@ -234,6 +376,7 @@ void Table::print_tower()
 
   for(int i = 1; i <= 7; i++) //rows 1-7
   {
+    cout << i << ":";
     for(int j = 0; j < 7 - i; j++)
       cout << "  ";
 
