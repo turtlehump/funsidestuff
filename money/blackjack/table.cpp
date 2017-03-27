@@ -42,21 +42,23 @@ void Table::simulation()
 void Table::set_table_limits()
 {
   int min = 0, max = 0;
+  string tmp_int_str;
 
   this->clear_screen_print();
 
   do
   {
     cout << "What is the table minimum bet? ";
-    cin >> min;
-    while(cin.fail())
+    cin >> tmp_int_str;
+    while(!good_int(tmp_int_str))
     {
       cout << endl << "Expecting an int." << endl << endl;
       cin.clear();
       cin.ignore();
       cout << "What is the table minimum bet? ";
-      cin >> min;
+      cin >> tmp_int_str;
     }
+    min = s_to_i(tmp_int_str);
     if(min < 1)
       cout << endl << "The table must have a positive minimum bet." << endl << endl;
   }while(min < 1);
@@ -65,15 +67,16 @@ void Table::set_table_limits()
   do
   {
     cout << "And the maximum bet? ";
-    cin >> max;
-    while(cin.fail())
+    cin >> tmp_int_str;
+    while(!good_int(tmp_int_str))
     {
       cout << endl << "Expecting an int." << endl << endl;
       cin.clear();
       cin.ignore();
       cout << "And the maximum bet? ";
-      cin >> max;
+      cin >> tmp_int_str;
     }
+    max = s_to_i(tmp_int_str);
     if(max < (5 * min))
     {
       cout << endl << "The maximum must be at least 5x the minimum bet of ";
@@ -90,21 +93,23 @@ void Table::set_table_limits()
 void Table::set_deck()
 {
   int num_decks = 0;
+  string tmp_int_str;
 
   this->clear_screen_print();
 
   do
   {
     cout << "How many decks are we going to use? ";
-    cin >> num_decks;
-    while(cin.fail())
+    cin >> tmp_int_str;
+    while(!good_int(tmp_int_str))
     {
       cout << endl << "Expecting an int." << endl << endl;
       cin.clear();
       cin.ignore();
       cout << "How many decks are we going to use? ";
-      cin >> num_decks;
+      cin >> tmp_int_str;
     }
+    num_decks = s_to_i(tmp_int_str);
     if(num_decks < 1)
       cout << endl << "Number of decks must be positive." << endl << endl;
   }while(num_decks < 1);
@@ -120,21 +125,23 @@ void Table::set_deck()
 void Table::get_players()
 {
   int num_players = 0;
+  string tmp_int_str;
   
   this->clear_screen_print();
 
   do
   {
     cout << "How many players are at the table? ";
-    cin >> num_players;
-    while(cin.fail())
+    cin >> tmp_int_str;
+    while(!good_int(tmp_int_str))
     {
       cout << endl << "Expecting an int." << endl << endl;
       cin.clear();
       cin.ignore();
       cout << "How many players are at the table? ";
-      cin >> num_players;
+      cin >> tmp_int_str;
     }
+    num_players = s_to_i(tmp_int_str);
     if(num_players < 1)
       cout << endl << "Must have a positive number of players." << endl << endl;
   }while(num_players < 1);
@@ -269,6 +276,8 @@ void Table::set_hands_for_players(bool repeat_last_hand)
 {
   int num_hands = 0;;
   double bet = 0;
+  string tmp_int_str;
+  string tmp_double_str;
 
   if(repeat_last_hand)
   {
@@ -296,15 +305,16 @@ void Table::set_hands_for_players(bool repeat_last_hand)
         do
         {
           cout << "How many hands does " << m_players[i]->get_name() << " want to play? ";
-          cin >> num_hands;
-          while(cin.fail())
+          cin >> tmp_int_str;
+          while(!good_int(tmp_int_str))
           {
             cout << endl << "Expecting an int." << endl << endl;
             cin.clear();
             cin.ignore();
             cout << "How many hands does " << m_players[i]->get_name() << " want to play? ";
-            cin >> num_hands;
+            cin >> tmp_int_str;
           }
+          num_hands = s_to_i(tmp_int_str);
           if(num_hands < 1)
             cout << endl << "You must play a positive number of hands." << endl << endl;
         }while(num_hands < 1);
@@ -312,15 +322,16 @@ void Table::set_hands_for_players(bool repeat_last_hand)
         do
         {
           cout << "And the bet (" << m_min_bet << "-" << m_max_bet << ")? ";
-          cin >> bet;
-          while(cin.fail())
+          cin >> tmp_double_str;
+          while(!good_double(tmp_double_str))
           {
             cout << endl << "Expecting an number." << endl << endl;
             cin.clear();
             cin.ignore();
             cout << "And the bet (" << m_min_bet << "-" << m_max_bet << ")? ";
-            cin >> bet;
+            cin >> tmp_double_str;
           }
+          bet = s_to_d(tmp_double_str);
           if(bet < m_min_bet)
             cout << endl << "Table minimum is " << m_min_bet << endl << endl;
           if(bet > m_max_bet)
@@ -397,6 +408,7 @@ void Table::player_play(Player* player)
 int Table::hand_play(Hand* hand, Player* player, int hand_num)
 {
   int option = 0;
+  string tmp_int_str;
   do
   {
     this->table_playing_print(player->get_name(), hand_num);
@@ -410,15 +422,16 @@ int Table::hand_play(Hand* hand, Player* player, int hand_num)
       cout << "          4) split";
     cout << endl;
 
-    cin >> option;
-    while(cin.fail())
+    cin >> tmp_int_str;
+    while(!good_int(tmp_int_str))
     {
       cout << endl << "Expecting an int." << endl << endl;
       cin.clear();
       cin.ignore();
       cout << "What do you want to do? ";
-      cin >> option;
+      cin >> tmp_int_str;
     }
+    option = s_to_i(tmp_int_str);
 
     switch(option)
     {
@@ -670,4 +683,156 @@ void Table::purge_broke_players()
   }
 
   return;
+}
+
+bool Table::good_int(string tmp)
+{
+  for(unsigned int i = 0; i < tmp.size(); i++)
+  {
+    if(i == 0 && tmp[i] == '-')
+      continue;
+    if(!isdigit(tmp[i]))
+      return false;
+  }
+
+  return true;
+}
+
+bool Table::good_double(string tmp)
+{
+  bool decimal = false;
+  for(unsigned int i = 0; i < tmp.size(); i++)
+  {
+    if(i == 0 && tmp[i] == '-')
+      continue;
+    if(!isdigit(tmp[i]))
+    {
+      if(tmp[i] == '.')
+      {
+        if(decimal)
+          return false;
+        else
+          decimal = true;
+      }
+      else
+       return false;
+    }
+  }
+
+  return true;
+}
+
+int Table::s_to_i(string tmp)
+{
+ bool negative = false;
+  int value = 0;
+  for(unsigned int i = 0; i < tmp.size(); i++)
+  {
+    if(i == 0 && tmp[i] == '-')
+      negative = true;
+    else
+    {
+      int digit = c_to_i(tmp[i]);
+      value += digit * pow(10, (tmp.size() - i) - 1);
+    }
+  }
+
+  if(negative)
+    value = -value;
+
+  return value;
+}
+
+double Table::s_to_d(string tmp)
+{
+  double value = 0;
+  bool negative = false;
+  bool decimal = false;
+  unsigned int decimal_index;
+  for(unsigned int i = 0; i < tmp.size(); i++)
+  {
+    if(i == 0 && tmp[i] == '-')
+      negative = true;
+    if(tmp[i] == '.')
+    {
+      decimal = true;
+      decimal_index = i;
+      break;
+    }
+  }
+
+  if(decimal)
+  {
+    int whole_number = 0;
+    for(unsigned int i = 0; i < decimal_index; i++)
+    {
+      int digit = c_to_i(tmp[i]);
+      whole_number += digit * pow(10, (decimal_index - i) - 1);
+    }
+
+    double decimal_number = 0;
+    for(unsigned int i = decimal_index + 1; i < tmp.size(); i++)
+    {
+      int digit = c_to_i(tmp[i]);
+      decimal_number += digit * pow(10, (tmp.size() - i) - 1);
+    }
+    decimal_number *= ne_pow(10, ((decimal_index + 1) - tmp.size()));
+
+    value = double(whole_number) + double(decimal_number);
+  }
+  else
+    value = double(s_to_i(tmp));
+
+  if(negative)
+    value = -value;
+
+  return value;
+}
+
+int Table::c_to_i(char tmp)
+{
+  if(tmp == '0')
+    return 0;
+  if(tmp == '1')
+    return 1;
+  if(tmp == '2')
+    return 2;
+  if(tmp == '3')
+    return 3;
+  if(tmp == '4')
+    return 4;
+  if(tmp == '5')
+    return 5;
+  if(tmp == '6')
+    return 6;
+  if(tmp == '7')
+    return 7;
+  if(tmp == '8')
+    return 8;
+  if(tmp == '9')
+    return 9;
+
+  return 0;
+}
+
+long Table::pow(int base, int exp)
+{
+  if(exp < 0)
+  {
+    cout << "pow(base, exp) only accepts positive exponents.";
+    cout << " Use ne_pow(base, exp) for negative exponents." << endl;
+    return 0;
+  }
+
+  long value = 1;
+  for(int i = 0; i < exp; i++)
+    value *= base;
+
+  return value;
+}
+
+double Table::ne_pow(int base, int exp)
+{
+  double value = 1.0 / pow(base, -exp);
+  return value;
 }
