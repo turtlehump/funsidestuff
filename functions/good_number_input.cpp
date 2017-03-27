@@ -4,13 +4,13 @@
 
 using namespace std;
 
-bool    good_int(string tmp);
-bool    good_double(string tmp);
-int     s_to_i(string tmp);
-double  s_to_d(string tmp);
-int     c_to_i(char tmp);
-int     pow(int base, int exp);
-double  ne_pow(int base, int exp);
+bool      good_int(string tmp);
+bool      good_double(string tmp);
+int       s_to_i(string tmp);
+double    s_to_d(string tmp);
+int       c_to_i(char tmp);
+long      pow(int base, int exp);
+double    ne_pow(int base, int exp);
 
 bool good_int(string tmp)
 {
@@ -144,7 +144,7 @@ int c_to_i(char tmp)
   return 0;
 }
 
-int pow(int base, int exp)
+long pow(int base, int exp)
 {
   if(exp < 0)
   {
@@ -153,7 +153,7 @@ int pow(int base, int exp)
     return 0;
   }
 
-  int value = 1;
+  long value = 1;
   for(int i = 0; i < exp; i++)
     value *= base;
 
