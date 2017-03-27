@@ -8,7 +8,7 @@ bool    good_int(string tmp);
 bool    good_double(string tmp);
 int     s_to_i(string tmp);
 double  s_to_d(string tmp);
-int     char_to_int(char tmp);
+int     c_to_i(char tmp);
 int     pow(int base, int exp);
 double  ne_pow(int base, int exp);
 
@@ -16,6 +16,8 @@ bool good_int(string tmp)
 {
   for(unsigned int i = 0; i < tmp.size(); i++)
   {
+    if(i == 0 && tmp[i] == '-')
+      continue;
     if(!isdigit(tmp[i]))
       return false;
   }
@@ -28,6 +30,8 @@ bool good_double(string tmp)
   bool decimal = false;
   for(unsigned int i = 0; i < tmp.size(); i++)
   {
+    if(i == 0 && tmp[i] == '-')
+      continue;
     if(!isdigit(tmp[i]))
     {
       if(tmp[i] == '.')
@@ -48,12 +52,21 @@ bool good_double(string tmp)
 //need to be sure that tmp is a good int
 int s_to_i(string tmp)
 {
+  bool negative = false;
   int value = 0;
   for(unsigned int i = 0; i < tmp.size(); i++)
   {
-    int digit = char_to_int(tmp[i]);
-    value += digit * pow(10, (tmp.size() - i) - 1);
+    if(i == 0 && tmp[i] == '-')
+      negative = true;
+    else
+    {
+      int digit = c_to_i(tmp[i]);
+      value += digit * pow(10, (tmp.size() - i) - 1);
+    }
   }
+
+  if(negative)
+    value = -value;
 
   return value;
 }
@@ -61,10 +74,14 @@ int s_to_i(string tmp)
 //need to be sure that tmp is a good double
 double s_to_d(string tmp)
 {
+  double value = 0;
+  bool negative = false;
   bool decimal = false;
   int decimal_index;
   for(unsigned int i = 0; i < tmp.size(); i++)
   {
+    if(i == 0 && tmp[i] == '-')
+      negative = true;
     if(tmp[i] == '.')
     {
       decimal = true;
@@ -78,25 +95,30 @@ double s_to_d(string tmp)
     int whole_number = 0;
     for(unsigned int i = 0; i < decimal_index; i++)
     {
-      int digit = char_to_int(tmp[i]);
+      int digit = c_to_i(tmp[i]);
       whole_number += digit * pow(10, (decimal_index - i) - 1);
     }
 
     double decimal_number = 0;
     for(unsigned int i = decimal_index + 1; i < tmp.size(); i++)
     {
-      int digit = char_to_int(tmp[i]);
+      int digit = c_to_i(tmp[i]);
       decimal_number += digit * pow(10, (tmp.size() - i) - 1);
     }
     decimal_number *= ne_pow(10, ((decimal_index + 1) - tmp.size()));
 
-    return double(whole_number) + double(decimal_number);
+    value = double(whole_number) + double(decimal_number);
   }
   else
-    return double(s_to_i(tmp));
+    value = double(s_to_i(tmp));
+
+  if(negative)
+    value = -value;
+
+  return value;
 }
 
-int char_to_int(char tmp)
+int c_to_i(char tmp)
 {
   if(tmp == '0')
     return 0;
@@ -127,7 +149,7 @@ int pow(int base, int exp)
   if(exp < 0)
   {
     cout << "pow(base, exp) only accepts positive exponents.";
-    cout << " Use ne_pow(base, exp) for negative exponents.";
+    cout << " Use ne_pow(base, exp) for negative exponents." << endl;
     return 0;
   }
 
