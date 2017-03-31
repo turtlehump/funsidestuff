@@ -4,9 +4,12 @@
 #include "player.h"
 #include "dealer.h"
 #include "deck.h"
+#include "questionasker.h"
 #include <iostream>
 #include <vector>
 #include <unistd.h>
+#include <ctype.h>
+#include <sstream>
 using namespace std;
 
 class Table
@@ -54,14 +57,7 @@ class Table
         Deck*           m_deck;
         Dealer*         m_dealer;
         vector<Player*> m_players;
-
-        bool      good_int(string tmp);
-        bool      good_double(string tmp);
-        int       s_to_i(string tmp);
-        double    s_to_d(string tmp);
-        int       c_to_i(char tmp);
-        long      pow(int base, int exp);
-        double    ne_pow(int base, int exp);
+        QuestionAsker*  m_qa;
 };
 #endif
 

@@ -1,5 +1,8 @@
-blackjack: card.o deck.o hand.o dealer.o player.o table.o blackjack.o
-	g++ -Wall -pedantic -g -o blackjack card.o deck.o hand.o dealer.o player.o table.o blackjack.o
+blackjack: questionasker.o card.o deck.o hand.o dealer.o player.o table.o blackjack.o
+	g++ -Wall -pedantic -g -o blackjack questionasker.o card.o deck.o hand.o dealer.o player.o table.o blackjack.o
+
+questionasker.o: questionasker.h questionasker.cpp
+	g++ -Wall -pedantic -g -c questionasker.cpp
 
 card.o: card.h card.cpp
 	g++ -Wall -pedantic -g -c card.cpp

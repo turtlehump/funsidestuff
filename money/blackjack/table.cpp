@@ -42,23 +42,12 @@ void Table::simulation()
 void Table::set_table_limits()
 {
   int min = 0, max = 0;
-  string tmp_int_str;
 
   this->clear_screen_print();
 
   do
   {
-    cout << "What is the table minimum bet? ";
-    cin >> tmp_int_str;
-    while(!good_int(tmp_int_str))
-    {
-      cout << endl << "Expecting an int." << endl << endl;
-      cin.clear();
-      cin.ignore();
-      cout << "What is the table minimum bet? ";
-      cin >> tmp_int_str;
-    }
-    min = s_to_i(tmp_int_str);
+    min = m_qa->aquire_int("What is the table minimum bet? ");
     if(min < 1)
       cout << endl << "The table must have a positive minimum bet." << endl << endl;
   }while(min < 1);
@@ -66,17 +55,7 @@ void Table::set_table_limits()
 
   do
   {
-    cout << "And the maximum bet? ";
-    cin >> tmp_int_str;
-    while(!good_int(tmp_int_str))
-    {
-      cout << endl << "Expecting an int." << endl << endl;
-      cin.clear();
-      cin.ignore();
-      cout << "And the maximum bet? ";
-      cin >> tmp_int_str;
-    }
-    max = s_to_i(tmp_int_str);
+    max = m_qa->aquire_int("And the maximum bet? ");
     if(max < (5 * min))
     {
       cout << endl << "The maximum must be at least 5x the minimum bet of ";
@@ -93,23 +72,12 @@ void Table::set_table_limits()
 void Table::set_deck()
 {
   int num_decks = 0;
-  string tmp_int_str;
 
   this->clear_screen_print();
 
   do
   {
-    cout << "How many decks are we going to use? ";
-    cin >> tmp_int_str;
-    while(!good_int(tmp_int_str))
-    {
-      cout << endl << "Expecting an int." << endl << endl;
-      cin.clear();
-      cin.ignore();
-      cout << "How many decks are we going to use? ";
-      cin >> tmp_int_str;
-    }
-    num_decks = s_to_i(tmp_int_str);
+    num_decks = m_qa->aquire_int("How many decks are we going to use? ");
     if(num_decks < 1)
       cout << endl << "Number of decks must be positive." << endl << endl;
   }while(num_decks < 1);
@@ -125,23 +93,12 @@ void Table::set_deck()
 void Table::get_players()
 {
   int num_players = 0;
-  string tmp_int_str;
   
   this->clear_screen_print();
 
   do
   {
-    cout << "How many players are at the table? ";
-    cin >> tmp_int_str;
-    while(!good_int(tmp_int_str))
-    {
-      cout << endl << "Expecting an int." << endl << endl;
-      cin.clear();
-      cin.ignore();
-      cout << "How many players are at the table? ";
-      cin >> tmp_int_str;
-    }
-    num_players = s_to_i(tmp_int_str);
+    num_players = m_qa->aquire_int("How many players are at the table? ");
     if(num_players < 1)
       cout << endl << "Must have a positive number of players." << endl << endl;
   }while(num_players < 1);
@@ -152,10 +109,9 @@ void Table::get_players()
     string name;
     do
     {
-      cout << "Player " << i + 1 << "'s name: ";
-      cin.ignore();
-      getline(cin, name);
-      cin.unget();
+      stringstream prompt;
+      prompt << "Player " << i + 1 << "'s name: ";
+      name = m_qa->aquire_string(prompt.str());
       if(name == "Dealer")
         cout << endl << "Player cannot be named \"Dealer\"." << endl << endl;
     }while(name == "Dealer");
@@ -236,31 +192,23 @@ int Table::ask_play_again()
     }
   }
 
-  string play_again;
   bool good_input = true;
-
   bool can_repeat = this->all_players_can_repeat();
 
   do
   {
-    if(can_repeat) cout << "Play again? (y/n/r) ";
-    else           cout << "Play again? (y/n) (no repeat) ";
-    cin >> play_again;
+    char play_again;
+    if(can_repeat) 
+      play_again = m_qa->aquire_char("Play again? (y/n/r) ");
+    else
+      play_again = m_qa->aquire_char("Play again? (y/n) (no repeat) ");
 
-    if(play_again == "y" || play_again == "Y")
+    if(toupper(play_again) == 'Y')
       return 1;
-    else if(play_again == "n" || play_again == "N")
+    else if(toupper(play_again) == 'N')
       return 2;
-    else if(play_again == "r" || play_again == "R")
-    {
-      if(can_repeat)
-        return 3;
-      else
-      {
-        good_input = false;
-        cout << endl << "That is not a valid option." << endl << endl;
-      }
-    }
+    else if(toupper(play_again) == 'R' && can_repeat)
+      return 3;
     else
     {
       good_input = false;
@@ -276,8 +224,6 @@ void Table::set_hands_for_players(bool repeat_last_hand)
 {
   int num_hands = 0;;
   double bet = 0;
-  string tmp_int_str;
-  string tmp_double_str;
 
   if(repeat_last_hand)
   {
@@ -304,49 +250,49 @@ void Table::set_hands_for_players(bool repeat_last_hand)
       {
         do
         {
-          cout << "How many hands does " << m_players[i]->get_name() << " want to play? ";
-          cin >> tmp_int_str;
-          while(!good_int(tmp_int_str))
-          {
-            cout << endl << "Expecting an int." << endl << endl;
-            cin.clear();
-            cin.ignore();
-            cout << "How many hands does " << m_players[i]->get_name() << " want to play? ";
-            cin >> tmp_int_str;
-          }
-          num_hands = s_to_i(tmp_int_str);
+          stringstream prompt;
+          prompt << "How many hands does ";
+          prompt << m_players[i]->get_name() << " want to play? ";
+          num_hands = m_qa->aquire_int(prompt.str());
+
           if(num_hands < 1)
-            cout << endl << "You must play a positive number of hands." << endl << endl;
+          {
+            cout << endl;
+            cout << "You must play a positive number of hands.";
+            cout << endl << endl;
+          }
         }while(num_hands < 1);
 
         do
         {
-          cout << "And the bet (" << m_min_bet << "-" << m_max_bet << ")? ";
-          cin >> tmp_double_str;
-          while(!good_double(tmp_double_str))
-          {
-            cout << endl << "Expecting an number." << endl << endl;
-            cin.clear();
-            cin.ignore();
-            cout << "And the bet (" << m_min_bet << "-" << m_max_bet << ")? ";
-            cin >> tmp_double_str;
-          }
-          bet = s_to_d(tmp_double_str);
+          stringstream prompt;
+          prompt << "And the bet ";
+          prompt << "(" << m_min_bet << "-" << m_max_bet << ")? ";
+          bet = m_qa->aquire_double(prompt.str());
+
           if(bet < m_min_bet)
-            cout << endl << "Table minimum is " << m_min_bet << endl << endl;
+          {
+            cout << endl;
+            cout << "Table minimum is " << m_min_bet;
+            cout << endl << endl;
+          }
           if(bet > m_max_bet)
-            cout << endl << "Table maximum is " << m_max_bet << endl << endl;
+          {
+            cout << endl;
+            cout << "Table maximum is " << m_max_bet;
+            cout << endl << endl;
+          }
         }while(bet < m_min_bet || bet > m_max_bet);
 
         if(!m_players[i]->can_afford(num_hands * bet))
         {
-          cout << endl << m_players[i]->get_name();
+          cout << endl;
+          cout << m_players[i]->get_name();
           cout << " cannot afford this play of $" << num_hands * bet;
           cout << " (" << m_players[i]->get_name();
           cout << ": $" << m_players[i]->get_money_count() << ")";
           cout << endl << endl;
         }
-
       }while(!m_players[i]->can_afford(num_hands * bet));
 
       m_players[i]->set_hands_and_bet_for_replay(num_hands, bet);
@@ -422,81 +368,37 @@ int Table::hand_play(Hand* hand, Player* player, int hand_num)
       cout << "          4) split";
     cout << endl;
 
-    cin >> tmp_int_str;
-    while(!good_int(tmp_int_str))
+    option = m_qa->aquire_int("");
+
+    if(option == 1)
+      hand->hit(m_deck->deal_top_card());
+    else if(option == 2)
+      return hand->stand();
+    else if(option == 3                  &&
+            hand->can_double_down()      &&
+            player->can_afford(hand->get_bet()) )
     {
-      cout << endl << "Expecting an int." << endl << endl;
-      cin.clear();
-      cin.ignore();
-      cout << "What do you want to do? ";
-      cin >> tmp_int_str;
+      player->take_money(hand->get_bet());
+      int hand_value = hand->double_down(m_deck->deal_top_card());
+      this->table_playing_print(player->get_name(), hand_num);
+
+      //keep it aligned for easy tracking of cards
+      cout << endl << endl << endl << endl << endl;
+
+      sleep(1);
+      return hand_value;
     }
-    option = s_to_i(tmp_int_str);
-
-    switch(option)
+    else if(option == 4               &&
+            hand->can_split()         &&
+            player->can_afford(hand->get_bet()) )
     {
-      case 1:
-        hand->hit(m_deck->deal_top_card());
-        break;
-
-      case 2:
-        return hand->stand();
-
-      case 3:
-        if(hand->can_double_down())
-        {
-          int bet = hand->get_bet();
-          if(player->can_afford(bet))
-          { 
-            player->take_money(bet);
-            int hand_value = hand->double_down(m_deck->deal_top_card());
-            this->table_playing_print(player->get_name(), hand_num);
-
-            //keep it aligned for easy tracking of cards
-            cout << endl << endl << endl << endl << endl;
-
-            sleep(1);
-            return hand_value;
-          }
-          else
-          {
-            cout << endl << "You do not have enough to double down on this bet (";
-            cout << bet << ")." << endl << endl;
-            sleep(1);
-          }
-        }
-        else
-        {
-          cout << endl << "That is not a valid option." << endl << endl;
-          sleep(1);
-        }
-        break;
-
-      case 4:
-        if(hand->can_split())
-        {
-          int bet = hand->get_bet();
-          if(player->can_afford(bet))
-            player->add_hand(hand->split(m_deck));
-          else
-          {
-            cout << endl << "You do not have enough to split on this bet (";
-            cout << bet << ")." << endl << endl;
-            sleep(1);
-          }
-        }
-        else
-        {
-          cout << endl << "That is not a valid option." << endl << endl;
-          sleep(1);
-        }
-        break;
-
-      default:
-        cout << endl << "That is not a valid option." << endl << endl;
-        sleep(1);
-     }
-
+      player->add_hand(hand->split(m_deck));
+    }
+    else
+    {
+      cout << endl << "That is not a valid option." << endl << endl;
+      sleep(1);
+    }
   }while(!hand->has_bust() && hand->value() != 21);
 
   this->table_playing_print(player->get_name(), hand_num);
@@ -683,156 +585,4 @@ void Table::purge_broke_players()
   }
 
   return;
-}
-
-bool Table::good_int(string tmp)
-{
-  for(unsigned int i = 0; i < tmp.size(); i++)
-  {
-    if(i == 0 && tmp[i] == '-')
-      continue;
-    if(!isdigit(tmp[i]))
-      return false;
-  }
-
-  return true;
-}
-
-bool Table::good_double(string tmp)
-{
-  bool decimal = false;
-  for(unsigned int i = 0; i < tmp.size(); i++)
-  {
-    if(i == 0 && tmp[i] == '-')
-      continue;
-    if(!isdigit(tmp[i]))
-    {
-      if(tmp[i] == '.')
-      {
-        if(decimal)
-          return false;
-        else
-          decimal = true;
-      }
-      else
-       return false;
-    }
-  }
-
-  return true;
-}
-
-int Table::s_to_i(string tmp)
-{
- bool negative = false;
-  int value = 0;
-  for(unsigned int i = 0; i < tmp.size(); i++)
-  {
-    if(i == 0 && tmp[i] == '-')
-      negative = true;
-    else
-    {
-      int digit = c_to_i(tmp[i]);
-      value += digit * pow(10, (tmp.size() - i) - 1);
-    }
-  }
-
-  if(negative)
-    value = -value;
-
-  return value;
-}
-
-double Table::s_to_d(string tmp)
-{
-  double value = 0;
-  bool negative = false;
-  bool decimal = false;
-  unsigned int decimal_index;
-  for(unsigned int i = 0; i < tmp.size(); i++)
-  {
-    if(i == 0 && tmp[i] == '-')
-      negative = true;
-    if(tmp[i] == '.')
-    {
-      decimal = true;
-      decimal_index = i;
-      break;
-    }
-  }
-
-  if(decimal)
-  {
-    int whole_number = 0;
-    for(unsigned int i = 0; i < decimal_index; i++)
-    {
-      int digit = c_to_i(tmp[i]);
-      whole_number += digit * pow(10, (decimal_index - i) - 1);
-    }
-
-    double decimal_number = 0;
-    for(unsigned int i = decimal_index + 1; i < tmp.size(); i++)
-    {
-      int digit = c_to_i(tmp[i]);
-      decimal_number += digit * pow(10, (tmp.size() - i) - 1);
-    }
-    decimal_number *= ne_pow(10, ((decimal_index + 1) - tmp.size()));
-
-    value = double(whole_number) + double(decimal_number);
-  }
-  else
-    value = double(s_to_i(tmp));
-
-  if(negative)
-    value = -value;
-
-  return value;
-}
-
-int Table::c_to_i(char tmp)
-{
-  if(tmp == '0')
-    return 0;
-  if(tmp == '1')
-    return 1;
-  if(tmp == '2')
-    return 2;
-  if(tmp == '3')
-    return 3;
-  if(tmp == '4')
-    return 4;
-  if(tmp == '5')
-    return 5;
-  if(tmp == '6')
-    return 6;
-  if(tmp == '7')
-    return 7;
-  if(tmp == '8')
-    return 8;
-  if(tmp == '9')
-    return 9;
-
-  return 0;
-}
-
-long Table::pow(int base, int exp)
-{
-  if(exp < 0)
-  {
-    cout << "pow(base, exp) only accepts positive exponents.";
-    cout << " Use ne_pow(base, exp) for negative exponents." << endl;
-    return 0;
-  }
-
-  long value = 1;
-  for(int i = 0; i < exp; i++)
-    value *= base;
-
-  return value;
-}
-
-double Table::ne_pow(int base, int exp)
-{
-  double value = 1.0 / pow(base, -exp);
-  return value;
 }
