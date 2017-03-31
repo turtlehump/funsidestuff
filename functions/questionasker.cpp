@@ -140,7 +140,7 @@ double QuestionAsker::string_to_double(string tmp)
   if(decimal)
   {
     int whole_number = 0;
-    for(unsigned int i = 0; i < decimal_index; i++)
+    for(int i = 0; i < decimal_index; i++)
     {
       int digit = char_to_int(tmp[i]);
       whole_number += digit * this->pow(10, (decimal_index - i) - 1);
