@@ -51,7 +51,8 @@ class Card:
 
     return "{0}{1}".format(tmpValue, tmpSuit)
 
-for i in CardSuit:
-  for j in CardValue:
-    tmp = Card(j,i)
-    print(tmp)
+
+#for i in CardSuit:
+#  for j in CardValue:
+#    tmp = Card(j,i)
+#    print(tmp)

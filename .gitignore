@@ -2,7 +2,6 @@
 *.o
 *.swp
 tmp*
-*/tmp/
 /hamspam/hamspam
 /hamspam/trained.data
 /hamspam/training
@@ -16,3 +15,4 @@ tmp*
 /money/blackjack/blackjack
 /money/topdowntower/topdowntower
 /functions/question_asker
+__pycache__*
