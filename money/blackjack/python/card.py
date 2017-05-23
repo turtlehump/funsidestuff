@@ -23,7 +23,7 @@ class CardSuit(Enum):
 
 class Card:
   def __init__(self, value, suit):
-    self.m_value = CardValue(value)
+    self.m_value = CardValue(value).value
     self.m_suit = CardSuit(suit)
 
   def __str__(self): #the print function
@@ -38,7 +38,7 @@ class Card:
     elif self.m_value == CardValue.ACE:
       tmpValue = "A"
     else:
-      tmpValue = CardValue(self.m_value)
+      tmpValue = str(self.m_value)
 
     if self.m_suit == CardSuit.SPADES:
       tmpSuit = "s"
@@ -48,11 +48,22 @@ class Card:
       tmpSuit = "c"
     else: #elif self.m_suit = CardSuit.HEARTS:
       tmpSuit = "h"
+    return tmpValue + tmpSuit
 
-    return "{0}{1}".format(tmpValue, tmpSuit)
+  def hard_value(self):
+    if self.m_value == CardValue.JACK or \
+       self.m_value == CardValue.QUEEN or \
+       self.m_value == CardValue.KING:
+      return 10
+    else:
+      return self.m_value
 
-
-#for i in CardSuit:
-#  for j in CardValue:
-#    tmp = Card(j,i)
-#    print(tmp)
+  def soft_value(self):
+    if self.m_value == CardValue.JACK or \
+       self.m_value == CardValue.QUEEN or \
+       self.m_value == CardValue.KING:
+      return 10
+    elif self.m_value == CardValue.ACE:
+      return 11
+    else:
+      return self.m_value

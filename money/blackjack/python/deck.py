@@ -9,6 +9,11 @@ class Deck:
           tmp = Card(k, j)
           self.m_cards.append(tmp)
 
+  def print(self):
+    for i in range(len(self.m_cards)):
+      print(self.m_cards[i])
+
+
   def __str__(self):
     tmp = ""
     index = 0
@@ -20,3 +25,4 @@ class Deck:
 
 #deck = Deck(2)
 #print(deck)
+#deck.print()
