@@ -1,5 +1,6 @@
 from question_asker import *
 from deck import *
+from dealer import *
 from player import *
 
 qa = QuestionAsker()
@@ -8,6 +9,10 @@ def clear_screen():
   print('\n' * 59)
 
 class Table:
+############################
+  def __init__(self):
+    self.m_dealer = Dealer()
+
 ############################
   def setup(self):
     self.set_deck()

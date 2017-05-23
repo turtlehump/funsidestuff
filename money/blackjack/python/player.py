@@ -1,7 +1,7 @@
+from hand import *
+
 class Player:
   def __init__(self, name):
-    #args -- tuple of anonymous arguments
-    #kwargs -- dictionary of named arguments
     self.name = name
     self.money = 300
     self.hands = []
