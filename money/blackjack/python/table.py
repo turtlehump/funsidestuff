@@ -35,7 +35,12 @@ class Table:
 ############################
   def set_deck(self):
     clear_screen()
-    num_decks = qa.aquire_int("How many decks are we going to use? ")
+    while(True):
+      num_decks = qa.aquire_int("How many decks are we going to use? ")
+      if(num_decks < 1):
+        print("We must play with a positive number of decks.")
+      else:
+        break
     self.m_deck = Deck(num_decks)
 
 ############################
@@ -71,11 +76,19 @@ class Table:
       self.players.append(tmp)
 
 ############################
+#########THE BEEF###########
+############################
   def play_an_entire_hand(self):
+      self.set_hands_for_players()
       clear_screen()
       print("Playing Blackjack with " \
             + str(len(self.players)) \
             + " players.")
+      for player in self.players:
+        print(player.name + " is playing " + str(len(player.hands)))
+        for hand in player.hands:
+          print(hand)
+      #self.starting_deal()
 
 ############################
   def ask_play_again(self):
@@ -85,6 +98,40 @@ class Table:
         return 1
       if(play_again == 'n' or play_again == 'n'):
         return 2
+
+############################
+  def set_hands_for_players(self):
+    clear_screen()
+    for player in self.players:
+      while(True):
+        while(True):
+          num_hands = qa.aquire_int("How many hands does "\
+                              + player.name + " want to play? ")
+          if(num_hands < 1):
+            print(player.name + " must play a positive number of hands")
+          else:
+            break
+        while(True):
+          bet = qa.aquire_int("And the bet? ("\
+                              + str(self.min_bet) + "-"\
+                              + str(self.max_bet) + ") ")
+          if(bet < self.min_bet):
+            print(player.name + " must bet more than " + str(self.min_bet))
+          elif(bet > self.max_bet):
+            print(player.name + " must bet less than " + str(self.max_bet))
+          else:
+            break
+
+        total_bet = num_hands * bet
+
+        if(not player.can_afford(total_bet)):
+          print(player.name + " can not afford this bet of " + str(total_bet))
+          continue
+        else:
+          for i in range(0, num_hands):
+            tmp = Hand(bet)
+            player.hands.append(tmp)
+          break
 
 ############################
   def player_money_print(self):

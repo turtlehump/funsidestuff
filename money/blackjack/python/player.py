@@ -8,3 +8,9 @@ class Player:
 
   def __str__(self):
     return self.name + ": $" + str(self.money)
+
+  def can_afford(self, amount):
+    if(self.money < amount):
+      return False
+    else:
+      return True
