@@ -478,7 +478,7 @@ void Table::table_dealing_print()
   for(unsigned int i = 0; i < m_players.size(); i++)
     m_players[i]->print();
 
-  //this is to kkep it aligned throughout all prints so its easier to track
+  //this is to keep it aligned throughout all prints so its easier to track
   cout << endl << endl << endl << endl;
 
   return;
