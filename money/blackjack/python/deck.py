@@ -1,3 +1,4 @@
+from time import *
 from card import *
 
 class Deck:
@@ -13,16 +14,6 @@ class Deck:
     for i in range(len(self.m_cards)):
       print(self.m_cards[i])
 
-
-  def __str__(self):
-    tmp = ""
-    index = 0
-    for i in range(len(self.m_cards)):
-      tmp = tmp + self.m_cards[i].__str__()
-      if(i < len(self.m_cards) - 1):
-        tmp = tmp + '\n'
-    return tmp
-
-#deck = Deck(2)
-#print(deck)
-#deck.print()
+  def deal_top_card(self):
+    sleep(1)
+    return self.m_cards.pop()

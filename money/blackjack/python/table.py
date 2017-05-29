@@ -56,7 +56,8 @@ class Table:
 
     #maximum bet setting
     while(True):
-      self.max_bet = qa.aquire_int("And the maximum bet? ")
+      self.max_bet = qa.aquire_int("And the maximum bet? (>= " \
+                                   + str(5 * self.min_bet) + ") ")
       if(self.max_bet < 5 * self.min_bet):
         print("Maximum bet must be at least 5 times the minimum bet.")
       else:
@@ -65,15 +66,18 @@ class Table:
 ############################
   def set_players(self):
     clear_screen()
-    num_players = 0
-    while(num_players < 1):
+    while(True):
       num_players = qa.aquire_int("How many players are playing? ")
+      if(num_players < 1):
+        print("There must be at least 1 player.")
+      else:
+        break
     
-    self.players = []
+    self.m_players = []
     for i in range(0, num_players):
       name = input("Player " + str(i + 1) + "'s name: ")
       tmp = Player(name)
-      self.players.append(tmp)
+      self.m_players.append(tmp)
 
 ############################
 #########THE BEEF###########
@@ -81,20 +85,21 @@ class Table:
   def play_an_entire_hand(self):
       self.set_hands_for_players()
       clear_screen()
-      print("Playing Blackjack with " \
-            + str(len(self.players)) \
-            + " players.")
-      for player in self.players:
-        print(player.name + " is playing " + str(len(player.hands)))
-        for hand in player.hands:
-          print(hand)
-      #self.starting_deal()
+#      print("Playing Blackjack with " \
+#            + str(len(self.m_players)) \
+#            + " players.")
+#      for player in self.m_players:
+#        print(player.m_name + " is playing " + str(len(player.hands)))
+#        for hand in player.hands:
+#          print(hand)
+      self.starting_deal()
 
 ############################
   def ask_play_again(self):
     while(True):
       play_again = input("Play again? (y/n) ")
       if(play_again == 'y' or play_again == 'Y'):
+        self.reset_players_hands()
         return 1
       if(play_again == 'n' or play_again == 'n'):
         return 2
@@ -102,13 +107,13 @@ class Table:
 ############################
   def set_hands_for_players(self):
     clear_screen()
-    for player in self.players:
+    for player in self.m_players:
       while(True):
         while(True):
           num_hands = qa.aquire_int("How many hands does "\
-                              + player.name + " want to play? ")
+                              + player.m_name + " want to play? ")
           if(num_hands < 1):
-            print(player.name + " must play a positive number of hands")
+            print(player.m_name + " must play a positive number of hands")
           else:
             break
         while(True):
@@ -116,24 +121,48 @@ class Table:
                               + str(self.min_bet) + "-"\
                               + str(self.max_bet) + ") ")
           if(bet < self.min_bet):
-            print(player.name + " must bet more than " + str(self.min_bet))
+            print(player.m_name + " must bet more than " + str(self.min_bet))
           elif(bet > self.max_bet):
-            print(player.name + " must bet less than " + str(self.max_bet))
+            print(player.m_name + " must bet less than " + str(self.max_bet))
           else:
             break
 
         total_bet = num_hands * bet
 
         if(not player.can_afford(total_bet)):
-          print(player.name + " can not afford this bet of " + str(total_bet))
+          print(player.m_name + " can not afford this bet of " + str(total_bet))
           continue
         else:
           for i in range(0, num_hands):
             tmp = Hand(bet)
-            player.hands.append(tmp)
+            player.m_hands.append(tmp)
           break
 
 ############################
+  def starting_deal(self):
+    for player in self.m_players:
+      for hand in player.m_hands:
+        hand.hit(self.m_deck.deal_top_card())
+        self.dealing_print()
+
+############################
+  def dealing_print(self):
+    #final_print = False
+    clear_screen()
+    print("****STARTING DEAL****" + '\n')
+
+    #Dealer is on top for display reasons
+    #self.m_dealer.dealer_print(final_print)
+    #print()
+    for player in self.m_players:
+      print(player)
+
+############################
+  def reset_players_hands(self):
+    for player in self.m_players:
+      player.m_hands.clear()
+
+############################
   def player_money_print(self):
-    for i in self.players:
-      print(i)
+    for player in self.m_players:
+      player.money_print()
