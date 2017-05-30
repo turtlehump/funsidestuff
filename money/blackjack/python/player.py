@@ -14,10 +14,10 @@ class Player:
         tmp += self.m_name + ": "
       else:
         tmp += ' ' * (len(self.m_name) + 2)
-      tmp += str(i) + ": "
-      for card in m_hand.m_cards:
-        tmp += card.__str__() + " "
-      tmp += "\t[" + str(m_hand.value()) + "]\n"
+      tmp += str(i) + " "
+      tmp += m_hand.__str__()
+      if(i < len(self.m_hands)):
+        tmp += '\n'
       i += 1
     return tmp
 

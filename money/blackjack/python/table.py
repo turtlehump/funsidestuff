@@ -146,10 +146,11 @@ class Table:
 
 ############################
   def starting_deal(self):
-    for player in self.m_players:
-      for hand in player.m_hands:
-        hand.hit(self.m_deck.deal_top_card())
-        self.dealing_print()
+    for i in range(0,2):
+      for player in self.m_players:
+        for hand in player.m_hands:
+          hand.hit(self.m_deck.deal_top_card())
+          self.dealing_print()
 
 ############################
   def dealing_print(self):

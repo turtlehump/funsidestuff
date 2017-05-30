@@ -6,7 +6,15 @@ class Hand:
     self.m_bet = bet
 
   def __str__(self):
-    return "Hand with bet of " + str(self.m_bet)
+    i = 0
+    tmp = "(" + str(self.m_bet) + "): "
+    for card in self.m_cards:
+      if(i > 0):
+        tmp += ", "
+      tmp += card.__str__()
+      i += 1
+    tmp += "\t[" + str(self.value()) + "]"
+    return tmp
 
   def hit(self, new_card):
     self.m_cards.append(new_card)
