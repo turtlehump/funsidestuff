@@ -4,12 +4,6 @@ class QuestionAsker:
       try:
         tmpstr = int(input(question))
       except:
-        print("Bad Int")
+        print("\nBad Int\n")
         continue
       return tmpstr
-
-
-#qa = QuestionAsker
-#tmpint = qa.aquire_int("Gimme an int: ")
-#tmpint2 = tmpint + 2
-#print("your int plus 2: ", tmpint2)

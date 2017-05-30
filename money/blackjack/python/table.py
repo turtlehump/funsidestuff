@@ -38,7 +38,7 @@ class Table:
     while(True):
       num_decks = qa.aquire_int("How many decks are we going to use? ")
       if(num_decks < 1):
-        print("We must play with a positive number of decks.")
+        print("\nWe must play with a positive number of decks.\n")
       else:
         break
     self.m_deck = Deck(num_decks)
@@ -50,7 +50,7 @@ class Table:
     while(True):
       self.min_bet = qa.aquire_int("What is the minimum bet? ")
       if(self.min_bet < 1):
-        print("Minimum bet must be greater than 0.")
+        print("\nMinimum bet must be greater than 0.\n")
       else:
         break
 
@@ -59,7 +59,7 @@ class Table:
       self.max_bet = qa.aquire_int("And the maximum bet? (>= " \
                                    + str(5 * self.min_bet) + ") ")
       if(self.max_bet < 5 * self.min_bet):
-        print("Maximum bet must be at least 5 times the minimum bet.")
+        print("\nMaximum bet must be at least 5 times the minimum bet.\n")
       else:
         break
 
@@ -69,7 +69,7 @@ class Table:
     while(True):
       num_players = qa.aquire_int("How many players are playing? ")
       if(num_players < 1):
-        print("There must be at least 1 player.")
+        print("\nThere must be at least 1 player.\n")
       else:
         break
     
@@ -101,8 +101,10 @@ class Table:
       if(play_again == 'y' or play_again == 'Y'):
         self.reset_players_hands()
         return 1
-      if(play_again == 'n' or play_again == 'n'):
+      elif(play_again == 'n' or play_again == 'n'):
         return 2
+      else:
+        print("\nInvalid Option\n")
 
 ############################
   def set_hands_for_players(self):
@@ -113,7 +115,8 @@ class Table:
           num_hands = qa.aquire_int("How many hands does "\
                               + player.m_name + " want to play? ")
           if(num_hands < 1):
-            print(player.m_name + " must play a positive number of hands")
+            print('\n' + player.m_name \
+                  + " must play a positive number of hands.\n")
           else:
             break
         while(True):
@@ -121,16 +124,19 @@ class Table:
                               + str(self.min_bet) + "-"\
                               + str(self.max_bet) + ") ")
           if(bet < self.min_bet):
-            print(player.m_name + " must bet more than " + str(self.min_bet))
+            print('\n' + player.m_name \
+                  + " must bet more than " + str(self.min_bet) + '\n')
           elif(bet > self.max_bet):
-            print(player.m_name + " must bet less than " + str(self.max_bet))
+            print('\n' + player.m_name \
+                  + " must bet less than " + str(self.max_bet) + '\n')
           else:
             break
 
         total_bet = num_hands * bet
 
         if(not player.can_afford(total_bet)):
-          print(player.m_name + " can not afford this bet of " + str(total_bet))
+          print('\n' + player.m_name \
+                + " can not afford this bet of " + str(total_bet) + '\n')
           continue
         else:
           for i in range(0, num_hands):
@@ -149,7 +155,7 @@ class Table:
   def dealing_print(self):
     #final_print = False
     clear_screen()
-    print("****STARTING DEAL****" + '\n')
+    print("****STARTING DEAL****\n")
 
     #Dealer is on top for display reasons
     #self.m_dealer.dealer_print(final_print)
