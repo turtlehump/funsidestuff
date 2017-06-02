@@ -22,3 +22,14 @@ class Hand:
 
   def value(self):
     return 42
+
+  def dealer_playing_str(self):
+    tmp = ""
+    size = len(self.m_cards)
+    if(size == 0):
+      return tmp
+      #do nothing
+    tmp += "-"
+    for i in range(1, size):
+      tmp += ", " + self.m_cards[i].__str__()
+    return tmp

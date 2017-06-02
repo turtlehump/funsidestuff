@@ -147,13 +147,14 @@ class Table:
 
         if(not player.can_afford(total_bet)):
           print('\n' + player.m_name \
-                + " can not afford this bet of " + str(total_bet) + '\n')
+               + " can not afford this bet of " + str(total_bet) + '\n')
           continue
         else:
           for i in range(0, num_hands):
             tmp = Hand(bet)
             player.m_hands.append(tmp)
           break
+    self.m_dealer.new_hand()
 
 ############################
   def starting_deal(self):
@@ -162,6 +163,8 @@ class Table:
         for hand in player.m_hands:
           hand.hit(self.m_deck.deal_top_card())
           self.dealing_print()
+      self.m_dealer.m_hand.hit(self.m_deck.deal_top_card())
+      self.dealing_print()
 
 ############################
   def dealing_print(self):
@@ -170,8 +173,8 @@ class Table:
     print("****STARTING DEAL****\n")
 
     #Dealer is on top for display reasons
-    #self.m_dealer.dealer_print(final_print)
-    #print()
+    print(self.m_dealer.playing_str())
+    print()
     for player in self.m_players:
       print(player)
 
