@@ -15,8 +15,8 @@ class Table:
 
 ############################
   def setup(self):
-    self.set_deck()
     self.set_limits()
+    self.set_deck()
     self.set_players()
 
 ############################
@@ -31,17 +31,6 @@ class Table:
         break
 
     self.player_money_print()
-
-############################
-  def set_deck(self):
-    clear_screen()
-    while(True):
-      num_decks = qa.aquire_int("How many decks are we going to use? ")
-      if(num_decks < 1):
-        print("\nWe must play with a positive number of decks.\n")
-      else:
-        break
-    self.m_deck = Deck(num_decks)
 
 ############################
   def set_limits(self):
@@ -59,20 +48,37 @@ class Table:
       self.max_bet = qa.aquire_int("And the maximum bet? (>= " \
                                    + str(5 * self.min_bet) + ") ")
       if(self.max_bet < 5 * self.min_bet):
-        print("\nMaximum bet must be at least 5 times the minimum bet.\n")
+        print("\nMaximum bet must be at least 5x times the minimum"\
+              + " bet of " + str(self.min_bet) + " ("\
+              + str(5 * self.min_bet) + ")\n")
       else:
         break
+
+############################
+  def set_deck(self):
+    clear_screen()
+    while(True):
+      num_decks = qa.aquire_int("How many decks are we going to use? ")
+      if(num_decks < 1):
+        print("\nWe must play with a positive number of decks.\n")
+      else:
+        break
+    tmp = Deck(num_decks)
+    tmp.shuffle()
+    tmp.cut()
+    self.m_deck = tmp
 
 ############################
   def set_players(self):
     clear_screen()
     while(True):
-      num_players = qa.aquire_int("How many players are playing? ")
+      num_players = qa.aquire_int("How many players are at the table? ")
       if(num_players < 1):
         print("\nThere must be at least 1 player.\n")
       else:
         break
-    
+
+    print()
     self.m_players = []
     for i in range(0, num_players):
       name = input("Player " + str(i + 1) + "'s name: ")
@@ -109,6 +115,11 @@ class Table:
 ############################
   def set_hands_for_players(self):
     clear_screen()
+    self.player_money_print()
+    print()
+    print("Count: " + str(self.m_deck.m_count))
+    print("Dealt: " + str(self.m_deck.m_dealt))
+    print()
     for player in self.m_players:
       while(True):
         while(True):
