@@ -23,13 +23,20 @@ class Hand:
   def value(self):
     return 42
 
-  def dealer_playing_str(self):
+  #dealer will only 0, 1, or 2 cards
+  def dealer_waiting_str(self):
     tmp = ""
     size = len(self.m_cards)
     if(size == 0):
       return tmp
       #do nothing
-    tmp += "-"
-    for i in range(1, size):
+    tmp += self.m_cards[0].__str__()
+    if(size == 2):
+      tmp += ", -"
+    return tmp
+
+  def dealer_playing_str(self):
+    tmp = ""
+    for i in range(0, len(self.m_cards)):
       tmp += ", " + self.m_cards[i].__str__()
     return tmp

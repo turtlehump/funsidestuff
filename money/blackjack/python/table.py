@@ -173,7 +173,7 @@ class Table:
     print("****STARTING DEAL****\n")
 
     #Dealer is on top for display reasons
-    print(self.m_dealer.playing_str())
+    print(self.m_dealer.waiting_str())
     print()
     for player in self.m_players:
       print(player)
