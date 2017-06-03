@@ -5,6 +5,7 @@ class Hand:
     self.m_cards = []
     self.m_bet = bet
 
+###############################
   def __str__(self):
     i = 0
     tmp = "(" + str(self.m_bet) + "): "
@@ -16,13 +17,39 @@ class Hand:
     tmp += "\t[" + str(self.value()) + "]"
     return tmp
 
+###############################
   def hit(self, new_card):
     self.m_cards.append(new_card)
     return self.value()
 
+###############################
   def value(self):
-    return 42
+    soft_value = self.soft_value()
+    hard_value = self.hard_value()
 
+    if(soft_value <= 21):
+      return soft_value
+
+    if((soft_value - hard_value) > 10):
+      while(hard_value <= 11):
+        hard_value += 10
+    return hard_value
+
+###############################
+  def soft_value(self):
+    soft_value = 0
+    for card in self.m_cards:
+      soft_value += card.soft_value()
+    return soft_value
+
+###############################
+  def hard_value(self):
+    hard_value = 0
+    for card in self.m_cards:
+      hard_value += card.hard_value()
+    return hard_value
+
+###############################
   #dealer will only 0, 1, or 2 cards
   def dealer_waiting_str(self):
     tmp = ""
@@ -35,6 +62,7 @@ class Hand:
       tmp += ", -"
     return tmp
 
+###############################
   def dealer_playing_str(self):
     tmp = ""
     for i in range(0, len(self.m_cards)):
