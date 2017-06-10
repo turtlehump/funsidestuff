@@ -91,14 +91,17 @@ class Table:
   def play_an_entire_hand(self):
       self.set_hands_for_players()
       clear_screen()
-#      print("Playing Blackjack with " \
-#            + str(len(self.m_players)) \
-#            + " players.")
-#      for player in self.m_players:
-#        print(player.m_name + " is playing " + str(len(player.hands)))
-#        for hand in player.hands:
-#          print(hand)
       self.starting_deal()
+
+      for player in self.m_players:
+        player.is_playing = True
+        hand_num = 1
+        for hand in player.m_hands:
+          hand.is_playing = True
+          self.play_hand(player.m_name, hand_num, hand)
+          hand_num += 1
+          hand.is_playing = False
+        player.is_playing = False
 
 ############################
   def ask_play_again(self):
@@ -157,6 +160,11 @@ class Table:
     self.m_dealer.new_hand()
 
 ############################
+  def play_hand(self, player_name, hand_num, hand):
+    self.playing_print(player_name, hand_num)
+    sleep(1)
+
+############################
   def starting_deal(self):
     for i in range(0,2):
       for player in self.m_players:
@@ -171,6 +179,19 @@ class Table:
     #final_print = False
     clear_screen()
     print("****STARTING DEAL****\n")
+
+    #Dealer is on top for display reasons
+    print(self.m_dealer.waiting_str())
+    print()
+    for player in self.m_players:
+      print(player)
+
+############################
+  def playing_print(self, player_name, hand_num):
+    #final_print = False
+    clear_screen()
+    print("****" + player_name + \
+          " IS PLAYING: HAND " + str(hand_num) + "****\n")
 
     #Dealer is on top for display reasons
     print(self.m_dealer.waiting_str())

@@ -5,15 +5,24 @@ class Player:
     self.m_name = name
     self.m_money = 300
     self.m_hands = []
+    self.is_playing = False
 
   def __str__(self):
     i = 1
     tmp = ""
+    if(self.is_playing):
+      tmp += "*"
+    else:
+      tmp += " "
     for m_hand in self.m_hands:
       if i == 1:
-        tmp += self.m_name + ": "
+        tmp += self.m_name + ":"
       else:
         tmp += ' ' * (len(self.m_name) + 2)
+      if(m_hand.is_playing):
+        tmp += "*"
+      else:
+        tmp += " "
       tmp += str(i) + " "
       tmp += m_hand.__str__()
       if(i < len(self.m_hands)):

@@ -4,6 +4,7 @@ class Hand:
   def __init__(self, bet):
     self.m_cards = []
     self.m_bet = bet
+    self.is_playing = False
 
 ###############################
   def __str__(self):
