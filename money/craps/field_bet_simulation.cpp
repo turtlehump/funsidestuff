@@ -64,7 +64,7 @@ void setup(int argc, char *argv[])
 void simulation()
 {
   srand(time(NULL));
-  int roll, dice1, dice2, cash_at_start_of_betting_seq;
+  int roll, dice1, dice2, cash_at_start_of_betting_seq = STARTING_CASH;
   int segment_rolls = 0, total_rolls = 0, losses = 0;
   bool maxed = false;
   bool just_won;
