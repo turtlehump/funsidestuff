@@ -15,5 +15,4 @@ tmp*
 /stocks/portfolio/profiles
 /money/blackjack/blackjack
 /money/topdowntower/topdowntower
-/functions/question_asker
 __pycache__*
