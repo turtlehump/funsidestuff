@@ -11,6 +11,7 @@ string Encrypter::single_key_encrypt(string message)
     next_char = itoa((atoi(message[i]) + atoi(m_single_key[single_key_i])) % 95);
     //95 is just the number of valid characters in my atoi (0-94)
     encrypted_message += next_char;
+    cout << message[i] << " encrypted with " << m_single_key[single_key_i] << " is " << next_char << endl;
   }
   return encrypted_message;
 }
