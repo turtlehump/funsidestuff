@@ -6,6 +6,7 @@ tmp*
 /hamspam/trained.data
 /hamspam/training
 /matrix/matrix_multiply
+/primes/prime_generator
 /primes/list_of_primes.data
 /stocks/curdata
 /stocks/DOW/stocks

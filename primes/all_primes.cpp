@@ -7,14 +7,14 @@
 
 using namespace std;
 
-bool is_prime(unsigned long long number, vector<unsigned long long> &prime_numbers, int size);
+bool is_prime(unsigned long long int number, vector<unsigned long long int> &prime_numbers, unsigned int size);
 
 int output_counter = 10000;
 
 int main()
 {
   bool first_time = false;
-  vector<unsigned long long> prime_numbers;
+  vector<unsigned long long int> prime_numbers;
 
   ifstream input_primes;
   input_primes.open ("list_of_primes.data");
@@ -24,12 +24,12 @@ int main()
   if(input_primes.is_open())
   {
     cout << "Opened the input file." << endl;
-    unsigned long long number;
+    unsigned long long int number;
     while(input_primes >> number)
     {
 /*      if(number < 0)
       {
-        cout << "You have found all prime unsigned long longs" << endl;
+        cout << "You have found all prime unsigned long long ints" << endl;
         cout << "Now you need to increase the number of bits to find higher numbers." << endl;
         return 0;
       }
@@ -64,7 +64,7 @@ int main()
 
   cout << "Calculating more primes." << endl;
 
-  for(unsigned long long i = (prime_numbers.back() + 2); i > 0; i+=2)
+  for(unsigned long long int i = (prime_numbers.back() + 2); i > 0; i+=2)
   // all prime numbers after 2 are odd,
   // the last element in the vector will always be odd
   // no need to check that last element that we got, check the next odd number
@@ -73,19 +73,21 @@ int main()
     {
       prime_numbers.push_back(i);
       primes << i << endl;
+/*
       if((prime_numbers.size() % output_counter) == 0)
       {
         cout << output_counter << " more: " << prime_numbers.size() << " total. latest = " << prime_numbers.back() << endl;
       }
+*/
     }
   }
   primes.close();
   return 0;
 }
 
-bool is_prime(unsigned long long number, vector<unsigned long long> &prime_numbers, int size)
+bool is_prime(unsigned long long int number, vector<unsigned long long int> &prime_numbers, unsigned int size)
 {
-  for(unsigned long long i = 0; i < size && (prime_numbers[i] * prime_numbers[i]) <= number; i++)
+  for(unsigned long long int i = 0; i < size && ((prime_numbers[i] * prime_numbers[i]) <= number); i++)
   {
     if((number % prime_numbers[i]) == 0)
     {
