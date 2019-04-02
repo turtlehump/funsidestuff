@@ -520,10 +520,15 @@ void Table::table_final_print(int dealer_hand_value)
 
   cout << endl;
 
-  cout << "The dealer got ";
-  if(m_dealer->has_blackjack()) cout << "a Blackjack.";
-  else                          cout << dealer_hand_value << ".";
+  if(dealer_hand_value == 0)
+    cout << "All hands have BUST. Dealer did not play.";
 
+  else
+  {
+    cout << "The dealer got ";
+    if(m_dealer->has_blackjack()) cout << "a Blackjack.";
+    else                          cout << dealer_hand_value << ".";
+  }
   //this is to keep it aligned throughout all prints so its easier to track
   cout << endl << endl;
 
