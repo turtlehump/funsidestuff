@@ -48,12 +48,12 @@ int main()
   {
     prime_numbers.push_back(2);
     prime_numbers.push_back(3);
-    first_time = true;          //added 2 and 3 to vector but not the file
+    first_time = true;          //added 2 and 3 to vector but not the file (file not open yet)
     cout << "This seems to be the first time." << endl;
   }
 
   ofstream primes;
-  primes.open ("list_of_primes.data", ios::out | ios::app); //WE ALWAYS WANT TO OPEN THE FILE
+  primes.open ("list_of_primes.data", ios::out | ios::app); //WE ALWAYS WANT TO OPEN THE OUTPUT FILE
 
   if(first_time)                //add 2 and 3 to the file first because we will skip them in the for loop
   {
