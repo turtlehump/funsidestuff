@@ -2,6 +2,7 @@
 */*.exe
 *.o
 *.swp
+*/*.stackdump
 tmp*
 /hamspam/hamspam
 /hamspam/trained.data
