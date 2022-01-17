@@ -5,13 +5,18 @@
 
 using namespace std;
 
+Encrypter* encrypter = new Encrypter();
+
 void intro_description();
 
 int get_encryption_option();
 
-int run_single_key();
-int run_single_key_encrypt();
-int run_single_key_decrypt();
+string get_message(bool encrypting);
+
+void run_single_key();
+void run_single_key_encrypt();
+void run_single_key_decrypt();
+string get_single_key(bool encrypting);
 
 int run_RSA();
 
@@ -21,9 +26,11 @@ int main()
 
   int option = get_encryption_option(); //can only return 1 or 2
 
-  if      (option == 1) return run_single_key();
-  else if (option == 2) return run_RSA();
-  else                  return 1; //There was an error in selecting the encryption type
+  if      (option == 1) run_single_key();
+  else if (option == 2) run_RSA();
+
+  delete encrypter;
+  return 0;
 }
 
 void intro_description()
@@ -52,7 +59,10 @@ int get_encryption_option()
     cout << "2) 2-key (RSA)" << endl << endl;
     cout << "What do you want to work with? ";
 
-    getline(cin, option);
+    do
+    {
+      getline(cin, option);
+    }while(option.length() == 0);
     option.erase(remove(option.begin(), option.end(), ' '), option.end());
     option.erase(remove(option.begin(), option.end(), '\t'), option.end());
     cout << endl;
@@ -63,7 +73,7 @@ int get_encryption_option()
   }while(1);
 }
 
-int run_single_key()
+void run_single_key()
 {
   cout << "************************* SINGLE-KEY *************************" << endl << endl;
 
@@ -75,7 +85,10 @@ int run_single_key()
     cout << "2) Decrypt" << endl << endl;
     cout << "What do you want to do? ";
 
-    getline(cin, option);
+    do
+    {
+      getline(cin, option);
+    }while(option.length() == 0);
     option.erase(remove(option.begin(), option.end(), ' '), option.end());
     option.erase(remove(option.begin(), option.end(), '\t'), option.end());
     cout << endl;
@@ -86,64 +99,137 @@ int run_single_key()
   }while(1);
 }
 
-int run_single_key_encrypt()
+void run_single_key_encrypt()
 {
   cout << "************************* ENCRYPTING *************************" << endl << endl;
 
-  Encrypter* encrypter = new Encrypter();
-  string message;
-  string key;
-
-  cout << "Give me a message to encrypt:" << endl;
-  getline(cin, message);
-  cout << endl;
-
-  cout << "Give me the key to encrypt the message with:" << endl;
-  getline(cin, key);
-  cout << endl;
-
-  if(key.length() < 15)
-  {
-     cout << "NOTE: You should think about making the key longer so that it is harder to crack." << endl << endl;
-  }
+  string msg = get_message(true);
+  string key = get_single_key(true);
 
   encrypter->set_single_key(key);
-  string encrypted_msg = encrypter->single_key_encrypt(message);
+  string encrypted_msg = encrypter->single_key_encrypt(msg);
 
   cout << endl << endl;
-  cout << "\"" << message << "\"" << endl;
+  cout << "\"" << msg << "\"" << endl;
   cout << "encrypted with \"" << key << "\" is:" << endl << endl;
   cout << "\"" << encrypted_msg << "\"" << endl;
 
-  delete encrypter;
-  return 0;
+  return;
 }
 
-int run_single_key_decrypt()
+void run_single_key_decrypt()
 {
   cout << "************************* DECRYPTING *************************" << endl << endl;
 
-  Encrypter* encrypter = new Encrypter();
-  string encrypted_msg;
-  string key;
-
-  cout << "Give me the encrypted message: ";
-  getline(cin, encrypted_msg);
-  cout << endl;
-
-  cout << "And what is the key? ";
-  getline(cin, key);
+  string encrypted_msg = get_message(false);
+  string key = get_single_key(false);
 
   encrypter->set_single_key(key);
-  string message = encrypter->single_key_decrypt(encrypted_msg);
+  string msg = encrypter->single_key_decrypt(encrypted_msg);
 
   cout << endl << endl;
   cout << "\"" << encrypted_msg << "\"" << endl;
   cout <<"decrypted with \"" << key << "\" is:" << endl << endl;
-  cout << "\"" << message << "\"" << endl;
+  cout << "\"" << msg << "\"" << endl;
 
-  delete encrypter;
-  return 0;
+  return;
+}
+
+string get_message(bool encrypting)
+{
+  string msg;
+  bool valid_str;
+
+  if(encrypting) //**More restrictive for creating a message**
+  {
+    do
+    {
+      cout << "Give me a message to encrypt:" << endl;
+      do
+      {
+        getline(cin, msg);
+      }while(msg.length() == 0);
+      cout << endl;
+
+      if(msg.length() < 5)
+      {
+        valid_str = false;
+        cout << " ** Message needs to be longer than 5 charaters **" << endl << endl;
+      }
+      else
+      {
+        valid_str = encrypter->is_valid_string(msg);
+        if(!valid_str) cout << " ** You used invlaid characters **" << endl << endl;
+      }
+    }while(!valid_str);
+  }
+  else //if you are trying to decrypt a message that was made outside this program/class then
+       //it's not going to work and you can waste as much time as your heart desires
+  {
+
+    cout << "Copy/paste the encrypted message:" << endl;
+    do
+    {
+      do
+      {
+        getline(cin, msg);
+      }while(msg.length() == 0);
+      cout << endl;
+
+      valid_str = encrypter->is_valid_string(msg);
+      if(!valid_str) cout << " ** Your message used invlaid characters **" << endl << endl;
+
+    }while(!valid_str);
+  }
+
+  return msg;
+}
+
+string get_single_key(bool encrypting)
+{
+  string key;
+  bool valid_str;
+
+  if(encrypting) //More restrictive for creating a message
+  {
+    do
+    {
+      cout << "Give me the key to encrypt the message with:" << endl;
+      do
+      {
+        getline(cin, key);
+      }while(key.length() == 0);
+      cout << endl;
+
+      if(key.length() < 5)
+      {
+        valid_str = false;
+        cout << " ** Key needs to be longer than 5 charaters **" << endl << endl;
+      }
+      else
+      {
+        valid_str = encrypter->is_valid_string(key);
+        if(!valid_str) cout << " ** You used invalid characters **" << endl << endl;
+      }
+    }while(!valid_str);
+
+    if(key.length() < 15)
+    {
+       cout << "NOTE: You should think about making the key longer so that it is harder to crack." << endl << endl;
+    }
+  }
+  else //If you are trying to decrypt a message that was made outside this program/class then
+       //it's not going to work and you can waste as much time as your heart desires
+  {
+    cout << "And what is the key?" << endl;
+    do
+    {
+      getline(cin, key);
+    }while(key.length() == 0);
+  }
+  cout << endl;
+
+  return key;
 }
 
 int run_RSA()
