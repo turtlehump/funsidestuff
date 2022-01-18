@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <filesystem>
 #include <algorithm>
 #include "encrypter.h"
 
@@ -11,6 +12,7 @@ void Usage()
 {
   cout << "Usage:" << endl;
   cout << "  encrypter            - Asks for every option" << endl;
+  cout << "  encrypter -f <file>  - Encrypt or decrypt a file" << endl;
   cout << "  encrypter -s         - Shows the math behind the encryption" << endl;
   cout << endl;
 
@@ -20,6 +22,8 @@ void Usage()
 
 //FUNCTIONS v
 bool correct_usage(int argc, char* argv[]);
+
+void run_message_program(bool show);
 
   void intro_description();
 
@@ -33,18 +37,16 @@ bool correct_usage(int argc, char* argv[]);
   int run_RSA();
 
     string get_message(bool encrypting);
+
+void run_file_program(string file_name);
 //FUNCTIONS ^
 
 int main(int argc, char* argv[])
 {
   bool show = correct_usage(argc, argv);
 
-  intro_description();
-
-  int option = get_encryption_option(); //can only return 1 or 2
-
-  if      (option == 1) run_single_key(show);
-  else if (option == 2) run_RSA();
+  if(argc == 1 || argc == 2) run_message_program(show);
+  else                       run_file_program(string (argv[2]));
 
   delete encrypter;
   return 0;
@@ -63,8 +65,28 @@ bool correct_usage(int argc, char* argv[])
     else                        Usage();
   }
 
+  if(argc == 3)
+  {
+    if(string(argv[1]) != "-f") Usage();
+
+    if(filesystem::exists(argv[2])) return false;
+    else                            Usage();
+  }
+
   Usage();     //<- Usage() will exit the program
   return true; //<- This is only to get rid of compiler warning
+}
+
+void run_message_program(bool show)
+{
+  intro_description();
+
+  int option = get_encryption_option(); //can only return 1 or 2
+
+  if      (option == 1) run_single_key(show);
+  else if (option == 2) run_RSA();
+
+  return;
 }
 
 void intro_description()
@@ -273,4 +295,10 @@ int run_RSA()
   cout << "This is not avaliable yet. Sorry." << endl;
 
   return 0;
+}
+
+void run_file_program(string file_name)
+{
+  cout << "This is not avaliable yet. Sorry." << endl;
+  return;
 }
