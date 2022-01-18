@@ -7,30 +7,64 @@ using namespace std;
 
 Encrypter* encrypter = new Encrypter();
 
-void intro_description();
-
-int get_encryption_option();
-
-string get_message(bool encrypting);
-
-void run_single_key();
-void run_single_key_encrypt();
-void run_single_key_decrypt();
-string get_single_key(bool encrypting);
-
-int run_RSA();
-
-int main()
+void Usage()
 {
+  cout << "Usage:" << endl;
+  cout << "  encrypter            - Asks for every option" << endl;
+  cout << "  encrypter -s         - Shows the math behind the encryption" << endl;
+  cout << endl;
+
+  delete encrypter;
+  exit(0);
+}
+
+//FUNCTIONS v
+bool correct_usage(int argc, char* argv[]);
+
+  void intro_description();
+
+  int get_encryption_option();
+
+  void run_single_key(bool show);
+    void run_single_key_encrypt(bool show);
+    void run_single_key_decrypt(bool show);
+      string get_single_key(bool encrypting);
+
+  int run_RSA();
+
+    string get_message(bool encrypting);
+//FUNCTIONS ^
+
+int main(int argc, char* argv[])
+{
+  bool show = correct_usage(argc, argv);
+
   intro_description();
 
   int option = get_encryption_option(); //can only return 1 or 2
 
-  if      (option == 1) run_single_key();
+  if      (option == 1) run_single_key(show);
   else if (option == 2) run_RSA();
 
   delete encrypter;
   return 0;
+}
+
+//The return bool is if the program should show the math behind the encryption
+//This will call Usage() (which exits) if the command was improperly used
+//Returning either true or false means the command arguments were acceptable
+bool correct_usage(int argc, char* argv[])
+{
+  if(argc == 1) return false;
+
+  if(argc == 2)
+  {
+    if(string(argv[1]) == "-s") return true;
+    else                        Usage();
+  }
+
+  Usage();     //<- Usage() will exit the program
+  return true; //<- This is only to get rid of compiler warning
 }
 
 void intro_description()
@@ -73,7 +107,7 @@ int get_encryption_option()
   }while(1);
 }
 
-void run_single_key()
+void run_single_key(bool show)
 {
   cout << "************************* SINGLE-KEY *************************" << endl << endl;
 
@@ -93,13 +127,13 @@ void run_single_key()
     option.erase(remove(option.begin(), option.end(), '\t'), option.end());
     cout << endl;
 
-    if      (option == "1") return run_single_key_encrypt();
-    else if (option == "2") return run_single_key_decrypt();
+    if      (option == "1") return run_single_key_encrypt(show);
+    else if (option == "2") return run_single_key_decrypt(show);
     else cout << " ** That is not a valid option. **" << endl << endl;
   }while(1);
 }
 
-void run_single_key_encrypt()
+void run_single_key_encrypt(bool show)
 {
   cout << "************************* ENCRYPTING *************************" << endl << endl;
 
@@ -107,9 +141,9 @@ void run_single_key_encrypt()
   string key = get_single_key(true);
 
   encrypter->set_single_key(key);
-  string encrypted_msg = encrypter->single_key_encrypt(msg);
+  string encrypted_msg = encrypter->single_key_encrypt(msg, show);
 
-  cout << endl << endl;
+  cout << endl;
   cout << "\"" << msg << "\"" << endl;
   cout << "encrypted with \"" << key << "\" is:" << endl << endl;
   cout << "\"" << encrypted_msg << "\"" << endl;
@@ -117,7 +151,7 @@ void run_single_key_encrypt()
   return;
 }
 
-void run_single_key_decrypt()
+void run_single_key_decrypt(bool show)
 {
   cout << "************************* DECRYPTING *************************" << endl << endl;
 
@@ -125,9 +159,9 @@ void run_single_key_decrypt()
   string key = get_single_key(false);
 
   encrypter->set_single_key(key);
-  string msg = encrypter->single_key_decrypt(encrypted_msg);
+  string msg = encrypter->single_key_decrypt(encrypted_msg, show);
 
-  cout << endl << endl;
+  cout << endl;
   cout << "\"" << encrypted_msg << "\"" << endl;
   cout <<"decrypted with \"" << key << "\" is:" << endl << endl;
   cout << "\"" << msg << "\"" << endl;
@@ -215,7 +249,7 @@ string get_single_key(bool encrypting)
 
     if(key.length() < 15)
     {
-       cout << "NOTE: You should think about making the key longer so that it is harder to crack." << endl << endl;
+       cout << " ** NOTE: You should think about making the key longer so that it is harder to crack. **" << endl;
     }
   }
   else //If you are trying to decrypt a message that was made outside this program/class then

@@ -19,8 +19,8 @@ class Encrypter
 
     //SINGLE-KEY FUNCTIONS
     void set_single_key(string single_key) {m_single_key = single_key;}
-    string single_key_encrypt(string message);
-    string single_key_decrypt(string encrypted_message);
+    string single_key_encrypt(string message, bool show);
+    string single_key_decrypt(string encrypted_message, bool show);
 
     //RSA FUNCTIONS
     void set_public_key(string public_key) {m_public_key = public_key;}

@@ -10,7 +10,7 @@ bool Encrypter::is_valid_string(string tmp)
   return true;
 }
 
-string Encrypter::single_key_encrypt(string message)
+string Encrypter::single_key_encrypt(string message, bool show)
 {
   string encrypted_message = "";
   int single_key_i;
@@ -20,14 +20,14 @@ string Encrypter::single_key_encrypt(string message)
     single_key_i = i % m_single_key.length();
     next_char = itoc((ctoi(message[i]) + ctoi(m_single_key[single_key_i])) % m_alphabet_size);
 
-    cout << message[i] << " encrypted with " << m_single_key[single_key_i] << " is " << next_char << endl;
+    if(show) cout << message[i] << " encrypted with " << m_single_key[single_key_i] << " is " << next_char << endl;
 
     encrypted_message += next_char;
   }
   return encrypted_message;
 }
 
-string Encrypter::single_key_decrypt(string encrypted_msg)
+string Encrypter::single_key_decrypt(string encrypted_msg, bool show)
 {
   string message = "";
   int single_key_i;
@@ -38,7 +38,7 @@ string Encrypter::single_key_decrypt(string encrypted_msg)
     next_char = itoc((ctoi(encrypted_msg[i]) - ctoi(m_single_key[single_key_i]) + m_alphabet_size) % m_alphabet_size);
     //Need to add alphabet_size in case the key char value was higher than the msg char value
 
-    cout << encrypted_msg[i] << " decrypted with " << m_single_key[single_key_i] << " is " << next_char << endl;
+    if(show) cout << encrypted_msg[i] << " decrypted with " << m_single_key[single_key_i] << " is " << next_char << endl;
 
     message += next_char;
   }
