@@ -162,8 +162,7 @@ void run_single_key_encrypt(bool show)
   string msg = get_message(true);
   string key = get_single_key(true);
 
-  encrypter->set_single_key(key);
-  string encrypted_msg = encrypter->single_key_encrypt(msg, show);
+  string encrypted_msg = encrypter->single_key_encrypt(msg, key, show);
 
   cout << endl;
   cout << "\"" << msg << "\"" << endl;
@@ -180,8 +179,7 @@ void run_single_key_decrypt(bool show)
   string encrypted_msg = get_message(false);
   string key = get_single_key(false);
 
-  encrypter->set_single_key(key);
-  string msg = encrypter->single_key_decrypt(encrypted_msg, show);
+  string msg = encrypter->single_key_decrypt(encrypted_msg, key, show);
 
   cout << endl;
   cout << "\"" << encrypted_msg << "\"" << endl;

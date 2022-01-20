@@ -9,34 +9,20 @@ using namespace std;
 class Encrypter
 {
   public:
-    Encrypter() {m_single_key = "";
-                 m_public_key = "";
-                 m_private_key1 = "";
-                 m_private_key2 = "";}
-
     //The alphabet includes eveything on the keyboard EXCEPT F-keys, arrow keys, and ESC
     bool is_valid_string (string tmp);
 
     //SINGLE-KEY FUNCTIONS
-    void set_single_key(string single_key) {m_single_key = single_key;}
-    string single_key_encrypt(string message, bool show);
-    string single_key_decrypt(string encrypted_message, bool show);
+    string single_key_encrypt(string message, string key, bool show);
+    string single_key_decrypt(string encrypted_message, string key, bool show);
 
     //RSA FUNCTIONS
-    void set_public_key(string public_key) {m_public_key = public_key;}
-    string encrypt_with_public_key(string message);
-    void set_private_keys(string private_key1, string private_key2)
-    {m_private_key1 = private_key1; m_private_key2 = private_key2;}
-    string generate_public_key_from_private_keys();
+    string RSA_generate_public_key(string private_key1, string private_key2);
+    string RSA_encrypt(string message, string public_key);
     
   private:
     int ctoi(char c);
     char itoc(int i);
-
-    string m_single_key;
-    string m_public_key;
-    string m_private_key1;
-    string m_private_key2;
 
     int  m_alphabet_size = 95; //0-94
     char m_alphabet[95] {' ',  // 0

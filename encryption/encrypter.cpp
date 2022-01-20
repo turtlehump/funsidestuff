@@ -10,49 +10,49 @@ bool Encrypter::is_valid_string(string tmp)
   return true;
 }
 
-string Encrypter::single_key_encrypt(string message, bool show)
+string Encrypter::single_key_encrypt(string message, string key, bool show)
 {
   string encrypted_message = "";
-  int single_key_i;
+  int key_i;
   char next_char;
   for(unsigned int i = 0; i < message.length(); i++)
   {
-    single_key_i = i % m_single_key.length();
-    next_char = itoc((ctoi(message[i]) + ctoi(m_single_key[single_key_i])) % m_alphabet_size);
+    key_i = i % key.length();
+    next_char = itoc((ctoi(message[i]) + ctoi(key[key_i])) % m_alphabet_size);
 
-    if(show) cout << message[i] << " encrypted with " << m_single_key[single_key_i] << " is " << next_char << endl;
+    if(show) cout << message[i] << " encrypted with " << key[key_i] << " is " << next_char << endl;
 
     encrypted_message += next_char;
   }
   return encrypted_message;
 }
 
-string Encrypter::single_key_decrypt(string encrypted_msg, bool show)
+string Encrypter::single_key_decrypt(string encrypted_msg, string key, bool show)
 {
   string message = "";
-  int single_key_i;
+  int key_i;
   char next_char;
   for(unsigned int i = 0; i < encrypted_msg.length(); i++)
   {
-    single_key_i = i % m_single_key.length();
-    next_char = itoc((ctoi(encrypted_msg[i]) - ctoi(m_single_key[single_key_i]) + m_alphabet_size) % m_alphabet_size);
+    key_i = i % key.length();
+    next_char = itoc((ctoi(encrypted_msg[i]) - ctoi(key[key_i]) + m_alphabet_size) % m_alphabet_size);
     //Need to add alphabet_size in case the key char value was higher than the msg char value
 
-    if(show) cout << encrypted_msg[i] << " decrypted with " << m_single_key[single_key_i] << " is " << next_char << endl;
+    if(show) cout << encrypted_msg[i] << " decrypted with " << key[key_i] << " is " << next_char << endl;
 
     message += next_char;
   }
   return message;
 }
 
-string Encrypter::encrypt_with_public_key(string message)
+string Encrypter::RSA_generate_public_key(string private_key1, string private_key2)
 {
-  return message;
+  return "Not implemented yet.";
 }
 
-string Encrypter::generate_public_key_from_private_keys()
+string Encrypter::RSA_encrypt(string message, string public_key)
 {
-  return m_private_key1 + m_private_key2;
+  return "Not implemented yet";
 }
 
 //This will return 0 if given an invalid character
