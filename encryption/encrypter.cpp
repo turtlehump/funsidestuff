@@ -1,5 +1,11 @@
 #include "encrypter.h"
 
+bool Encrypter::is_valid_char (char tmp)
+{
+  if(tmp == ' ' || ctoi(tmp)) return true;
+  else return false;
+}
+
 bool Encrypter::is_valid_string(string tmp)
 {
   for(unsigned int i = 0; i < tmp.length(); i++)
@@ -8,6 +14,17 @@ bool Encrypter::is_valid_string(string tmp)
     else return false;
   }
   return true;
+}
+
+
+char Encrypter::encrypt_char(char message_char, char key_char)
+{
+  return itoc((ctoi(message_char) + ctoi(key_char)) % m_alphabet_size);
+}
+
+char Encrypter::decrypt_char(char message_char, char key_char)
+{
+  return itoc((ctoi(message_char) - ctoi(key_char) + m_alphabet_size) % m_alphabet_size);
 }
 
 string Encrypter::single_key_encrypt(string message, string key, bool show)

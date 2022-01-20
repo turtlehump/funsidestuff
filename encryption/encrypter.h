@@ -10,9 +10,12 @@ class Encrypter
 {
   public:
     //The alphabet includes eveything on the keyboard EXCEPT F-keys, arrow keys, and ESC
+    bool is_valid_char (char tmp);
     bool is_valid_string (string tmp);
 
     //SINGLE-KEY FUNCTIONS
+    char encrypt_char(char message_char, char key_char);
+    char decrypt_char(char message_char, char key_char);
     string single_key_encrypt(string message, string key, bool show);
     string single_key_decrypt(string encrypted_message, string key, bool show);
 
@@ -24,8 +27,8 @@ class Encrypter
     int ctoi(char c);
     char itoc(int i);
 
-    int  m_alphabet_size = 95; //0-94
-    char m_alphabet[95] {' ',  // 0
+    int  m_alphabet_size = 97; //0-96
+    char m_alphabet[97] {' ',  // 0
                          '!',  // 1
                          '\"', // 2
                          '#',  // 3
@@ -119,6 +122,8 @@ class Encrypter
                          '{',  // 91
                          '|',  // 92
                          '}',  // 93
-                         '~'}; // 94
+                         '~',  // 94
+                         '\t', // 95
+                         '\n'};// 96
 };
 #endif
