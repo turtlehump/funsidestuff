@@ -11,39 +11,45 @@ using namespace std;
 
 class Table
 {
-    public:
-        Table();
-        ~Table();
+  public:
+    Table();
+    ~Table();
 
-        void  set_player();
-        void  simulation();
+    void  play_round(Player* player);
 
-    private:
+  private:
 
-        void  ask_for_bet();
-        void  fill_tower();
+    void  clear_screen() {for(int i = 0; i < 70; i++) cout << endl;}
+    void  print_tower();
 
-        int   flip_and_evaluate_row(int row);
-        int   joker_max_value(int row, int index);
-        bool  ask_continue(int takehome_payment);
+    int   get_bet(Player* player);
+    void  deal(); 
 
-        void  print_tower();
+    int   play_row(int current_row);  //returns payout value
+    bool    conflict(Card* lower, Card* upper);
+    int     handle_conflicts(int current_row); //checks for conflicts and acts accordingly
 
-        void  flip_all_cards();
-        bool  ask_play_again();
+    bool  continue_or_payout(int win_payment);
 
-        int   m_bet_multiplier;
+    void  display_winnings(int win_payment, int current_row);
+    void  reveal_all_cards();
 
-        Card* m_row1[1];
-        Card* m_row2[2];
-        Card* m_row3[3];
-        Card* m_row4[4];
-        Card* m_row5[5];
-        Card* m_row6[6];
-        Card* m_row7[7];
-        Card* m_savior_card;
+    void  delete_cards_in_tower();
 
-        Deck* m_deck;
-        Player* m_player;
+
+    vector<vector<Card*>> m_tower
+    {
+                               {NULL},                     //1 in row 1
+                            {NULL, NULL},                  //2 in row 2
+                         {NULL, NULL, NULL},               //3 in row 3
+                      {NULL, NULL, NULL, NULL},            //4 in row 4
+                   {NULL, NULL, NULL, NULL, NULL},         //5 in row 5
+                {NULL, NULL, NULL, NULL, NULL, NULL},      //6 in row 6
+              {NULL, NULL, NULL, NULL, NULL, NULL, NULL}   //7 in row 7
+    };
+
+    Card* m_savior_card;
+
+    Deck* m_deck;
 };
 #endif

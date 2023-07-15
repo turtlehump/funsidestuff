@@ -5,21 +5,27 @@
 #include <sstream>
 using namespace std;
 
+enum CardFace {ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, WILD, XTWO, XFIVE, XTEN};
+
 class Card
 {
-    public:
-        Card(int value)    {m_value = value; m_revealed = false;}
+  public:
+    Card(CardFace face);
 
-        int    get_value()    {return m_value;}
-        bool   is_revealed()  {return m_revealed;}
+    CardFace get_face()                {return m_face;}
 
-        void   flip()         {m_revealed = true;}
+    void     reveal()                  {m_revealed = true;}
+    bool     is_revealed()             {return m_revealed;}
 
-        string get_display_value();
-        void   print();
+    int      money_value()             {return m_money_value;}
 
-    private:
-        int  m_value;
-        bool m_revealed;
+    string   display_value();
+    void     print();
+
+  private:
+    CardFace    m_face;
+    int         m_money_value;
+    bool        m_special;     //Does this card have any special effects to the payout?
+    bool        m_revealed;
 };
 #endif

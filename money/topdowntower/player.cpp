@@ -15,10 +15,3 @@ Player::Player(string name, int money)
 
   return;
 }
-
-void Player::print()
-{
-  cout << m_name << ": $" << m_money;
-
-  return;
-}

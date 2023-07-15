@@ -1,11 +1,11 @@
 #ifndef DECK_H
 #define DECK_H
 
-#include "card.h"
 #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include "card.h"
 using namespace std;
 
 class Deck
@@ -22,5 +22,6 @@ class Deck
 
     private:
         vector<Card*>  m_deck;
+        int            m_size = 0;
 };
 #endif

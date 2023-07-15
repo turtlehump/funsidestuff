@@ -4,333 +4,290 @@ Table::Table()
 {
   m_deck = NULL;
   m_savior_card = NULL;
-  m_player = NULL;
-  m_bet_multiplier = 0;
 
   return;
 }
 
 Table::~Table()
 {
-  delete m_deck;
-  delete m_savior_card;
-  delete m_player;
-
+  //The actual deck object gets deleted at the end of every round
+  
+  if(m_savior_card) delete m_savior_card;
   return;
 }
 
-void Table::set_player()
+void Table::play_round(Player* player)
 {
-  for(int i = 0; i < 59; i++)
-    cout << endl;
+  m_deck = new Deck(); //new deck must be deleted
 
-  string name;
-  cout << "Whats your name? ";
-  cin >> name;
-  m_player = new Player(name);
+  int multiplier = this->get_bet(player);
 
-  return;
-}
+  m_deck->shuffle();
+  this->deal();        //cards move from deck to tower -> must delete them
 
-void Table::simulation()
-{
-  bool should_play_again;
+  this->print_tower();
+
+  int current_row = 0, next_row = 1, win_payment = 0;
+  bool press_luck;
   do
   {
-    this->ask_for_bet();
+    sleep(1);
 
-    m_deck = new Deck();
-    m_deck->shuffle();
-    this->fill_tower();
+    cout << "Playing row: " << current_row + 1 << endl;
 
-    int i = 0; //increment on first loop for rows 1-7
-    bool should_continue;
-    int takehome_payment;
-    do
-    {
-      i++;
-      sleep(1);
-      takehome_payment = this->flip_and_evaluate_row(i);
-      takehome_payment *= m_bet_multiplier;
-      this->print_tower();
-      if(i < 7)
-        should_continue = this->ask_continue(takehome_payment);
-      else
-      {
-        should_continue = false;
-        if(m_savior_card)
-          takehome_payment += 30;
-        sleep(1);
-      }
-    }while(i < 7 && should_continue);
+    win_payment = this->play_row(current_row) * multiplier;
 
-    this->flip_all_cards();
     this->print_tower();
 
-    cout << endl << "Payout of $" << takehome_payment;
-    cout << " from row " << i;
-    if(m_savior_card && i == 7)
-      cout << " (including the +30 from the savior card)";
-    cout << "." << endl << endl;
+    if(win_payment == 0) //LOSS
+    {
+      cout << "You Lose" << endl;
+      break;
+    }
 
-    m_player->give_money(takehome_payment);
+    if(current_row < 7)
+      press_luck = this->continue_or_payout(win_payment);
+    else //JACKPOT!
+    {
+      press_luck = false;
+      if(m_savior_card) // MEGA JACKPOT!!
+      {
+         win_payment *= 25;
+      }
+      sleep(1);
+    }
 
-    should_play_again = ask_play_again();
+    current_row = next_row;
+    next_row++;
 
-  }while(should_play_again);
+  }while(current_row < 7 && press_luck);
 
-  cout << endl;
-  m_player->print();
+  display_winnings(win_payment, current_row);
+  player->give_money(win_payment);
+  cout << endl; player->print(); cout << endl;
+
+  this->delete_cards_in_tower();
+  delete m_deck;
+  return;
+}
+
+void Table::print_tower()
+{
+  for(unsigned long int i = 0; i < m_tower.size(); i++)
+  {
+    cout << i + 1 << ":";
+    for(unsigned long int j = 0; j < m_tower.size() - i; j++)
+    {
+      cout << "  ";
+    }
+    for(unsigned long int j = 0; j < m_tower[i].size(); j++)
+    {
+      cout << " " << m_tower[i][j]->display_value() << " ";
+    }
+    cout << endl;
+  }
+
+  cout << "s:";
+  for(unsigned long int i = 0; i < m_tower.size(); i++)
+    cout << "  ";
+  if(!m_savior_card) cout << "X";
+  else               cout << m_savior_card->display_value();
   cout << endl;
 
   return;
 }
 
-void Table::ask_for_bet()
-{
-  for(int i = 0; i < 59; i++)
-    cout << endl;
 
-  m_player->print();
+int Table::get_bet(Player* player)
+{
+  this->clear_screen();
+
+  player->print();
   cout << endl;
 
-  int units, bet;
+  if(player->money() < 15)
+  {
+     cout << endl << endl << "Too poor to play" << endl;
+     return 0;
+  }
+
+  int multiplier, bet;
   do
   {
     do
     {
-      cout << "Your bet will be in units of $15. " << endl;
-      cout << "How many units do you want to bet? (1-5) " << endl;
-      cin >> units;
+      cout << "Your bet will be in multiples of $15. " << endl;
+      cout << "How many multiples? (1-5) " << endl;
+      cin >> multiplier;
 
-      if(units < 1)
+
+      if(multiplier < 1)
       {
         cout << endl << endl;
         cout << "You must bet a positive number of units.";
         cout << endl;
       }
-      if(units > 5)
+      if(multiplier > 5)
       {
         cout << endl << endl;
         cout << "You must bet less than 5 units.";
         cout << endl;
       }
-    }while(units < 1 || units > 5);
+    }while(multiplier < 1 || multiplier > 5);
 
-    bet = units * 15;
+    bet = multiplier * 15;
 
-    if(m_player->can_afford(bet))
-      m_bet_multiplier = units;
+    if(player->can_afford(bet))
+    {
+      cout << "Bet of " << bet << endl;
+      player->take_money(bet);
+      return multiplier;
+    }
     else
     {
-      cout << endl << m_player->get_name() << " cannot afford ";
-      cout << "this bet of $" << bet << " (";
-      m_player->print();
-      cout << ")" << endl << endl;
+      cout << endl << "You cannot afford a bet of $" << bet << endl;
+      sleep(1);
     }
-  }while(!m_player->can_afford(bet));
+  }while(1);
 
-  m_player->take_money(bet);
-
-  return;
+  return 420; //:D
 }
 
-void Table::fill_tower()
+void Table::deal()
 {
-  for(int i = 1; i <= 7; i++) //i will be the row (1-7)
-  {
-    for(int j = 0; j < i; j++) //j will be the index (depends on row)
-    {
-      //I was hoping to be able to make a string and use that
-      //string as a variable name, but variable names are set at 
-      //compile time and strings are evaluated at run time
-      if(i == 1)
-        m_row1[j] = m_deck->deal_top_card();
 
-      else if(i == 2)
-        m_row2[j] = m_deck->deal_top_card();
+  for(unsigned long int i = 0; i < m_tower.size(); i++)
+     for(unsigned long int j = 0; j < m_tower[i].size(); j++)
+       m_tower[i][j] = m_deck->deal_top_card();
 
-      else if(i == 3)
-        m_row3[j] = m_deck->deal_top_card();
-
-      else if(i == 4)
-        m_row4[j] = m_deck->deal_top_card();
-
-      else if(i == 5)
-        m_row5[j] = m_deck->deal_top_card();
-
-      else if(i == 6)
-        m_row6[j] = m_deck->deal_top_card();
-
-      else if(i == 7)
-        m_row7[j] = m_deck->deal_top_card();
-    }
-  }
   m_savior_card = m_deck->deal_top_card();
 
   return;
 }
 
-int Table::flip_and_evaluate_row(int row)
+//returns total winning value for the row
+//To-Do:
+//corrects a conflict if needed/possible
+int Table::play_row(int current_row)
 {
-  int takehome_payment = 0;
-  for(int i = 0; i < row; i++)
-  {
-    int card_value;
-    if(row == 1)
-    {
-      card_value = m_row1[i]->get_value();
-      m_row1[i]->flip();
-    }
-    else if(row == 2)
-    {
-      card_value = m_row2[i]->get_value();
-      m_row2[i]->flip();
-    }
-    else if(row == 3)
-    {
-      card_value = m_row3[i]->get_value();
-      m_row3[i]->flip();
-    }
-    else if(row == 4)
-    {
-      card_value = m_row4[i]->get_value();
-      m_row4[i]->flip();
-    }
-    else if(row == 5)
-    {
-      card_value = m_row5[i]->get_value();
-      m_row5[i]->flip();
-    }
-    else if(row == 6)
-    {
-      card_value = m_row6[i]->get_value();
-      m_row6[i]->flip();
-    }
-    else if(row == 7)
-    {
-      card_value = m_row7[i]->get_value();
-      m_row7[i]->flip();
-    }
+  bool conflicts = false;
+  int winnings = 0, multiplier = 1;
 
-    if(card_value == 0)
-      card_value = this->joker_max_value(row, i);
-    takehome_payment += card_value;
+  if(current_row == 0)
+  {
+    m_tower[0][0]->reveal();
+
+    //special things for wilds and multipliers on the first card
+    switch(m_tower[0][0]->get_face())
+    {
+      case WILD:  return 10;
+      case XTWO:  return 10;
+      case XFIVE: return 15;
+      case XTEN:  return 25;
+      default:    return m_tower[0][0]->money_value();
+    }
   }
 
-  return takehome_payment;
-}
-
-//row can be from 1-7
-//index can be from 0-6
-int Table::joker_max_value(int row, int index)
-{
-  int max_value = 7;
-  switch(row)
+  //vvvvvvvvvvvv  THE MEAT vvvvvvvvvvvvvvv 
+  else
   {
-    case 1:
-      break;
+    for(unsigned long int i = 0; i < m_tower[current_row].size(); i++)
+    {
+      //cout << "revealing [" << current_row << "][" << i << "]" << endl;
+      m_tower[current_row][i]->reveal();
+      //this->print_tower();
 
-    case 2: //only one card to check for row 2
-      if(m_row1[0]->get_value() == 7)
-        max_value = 6;
-      break;
+      winnings += m_tower[current_row][i]->money_value();
 
-    case 3:
-      if(index == 0 && m_row2[0]->get_value() == 7)
-        max_value = 6;
-      else if(index == (row - 1) &&
-              m_row2[row - 1]->get_value() == 7)
-        max_value = 6;
-      else //middle index
-        if(m_row2[index - 1]->get_value() == 7 ||
-           m_row2[index]->get_value() == 7)
+      switch(m_tower[current_row][i]->get_face())
+      {
+        case XTWO:  multiplier *= 2; break;
+        case XFIVE: multiplier *= 5; break;
+        case XTEN:  multiplier *= 10; break;
+        default:    break;
+      }
+
+      if(i == 0)  //far left card
+      {
+        //cout << "Conflict Check Far left" << endl;
+        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
         {
-          if(m_row2[index - 1]->get_value() == 6 ||
-             m_row2[index]->get_value() == 6)
-            max_value = 5;
-          else
-            max_value = 6;
+          conflicts = true;
+          //cout << "Conflict in i = " << i << endl;
         }
-      break;
-
-    case 4:
-      if(index == 0 && m_row3[0]->get_value() == 7)
-        max_value = 6;
-      else if(index == (row - 1) &&
-              m_row3[row - 1]->get_value() == 7)
-        max_value = 6;
-      else //middle index
-        if(m_row3[index - 1]->get_value() == 7 ||
-           m_row3[index]->get_value() == 7)
+      }
+      else if(i == m_tower[current_row].size() - 1)  //far right card
+      {
+        //cout << "Conflict Check Far right" << endl;
+        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
         {
-          if(m_row3[index - 1]->get_value() == 6 ||
-             m_row3[index]->get_value() == 6)
-            max_value = 5;
-          else
-            max_value = 6;
+          //cout << "Conflict in i = " << i << endl;
+          conflicts = true;
         }
-      break;
-
-    case 5:
-      if(index == 0 && m_row4[0]->get_value() == 7)
-        max_value = 6;
-      else if(index == (row - 1) &&
-              m_row4[row - 1]->get_value() == 7)
-        max_value = 6;
-      else //middle index
-        if(m_row4[index - 1]->get_value() == 7 ||
-           m_row4[index]->get_value() == 7)
+      }
+      else if(i < m_tower[current_row].size())
+      {
+        //cout << "Conflict Check mid" << endl;
+        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
         {
-          if(m_row4[index - 1]->get_value() == 6 ||
-             m_row4[index]->get_value() == 6)
-            max_value = 5;
-          else
-            max_value = 6;
+          conflicts = true;
+         // cout << "Conflict in i = " << i << " on LEFT parent " << endl;
         }
-      break;
-
-    case 6:
-      if(index == 0 && m_row5[0]->get_value() == 7)
-        max_value = 6;
-      else if(index == (row - 1) &&
-              m_row5[row - 1]->get_value() == 7)
-        max_value = 6;
-      else //middle index
-        if(m_row5[index - 1]->get_value() == 7 ||
-           m_row5[index]->get_value() == 7)
+        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
         {
-          if(m_row5[index - 1]->get_value() == 6 ||
-             m_row5[index]->get_value() == 6)
-            max_value = 5;
-          else
-            max_value = 6;
+          conflicts = true;
+          //cout << "Conflict in i = " << i << " on RIGHT parent " << endl;
         }
-      break;
+      }
 
-    case 7:
-      if(index == 0 && m_row6[0]->get_value() == 7)
-        max_value = 6;
-      else if(index == (row - 1) &&
-              m_row6[row - 1]->get_value() == 7)
-        max_value = 6;
-      else //middle index
-        if(m_row6[index - 1]->get_value() == 7 ||
-           m_row6[index]->get_value() == 7)
-        {
-          if(m_row6[index - 1]->get_value() == 6 ||
-             m_row6[index]->get_value() == 6)
-            max_value = 5;
-          else
-            max_value = 6;
-        }
-      break;
+      if(conflicts) multiplier = 0;
+      //cout << "**********" << endl;
+    }
+
+    if(winnings == 0) //full row of multiplers
+    {
+       winnings = 50 * current_row;
+    }
+    //cout << "Row " << current_row + 1 << " winnings: " << winnings << endl;
+
+  }
+  //this->print_tower();
+
+  if(conflicts)
+    multiplier = handle_conflicts(current_row);
+
+  return winnings * multiplier;
+}
+// ^^^^^^^^^^ THE MEAT ^^^^^^^^^^^^^^^^^
+
+bool Table::conflict(Card* lower, Card* upper)
+{
+  if(lower->get_face() == upper->get_face())
+  {
+    switch(lower->get_face())
+    {
+      case ONE:
+      case TWO:
+      case THREE:
+      case FOUR:
+      case FIVE:
+      case SIX:
+      case SEVEN:
+        return true;
+      default:
+        return false;
+    }
   }
 
-  return max_value;
+   return false;
 }
 
-bool Table::ask_continue(int takehome_payment)
+int Table::handle_conflicts(int current_row)
+{
+  return 0;
+}
+
+bool Table::continue_or_payout(int takehome_payment)
 {
   string should_continue;
   do
@@ -352,96 +309,40 @@ bool Table::ask_continue(int takehome_payment)
   return 420; //:D
 }
 
-void Table::print_tower()
+
+void Table::display_winnings(int win_payment, int current_row)
 {
-  for(int i = 0; i < 59; i++)
-    cout << endl;
+  this->reveal_all_cards();
+  this->print_tower();
 
-  for(int i = 1; i <= 7; i++) //rows 1-7
-  {
-    cout << i << ":";
-    for(int j = 0; j < 7 - i; j++)
-      cout << "  ";
-
-    for(int j = 0; j < i; j++)
-    {
-      cout << "   ";
-      if(i == 1)
-        cout << m_row1[j]->get_display_value();
-      if(i == 2)
-        cout << m_row2[j]->get_display_value();
-      if(i == 3)
-        cout << m_row3[j]->get_display_value();
-      if(i == 4)
-        cout << m_row4[j]->get_display_value();
-      if(i == 5)
-        cout << m_row5[j]->get_display_value();
-      if(i == 6)
-        cout << m_row6[j]->get_display_value();
-      if(i == 7)
-        cout << m_row7[j]->get_display_value();
-    }
-    cout << endl;
-  }
-
-  cout << endl;
-
-  //following the same format
-  cout << "s:";
-  for(int i = 0; i < 6; i++)
-    cout << "  ";
-  cout << "   "; 
-  cout << m_savior_card->get_display_value() << endl;
+  cout << endl << "Payout of $" << win_payment << " from row " << current_row + 1 << endl;
 
   return;
 }
 
-void Table::flip_all_cards()
+void Table::reveal_all_cards()
 {
-  for(int i = 1; i <= 7; i++) //rows 1-7
+  for(unsigned long int i = 0; i < m_tower.size(); i++)
   {
-    for(int j = 0; j < i; j++)
+    for(unsigned long int j = 0; j < m_tower[i].size(); j++)
     {
-      if(i == 1)
-        m_row1[j]->flip();
-      if(i == 2)
-        m_row2[j]->flip();
-      if(i == 3)
-        m_row3[j]->flip();
-      if(i == 4)
-        m_row4[j]->flip();
-      if(i == 5)
-        m_row5[j]->flip();
-      if(i == 6)
-        m_row6[j]->flip();
-      if(i == 7)
-        m_row7[j]->flip();
+        m_tower[i][j]->reveal();
     }
   }
-  m_savior_card->flip();
+
+  if(m_savior_card) m_savior_card->reveal();
 
   return;
 }
 
-bool Table::ask_play_again()
+void Table::delete_cards_in_tower()
 {
-  string play_again;
-
-  do
+  for(unsigned long int i = 0; i < m_tower.size(); i++)
   {
-    cout << "Do you want to play again? (y/n) ";
-    cin >> play_again;
-
-    if(play_again == "y" || play_again == "Y")
-      return true;
-    else if(play_again == "n" || play_again == "N")
-      return false;
-    else
-      cout << endl << "That is not a valid input." << endl << endl;
-
-  }while(!(play_again == "y" || play_again == "Y" ||
-           play_again == "n" || play_again == "N" ));
-
-  //we will never get out the loop
-  return 420; //:D
+    for(unsigned long int j = 0; j < m_tower[i].size(); j++)
+    {
+       delete m_tower[i][j];
+    }
+  }
+  return;
 }
