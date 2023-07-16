@@ -41,7 +41,9 @@ void Table::play_round(Player* player)
 
     if(win_payment == 0) //LOSS
     {
-      cout << "You Lose" << endl;
+      sleep(1);
+      cout << endl << endl << "You Lose" << endl << endl;
+      sleep(2);
       break;
     }
 
@@ -193,9 +195,7 @@ int Table::play_row(int current_row)
   {
     for(unsigned long int i = 0; i < m_tower[current_row].size(); i++)
     {
-      //cout << "revealing [" << current_row << "][" << i << "]" << endl;
       m_tower[current_row][i]->reveal();
-      //this->print_tower();
 
       winnings += m_tower[current_row][i]->money_value();
 
@@ -209,49 +209,31 @@ int Table::play_row(int current_row)
 
       if(i == 0)  //far left card
       {
-        //cout << "Conflict Check Far left" << endl;
         if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
-        {
           conflicts = true;
-          //cout << "Conflict in i = " << i << endl;
-        }
       }
       else if(i == m_tower[current_row].size() - 1)  //far right card
       {
-        //cout << "Conflict Check Far right" << endl;
         if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
-        {
-          //cout << "Conflict in i = " << i << endl;
           conflicts = true;
-        }
       }
-      else if(i < m_tower[current_row].size())
+      else if(i < m_tower[current_row].size())  //cards in the middle check both "parents"
       {
-        //cout << "Conflict Check mid" << endl;
         if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
-        {
           conflicts = true;
-         // cout << "Conflict in i = " << i << " on LEFT parent " << endl;
-        }
+
         if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
-        {
           conflicts = true;
-          //cout << "Conflict in i = " << i << " on RIGHT parent " << endl;
-        }
       }
 
       if(conflicts) multiplier = 0;
-      //cout << "**********" << endl;
     }
 
     if(winnings == 0) //full row of multiplers
     {
        winnings = 50 * current_row;
     }
-    //cout << "Row " << current_row + 1 << " winnings: " << winnings << endl;
-
   }
-  //this->print_tower();
 
   if(conflicts)
     multiplier = handle_conflicts(current_row);
@@ -278,8 +260,7 @@ bool Table::conflict(Card* lower, Card* upper)
         return false;
     }
   }
-
-   return false;
+  return false;
 }
 
 int Table::handle_conflicts(int current_row)
