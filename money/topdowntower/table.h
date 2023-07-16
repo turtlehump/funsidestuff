@@ -26,6 +26,7 @@ class Table
     void  deal(); 
 
     int   play_row(int current_row);  //returns payout value
+    void    announce_row(int current_row);
     bool    conflict(Card* lower, Card* upper);
     int     handle_conflicts(int current_row); //checks for conflicts and acts accordingly
 
