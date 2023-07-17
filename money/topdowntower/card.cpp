@@ -18,6 +18,7 @@ Card::Card(CardFace face)
     case XTEN:  m_money_value = 0; m_special = true;  break;
   }
   m_revealed = false;
+  m_conflicted = false;
 }
 
 string Card::display_value()
@@ -25,22 +26,30 @@ string Card::display_value()
   if(!m_revealed)
     return " - ";
 
+  string display_value = "";
+
+  if(this->m_conflicted) display_value += "*";
+  else                  display_value += " ";
+
   switch(m_face)
   {
-    case ONE:   return " 1 ";
-    case TWO:   return " 2 ";
-    case THREE: return " 3 ";
-    case FOUR:  return " 4 ";
-    case FIVE:  return " 5 ";
-    case SIX:   return " 6 ";
-    case SEVEN: return " 7 ";
+    case ONE:   display_value += "1"; break;
+    case TWO:   display_value += "2"; break;
+    case THREE: display_value += "3"; break;
+    case FOUR:  display_value += "4"; break;
+    case FIVE:  display_value += "5"; break;
+    case SIX:   display_value += "6"; break;
+    case SEVEN: display_value += "7"; break;
     case WILD:  return " W ";
     case XTWO:  return " X2";
     case XFIVE: return " X5";
     case XTEN:  return "X10";
   }
 
-  return "ERROR - NOT POSSIBLE CARD";
+  if(this->m_conflicted) display_value += "*";
+  else                   display_value += " ";
+
+  return display_value;
 }
 
 void Card::print()

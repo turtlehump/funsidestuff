@@ -16,6 +16,8 @@ class Card
 
     void     reveal()                  {m_revealed = true;}
     bool     is_revealed()             {return m_revealed;}
+    void     make_conflicted()         {m_conflicted = true;}
+    bool     is_conflicted()           {return m_revealed;}
 
     int      money_value()             {return m_money_value;}
 
@@ -27,5 +29,6 @@ class Card
     int         m_money_value;
     bool        m_special;     //Does this card have any special effects to the payout?
     bool        m_revealed;
+    bool        m_conflicted;
 };
 #endif
