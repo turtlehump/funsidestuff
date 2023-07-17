@@ -23,20 +23,24 @@ class Table
     void  print_tower();
 
     int   get_bet(Player* player);
+    void    announce_bet(int round_multiplier);
+
     void  deal(); 
 
     int   play_row(int current_row);  //returns payout value
     void    announce_row(int current_row);
     bool    conflict(Card* lower, Card* upper);
-    int     handle_conflicts(int current_row); //checks for conflicts and acts accordingly
+    int     handle_conflicts(int current_row); //called only when there is a conflict
+    void      announce_handling_conflict();
 
     bool  continue_or_payout(int win_payment);
 
     void  display_winnings(int win_payment, int current_row);
-    void  reveal_all_cards();
+    void    announce_win();
+    void     reveal_all_cards();
+    void    announce_loss();
 
     void  delete_cards_in_tower();
-
 
     vector<vector<Card*>> m_tower
     {
