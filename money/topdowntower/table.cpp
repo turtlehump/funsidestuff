@@ -58,7 +58,7 @@ void Table::play_round(Player* player)
 {
   m_deck = new Deck(); //new deck must be deleted
 
-  int round_multiplier = this->get_bet(player);
+  int round_multiplier = this->get_bet(player, 15);
 
   m_deck->shuffle();
   this->deal();        //cards move from deck to tower -> must delete them
@@ -74,6 +74,9 @@ void Table::play_round(Player* player)
     sleep(1);
 
     this->clear_screen();
+
+    this->announce_row(current_row);
+    cout << endl << endl;
 
     win_payment = this->play_row(current_row) * round_multiplier;
 
@@ -115,14 +118,14 @@ void Table::play_round(Player* player)
   return;
 }
 
-int Table::get_bet(Player* player)
+int Table::get_bet(Player* player, int base_bet)
 {
   this->clear_screen();
 
   player->print();
   cout << endl << endl;
 
-  if(player->money() < 15)
+  if(player->money() < base_bet)
   {
      cout << endl << endl << "Too poor to play" << endl;
      return 0;
@@ -133,10 +136,9 @@ int Table::get_bet(Player* player)
   {
     do
     {
-      cout << "Your bet will be in multiples of $15. " << endl;
+      cout << "Your bet will be in multiples of $" << base_bet << endl;
       cout << "How many multiples? (1-5) " << endl;
       cin >> round_multiplier;
-
 
       if(round_multiplier < 1)
       {
@@ -152,12 +154,12 @@ int Table::get_bet(Player* player)
       }
     }while(round_multiplier < 1 || round_multiplier > 5);
 
-    bet = round_multiplier * 15;
+    bet = round_multiplier * base_bet;
 
     if(player->can_afford(bet))
     {
       this->clear_screen();
-      this->announce_bet(round_multiplier);
+      this->announce_bet(bet);
       player->take_money(bet);
       sleep(1);
       return round_multiplier;
@@ -188,9 +190,6 @@ void Table::deal()
 //corrects a conflict if needed/possible
 int Table::play_row(int current_row)
 {
-
-  this->announce_row(current_row);
-
   bool conflicts = false;
   int winnings = 0, multiplier = 1;
 
@@ -370,11 +369,11 @@ void Table::reveal_all_cards()
   return;
 }
 
-void Table::announce_bet(int round_multiplier)
+void Table::announce_bet(int bet)
 {
-  switch(round_multiplier)
+  switch(bet)
   {
-    case 1:
+    case 15:
       cout << "  #######      #########  ############          ####     ##########"   << endl;
       cout << "  ###   ###    #########  ############         #####     ##########"   << endl;
       cout << "  ###    ###   ###            ###             ######     ##"           << endl;
@@ -387,20 +386,59 @@ void Table::announce_bet(int round_multiplier)
       cout << "  ########     ########       ###           ############   #######"    << endl;
       break;
 
-    case 2:
-      cout << "  #######      #########  ############         #####        #####"     << endl;
-      cout << "  ###   ###    #########  ############       ###  ###     ###   ###"   << endl;
-      cout << "  ###    ###   ###            ###           ###    ###   ###     ###"  << endl;
-      cout << "  ###   ###    ###            ###                 ###   ###       ###" << endl;
-      cout << "  #######      ######         ###               ###     ###       ###" << endl;
-      cout << "  ###   ###    ######         ###               ####    ###       ###" << endl;
-      cout << "  ###    ###   ###            ###                 ###   ###       ###" << endl;
-      cout << "  ###     ###  ###            ###           ###    ###   ###     ###"  << endl;
-      cout << "  ###    ###   ########       ###            ###  ###     ###   ###"   << endl;
-      cout << "  ########     ########       ###              #####        #####"     << endl;
+    case 20:
+      cout << "  #######      #########  ############        ######        ######"     << endl;
+      cout << "  ###   ###    #########  ############      ####  ####    ###    ###"   << endl;
+      cout << "  ###    ###   ###            ###          ###      ###  ###      ###"  << endl;
+      cout << "  ###   ###    ###            ###          ##       ### ###        ###" << endl;
+      cout << "  #######      ######         ###                 ###   ###        ###" << endl;
+      cout << "  ###   ###    ######         ###                ###    ###        ###" << endl;
+      cout << "  ###    ###   ###            ###              ###      ###        ###" << endl;
+      cout << "  ###     ###  ###            ###            ###         ###      ###"  << endl;
+      cout << "  ###    ###   ########       ###           ###########   ###    ###"   << endl;
+      cout << "  ########     ########       ###           ###########     ######"     << endl;
       break;
 
-    case 3:
+    case 25:
+      cout << "  #######      #########  ############        ######     #########"   << endl;
+      cout << "  ###   ###    #########  ############      ####  ####   #########"   << endl;
+      cout << "  ###    ###   ###            ###          ###      ###  ##"          << endl;
+      cout << "  ###   ###    ###            ###          ##       ###  ## #####"    << endl;
+      cout << "  #######      ######         ###                 ###    ###    ##"   << endl;
+      cout << "  ###   ###    ######         ###                ###             ##"  << endl;
+      cout << "  ###    ###   ###            ###              ###                ##" << endl;
+      cout << "  ###     ###  ###            ###            ###         ##      ##"  << endl;
+      cout << "  ###    ###   ########       ###           ###########   ##    ##"   << endl;
+      cout << "  ########     ########       ###           ###########    ######"    << endl;
+      break;
+
+    case 30:
+      cout << "  #######      #########  ############         #####        ######"     << endl;
+      cout << "  ###   ###    #########  ############       ###  ###     ###    ###"   << endl;
+      cout << "  ###    ###   ###            ###           ###    ###   ###      ###"  << endl;
+      cout << "  ###   ###    ###            ###                 ###   ###        ###" << endl;
+      cout << "  #######      ######         ###               ###     ###        ###" << endl;
+      cout << "  ###   ###    ######         ###               ####    ###        ###" << endl;
+      cout << "  ###    ###   ###            ###                 ###   ###        ###" << endl;
+      cout << "  ###     ###  ###            ###           ###    ###   ###      ###"  << endl;
+      cout << "  ###    ###   ########       ###            ###  ###     ###    ###"   << endl;
+      cout << "  ########     ########       ###              #####        ######"     << endl;
+      break;
+
+    case 40:
+      cout << "  #######      #########  ############           ####      ######"     << endl;
+      cout << "  ###   ###    #########  ############          #####    ###    ###"   << endl;
+      cout << "  ###    ###   ###            ###              ######   ###      ###"  << endl;
+      cout << "  ###   ###    ###            ###             ### ###  ###        ###" << endl;
+      cout << "  #######      ######         ###            ###  ###  ###        ###" << endl;
+      cout << "  ###   ###    ######         ###           ###   ###  ###        ###" << endl;
+      cout << "  ###    ###   ###            ###          ##########  ###        ###" << endl;
+      cout << "  ###     ###  ###            ###          ##########   ###      ###"  << endl;
+      cout << "  ###    ###   ########       ###                 ###    ###    ###"   << endl;
+      cout << "  ########     ########       ###                 ###      ######"     << endl;
+      break;
+
+    case 45:
       cout << "  #######      #########  ############           ####  ##########"   << endl;
       cout << "  ###   ###    #########  ############          #####  ##########"   << endl;
       cout << "  ###    ###   ###            ###              ######  ##"           << endl;
@@ -413,20 +451,33 @@ void Table::announce_bet(int round_multiplier)
       cout << "  ########     ########       ###                 ###    #######"    << endl;
       break;
 
-    case 4:
-      cout << "  #######      #########  ############           ###        #####"     << endl;
-      cout << "  ###   ###    #########  ############          ###       ###   ###"   << endl;
-      cout << "  ###    ###   ###            ###              ###       ###     ###"  << endl;
-      cout << "  ###   ###    ###            ###             ###       ###       ###" << endl;
-      cout << "  #######      ######         ###            ###        ###       ###" << endl;
-      cout << "  ###   ###    ######         ###           #########   ###       ###" << endl;
-      cout << "  ###    ###   ###            ###          ###     ###  ###       ###" << endl;
-      cout << "  ###     ###  ###            ###          ###      ###  ###     ###"  << endl;
-      cout << "  ###    ###   ########       ###           ###    ###    ###   ###"   << endl;
-      cout << "  ########     ########       ###             ######        #####"     << endl;
+    case 50:
+      cout << "  #######      #########  ############     ##########       ######"     << endl;
+      cout << "  ###   ###    #########  ############     ##########     ###    ###"   << endl;
+      cout << "  ###    ###   ###            ###          ##            ###      ###"  << endl;
+      cout << "  ###   ###    ###            ###          ## ######    ###        ###" << endl;
+      cout << "  #######      ######         ###          ###     ##   ###        ###" << endl;
+      cout << "  ###   ###    ######         ###                   ##  ###        ###" << endl;
+      cout << "  ###    ###   ###            ###                    ## ###        ###" << endl;
+      cout << "  ###     ###  ###            ###          ##       ##   ###      ###"  << endl;
+      cout << "  ###    ###   ########       ###           ##     ##     ###    ###"   << endl;
+      cout << "  ########     ########       ###            #######        ######"     << endl;
       break;
 
-    case 5:
+    case 60:
+      cout << "  #######      #########  ############           ###        ######"     << endl;
+      cout << "  ###   ###    #########  ############          ###       ###    ###"   << endl;
+      cout << "  ###    ###   ###            ###              ###       ###      ###"  << endl;
+      cout << "  ###   ###    ###            ###             ###       ###        ###" << endl;
+      cout << "  #######      ######         ###            ###        ###        ###" << endl;
+      cout << "  ###   ###    ######         ###           #########   ###        ###" << endl;
+      cout << "  ###    ###   ###            ###          ###     ###  ###        ###" << endl;
+      cout << "  ###     ###  ###            ###          ###      ###  ###      ###"  << endl;
+      cout << "  ###    ###   ########       ###           ###    ###    ###    ###"   << endl;
+      cout << "  ########     ########       ###             ######        ######"     << endl;
+      break;
+
+    case 75:
       cout << "  #######      #########  ############      ###########  ##########"   << endl;
       cout << "  ###   ###    #########  ############      ###########  ##########"   << endl;
       cout << "  ###    ###   ###            ###                  ###   ##"           << endl;
@@ -438,8 +489,46 @@ void Table::announce_bet(int round_multiplier)
       cout << "  ###    ###   ########       ###              ###        ##     ##"   << endl;
       cout << "  ########     ########       ###              ###         #######"    << endl;
       break;
+
+    case 80:
+      cout << "  #######      #########  ############          ####          ######"     << endl;
+      cout << "  ###   ###    #########  ############        ###  ###      ###    ###"   << endl;
+      cout << "  ###    ###   ###            ###            ###    ###    ###      ###"  << endl;
+      cout << "  ###   ###    ###            ###             ###  ###    ###        ###" << endl;
+      cout << "  #######      ######         ###               ####      ###        ###" << endl;
+      cout << "  ###   ###    ######         ###             ###  ###    ###        ###" << endl;
+      cout << "  ###    ###   ###            ###            ###    ###   ###        ###" << endl;
+      cout << "  ###     ###  ###            ###           ###      ###   ###      ###"  << endl;
+      cout << "  ###    ###   ########       ###            ###    ###     ###    ###"   << endl;
+      cout << "  ########     ########       ###              ######         ######"     << endl;
+      break;
+
+    case 100:
+      cout << "  #######      #########  ############          ####        ######          ######"     << endl;
+      cout << "  ###   ###    #########  ############         #####      ###    ###      ###    ###"   << endl;
+      cout << "  ###    ###   ###            ###             ######     ###      ###    ###      ###"  << endl;
+      cout << "  ###   ###    ###            ###            ### ###    ###        ###  ###        ###" << endl;
+      cout << "  #######      ######         ###           ###  ###    ###        ###  ###        ###" << endl;
+      cout << "  ###   ###    ######         ###                ###    ###        ###  ###        ###" << endl;
+      cout << "  ###    ###   ###            ###                ###    ###        ###  ###        ###" << endl;
+      cout << "  ###     ###  ###            ###                ###     ###      ###    ###      ###"  << endl;
+      cout << "  ###    ###   ########       ###           ############  ###    ###      ###    ###"   << endl;
+      cout << "  ########     ########       ###           ############    ######          ######"     << endl;
+      break;
+
+    case 125:
+      cout << "  #######      #########  ############           ####        ######    #########"   << endl;
+      cout << "  ###   ###    #########  ############          #####     ####  ####   #########"   << endl;
+      cout << "  ###    ###   ###            ###              ######    ###      ###  ##"          << endl;
+      cout << "  ###   ###    ###            ###             ### ###    ##       ###  ## #####"    << endl;
+      cout << "  #######      ######         ###            ###  ###           ###    ###    ##"   << endl;
+      cout << "  ###   ###    ######         ###                 ###          ###             ##"  << endl;
+      cout << "  ###    ###   ###            ###                 ###        ###                ##" << endl;
+      cout << "  ###     ###  ###            ###                 ###      ###         ##      ##"  << endl;
+      cout << "  ###    ###   ########       ###            ###########  ###########   ##    ##"   << endl;
+      cout << "  ########     ########       ###            ###########  ###########    ######"    << endl;
+      break;
   }
-  cout << endl << endl;
 
   return;
 }
@@ -539,7 +628,6 @@ void Table::announce_row(int current_row)
       cout << "  ##    ###      ######          #####       #####           ###"      << endl;
       break;
   }
-  cout << endl << endl;
 
   return;
 }
@@ -556,7 +644,6 @@ void Table::announce_win()
   cout << "      ### ###     ### ###      ###  ###    ##  ###" << endl;
   cout << "      ### ###     ### ###      ###  ###     ## ###" << endl;
   cout << "       #####       #####       ###  ###     ######" << endl;
-  cout << endl << endl;
 
   return;
 }
@@ -573,7 +660,6 @@ void Table::announce_loss()
   cout << "  ###        ###        ###   ##        ###  ##        ###" << endl;
   cout << "  #########   ###      ###     ###      ###   ###      ###" << endl;
   cout << "  #########     ########         ########       ########"   << endl;
-  cout << endl << endl;
 
   return;
 }
@@ -590,7 +676,6 @@ void Table::announce_handling_conflict()
   cout << "   ###      ###    ###        ###   ###    ##  ###  ###         ###       ###    ###      ###      ###"      << endl;
   cout << "    ###    ###      ###      ###    ###     ## ###  ###         ########  ###     ###    ###       ###"      << endl;
   cout << "      ######          ########      ###     ######  ###         ########  ###       ######         ###"      << endl;
-  cout << endl << endl;
 
   return;
 }

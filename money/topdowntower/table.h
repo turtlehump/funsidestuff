@@ -22,7 +22,7 @@ class Table
     void  clear_screen() {for(int i = 0; i < 70; i++) cout << endl;}
     void  print_tower();
 
-    int   get_bet(Player* player);
+    int   get_bet(Player* player, int base_bet);
     void    announce_bet(int round_multiplier);
 
     void  deal(); 
