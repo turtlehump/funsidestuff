@@ -35,7 +35,7 @@ void Table::print_tower()
   cout << "s: ";
   for(unsigned long int i = 0; i < m_tower.size(); i++)
     cout << "  ";
-  if(!m_savior_card) cout << "X";
+  if(!m_savior_card) cout << " X";
   else               cout << m_savior_card->display_value();
   cout << endl;
 
@@ -186,8 +186,6 @@ void Table::deal()
 }
 
 //returns total winning value for the row
-//To-Do:
-//corrects a conflict if needed/possible
 int Table::play_row(int current_row)
 {
   bool conflicts = false;
@@ -243,7 +241,7 @@ int Table::play_row(int current_row)
           conflicts = true;
         }
       }
-      else if(i < m_tower[current_row].size())  //cards in the middle check both "parents"
+      else if(i < m_tower[current_row].size())  //cards in the middle - check both "parents"
       {
         if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
         {
@@ -258,19 +256,28 @@ int Table::play_row(int current_row)
           conflicts = true;
         }
       }
-
-      if(conflicts) multiplier = 0;
     }
 
     if(winnings == 0) //full row of multiplers
-    {
-       winnings = 50 * current_row;
-    }
+      return 50 * current_row;
   }
 
   if(conflicts)
-    multiplier = handle_conflicts(current_row);
+  {
+    if(!m_savior_card) return 0;
 
+    bool fixed = handle_conflicts(current_row);
+    if(fixed)
+    {
+      this->clear_screen();
+      this->announce_row(current_row);
+      cout << endl << endl;
+      return evaluate_winnings(current_row);
+    }
+    else
+      return 0;
+  }
+  //else
   return winnings * multiplier;
 }
 // ^^^^^^^^^^ THE MEAT ^^^^^^^^^^^^^^^^^
@@ -297,7 +304,7 @@ bool Table::conflict(Card* lower, Card* upper)
   return false;
 }
 
-int Table::handle_conflicts(int current_row)
+bool Table::handle_conflicts(int current_row)
 {
   cout << endl;
   this->print_tower();
@@ -305,10 +312,109 @@ int Table::handle_conflicts(int current_row)
 
   this->clear_screen();
   this->announce_handling_conflict();
+  cout << endl << endl;
   this->print_tower();
+  cout << endl;
   sleep(1);
 
-  return 0;
+  //HANDLE THE CONFLICT HERE
+
+  //Savior Card had already been used in a previous row
+  if(!this->m_savior_card)
+    return false;
+
+  //The Savior Card had not been used yet
+  m_savior_card->reveal();
+
+  this->clear_screen();
+  this->announce_handling_conflict();
+  cout << endl << endl;
+  this->print_tower();
+  cout << endl;
+  sleep(1);
+
+  for(unsigned long int i = 0; i < m_tower[current_row].size(); i++)
+  {
+    if(m_tower[current_row][i]->is_conflicted())
+    {
+      if(!m_savior_card)
+        return false;
+
+      delete m_tower[current_row][i];
+      m_tower[current_row][i] = m_savior_card;
+      m_savior_card = NULL;
+
+      //check for new conflicts
+      if(i == 0)  //far left card
+      {
+        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
+        {
+          m_tower[current_row][i]->make_conflicted();
+          return false;
+        }
+        else m_tower[current_row - 1][i]->fixed_conflict();
+      }
+      else if(i == m_tower[current_row].size() - 1)  //far right card
+      {
+        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
+        {
+          m_tower[current_row][i]->make_conflicted();
+          return false;
+        }
+        else m_tower[current_row - 1][i - 1]->fixed_conflict();
+      }
+      else if(i < m_tower[current_row].size())  //cards in the middle - check both "parents"
+      {
+        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
+        {
+          m_tower[current_row][i]->make_conflicted();
+          m_tower[current_row - 1][i]->make_conflicted();
+          return false;
+        }
+        else m_tower[current_row - 1][i]->fixed_conflict();
+
+        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
+        {
+          m_tower[current_row][i]->make_conflicted();
+          m_tower[current_row - 1][i - 1]->make_conflicted();
+          return false;
+        }
+        else m_tower[current_row - 1][i - 1]->fixed_conflict();
+      }
+
+      this->clear_screen();
+      this->announce_handling_conflict();
+      cout << endl << endl;
+      this->print_tower();
+      cout << endl;
+      sleep(1);
+    }
+  }
+
+  return true;
+}
+
+//Only gets called if the savior card saved the row
+int Table::evaluate_winnings(int current_row)
+{
+  int winnings = 0, multiplier = 1;
+  for(unsigned long int i = 0; i < m_tower[current_row].size(); i++)
+  {
+    winnings += m_tower[current_row][i]->money_value();
+
+    switch(m_tower[current_row][i]->get_face())
+    {
+      case XTWO:  multiplier *= 2;  break;
+      case XFIVE: multiplier *= 5;  break;
+      case XTEN:  multiplier *= 10; break;
+      default:    break;
+    }
+  }
+
+  if(winnings == 0) //full row of multiplers
+    return 50 * current_row;
+
+  return winnings * multiplier;
 }
 
 bool Table::continue_or_payout(int takehome_payment)
@@ -337,12 +443,14 @@ void Table::display_winnings(int win_payment, int current_row)
   if(win_payment == 0)
   {
     this->announce_loss();
+    cout << endl << endl;
     this->print_tower();
     cout << "LOST ON ROW " << current_row + 1 << endl;
   }
   else
   {
     this->announce_win();
+    cout << endl << endl;
     this->print_tower();
     cout << endl;
     sleep(1);
@@ -351,6 +459,7 @@ void Table::display_winnings(int win_payment, int current_row)
 
     this->clear_screen();
     this->announce_win();
+    cout << endl << endl;
     this->print_tower();
     cout << "Payout of $" << win_payment << " from row " << current_row + 1 << endl;
   }

@@ -30,8 +30,9 @@ class Table
     int   play_row(int current_row);  //returns payout value
     void    announce_row(int current_row);
     bool    conflict(Card* lower, Card* upper);
-    int     handle_conflicts(int current_row); //called only when there is a conflict
+    bool    handle_conflicts(int current_row);  //called only when there is a conflict
     void      announce_handling_conflict();
+    int     evaluate_winnings(int current_row); //called only when there is a conflict
 
     bool  continue_or_payout(int win_payment);
 

@@ -17,7 +17,8 @@ class Card
     void     reveal()                  {m_revealed = true;}
     bool     is_revealed()             {return m_revealed;}
     void     make_conflicted()         {m_conflicted = true;}
-    bool     is_conflicted()           {return m_revealed;}
+    bool     is_conflicted()           {return m_conflicted;}
+    void     fixed_conflict()          {m_conflicted = false;}
 
     int      money_value()             {return m_money_value;}
 
