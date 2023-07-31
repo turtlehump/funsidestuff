@@ -1,5 +1,5 @@
-*/a.out
-*/*.exe
+a.out
+*.exe
 *.o
 *.swp
 */*.stackdump
