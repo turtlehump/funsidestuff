@@ -13,15 +13,19 @@ class BigInt
   public:
     BigInt();
     BigInt(int tmp);
+    BigInt(BigInt* tmp);
 
     void set(int tmp);
+    void set(BigInt* tmp);
 
     void   print();
     string str_value();
 
     int magnitude();
+    int get_digit(int i);
 
     void add(int addition);
+    void add(BigInt* adition);
 
     void multiply(int multiplier);
     //void multiply(BigInt multiplier);

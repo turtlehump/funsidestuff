@@ -13,8 +13,24 @@ BigInt::BigInt(int tmp)
   return;
 }
 
+BigInt::BigInt(BigInt* tmp)
+{
+  for(int i = 0; i < BIGINT_MAXDIGITS; i++)
+  {
+    m_int[i] = tmp->get_digit(i);
+  }
+
+  return;
+}
+
 void BigInt::set(int tmp)
 {
+  if(tmp < 0)
+  {
+    cout << "Trying to set BigInt to a negative int." << endl;
+    return;
+  }
+
   int digit = 0;
   do
   {
@@ -27,6 +43,16 @@ void BigInt::set(int tmp)
   {
     m_int[digit] = 0;
     digit++;
+  }
+
+  return;
+}
+
+void BigInt::set(BigInt* tmp)
+{
+  for(int i = 0; i < BIGINT_MAXDIGITS; i++)
+  {
+    m_int[i] = tmp->get_digit(i);
   }
 
   return;
@@ -48,6 +74,9 @@ void BigInt::print()
     }
     else cout << m_int[i];
   }
+
+  if(!started) cout << "0";
+
   return;
 }
 
@@ -65,7 +94,7 @@ string BigInt::str_value()
       if(m_int[i] != 0)
       {
         started = true;
-        tmp += m_int[i];
+        tmp += to_string(m_int[i]);
       }
     }
   }
@@ -82,6 +111,22 @@ int BigInt::magnitude()
       answer = i;
   }
   return answer;
+}
+
+int BigInt::get_digit(int i)
+{
+  if(i >= BIGINT_MAXDIGITS)
+  {
+    cout << "Request for digit greater than BIGINT_MAXDIGIT" << endl;
+    return -1;
+  }
+  if(i < 0)
+  {
+    cout << "Request for negative digit in a BIGINT" << endl;
+    return -1;
+  }
+
+  return m_int[i];
 }
 
 void BigInt::add(int addition)
@@ -103,6 +148,19 @@ void BigInt::add(int addition)
     addition /= 10;
 
   }while(addition > 0 || carry == 1);
+
+  return;
+}
+
+void BigInt::add(BigInt* addition)
+{
+  int carry = 0;
+  for(int i = 0; i < BIGINT_MAXDIGITS; i++)
+  {
+    m_int[i] = m_int[i] + addition->get_digit(i) + carry;
+    carry = m_int[i] / 10;
+    m_int[i] = m_int[i] % 10;
+  }
 
   return;
 }
