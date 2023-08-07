@@ -5,7 +5,21 @@
 #include <sstream>
 using namespace std;
 
-enum CardFace {ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, WILD, XTWO, XFIVE, XTEN};
+enum CardFace
+{
+  ONE = 0,
+  TWO = 1,
+  THREE = 2,
+  FOUR = 3,
+  FIVE = 4,
+  SIX = 5,
+  SEVEN = 6,
+  WILD = 7,
+  XTWO = 8,
+  XFIVE = 9,
+  XTEN = 10,
+  LAST = 11
+};
 
 class Card
 {
@@ -26,10 +40,10 @@ class Card
     void     print();
 
   private:
-    CardFace    m_face;
-    int         m_money_value;
-    bool        m_special;     //Does this card have any special effects to the payout?
-    bool        m_revealed;
-    bool        m_conflicted;
+    CardFace m_face;
+    int      m_money_value;
+    bool     m_special;     //Does this card have any special effects to the payout?
+    bool     m_revealed;
+    bool     m_conflicted;
 };
 #endif

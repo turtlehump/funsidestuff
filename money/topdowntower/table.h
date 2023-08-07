@@ -7,6 +7,8 @@
 #include "card.h"
 #include "deck.h"
 #include "player.h"
+#include "bigint.h"
+
 using namespace std;
 
 class Table
@@ -16,11 +18,13 @@ class Table
     ~Table();
 
     void  play_round(Player* player);
+    void  get_full_odds_breakdown();  //change the deck in the deck class (deck.cpp)
 
   private:
 
     void  clear_screen() {for(int i = 0; i < 70; i++) cout << endl;}
     void  print_tower();
+    void  delete_cards_in_tower();
 
     int   get_bet(Player* player, int base_bet);
     void    announce_bet(int round_multiplier);
@@ -38,10 +42,10 @@ class Table
 
     void  display_winnings(int win_payment, int current_row);
     void    announce_win();
-    void     reveal_all_cards();
+    void      reveal_all_cards();
     void    announce_loss();
 
-    void  delete_cards_in_tower();
+    void  get_odds(long unsigned int row, long unsigned int spot_in_row, CardFace cardface);
 
     vector<vector<Card*>> m_tower
     {
@@ -51,11 +55,13 @@ class Table
                       {NULL, NULL, NULL, NULL},            //4 in row 4
                    {NULL, NULL, NULL, NULL, NULL},         //5 in row 5
                 {NULL, NULL, NULL, NULL, NULL, NULL},      //6 in row 6
-              {NULL, NULL, NULL, NULL, NULL, NULL, NULL}   //7 in row 7
+             {NULL, NULL, NULL, NULL, NULL, NULL, NULL}    //7 in row 7
     };
 
     Card* m_savior_card;
 
     Deck* m_deck;
+
+    BigInt* m_total_possibilities = NULL;
 };
 #endif

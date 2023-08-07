@@ -27,7 +27,9 @@ void Table::print_tower()
     }
     for(unsigned long int j = 0; j < m_tower[i].size(); j++)
     {
-      cout << " " << m_tower[i][j]->display_value();
+      cout << " ";
+      if(m_tower[i][j]) cout << m_tower[i][j]->display_value();
+      else cout << " X ";
     }
     cout << endl;
   }
@@ -476,6 +478,111 @@ void Table::reveal_all_cards()
   if(m_savior_card) m_savior_card->reveal();
 
   return;
+}
+
+void Table::get_full_odds_breakdown()
+{
+  m_deck = new Deck(); //new deck must be deleted
+  m_deck->reveal_all_for_odds();
+
+  //check for progress file and update progress
+
+  m_total_possibilities = new BigInt(0);
+
+  for(CardFace cardface = ONE; cardface != LAST; cardface = CardFace(cardface + 1))
+  {
+    this->get_odds(0, 0, cardface);
+
+    cout << "Completed m_tower[0][0] of " << cardface << endl;
+    cout << "Total possibilities of " << m_total_possibilities->str_value() << " (cumulative)" << endl << endl;
+
+  }
+  cout << "DONE" << endl;
+
+  //print odds by row
+
+  delete m_deck;
+  return;
+}
+
+void Table::get_odds(long unsigned int current_row, long unsigned int current_spot_in_row, CardFace current_cardface)
+{
+  if(current_row < m_tower.size())
+  {
+    Card* current_card = m_deck->deal_card_by_face(current_cardface);
+
+    m_tower[current_row][current_spot_in_row] = current_card;
+
+    //did this new card cause a conflict? take note of each conflict index
+
+    //make next_iteration variables
+    long unsigned int next_spot_in_row = current_spot_in_row + 1;
+    long unsigned int next_row = current_row;
+    if(next_spot_in_row == m_tower[current_row].size()) //row is full and we need to go to the next row
+    {
+      next_row++;
+      next_spot_in_row = 0;
+    }
+
+    //go through every possible next card
+    CardFace next_cardface = CardFace::ONE;
+    do
+    {
+      //if there are no more of this card in the deck
+      //pick the next available card
+      if(!m_deck->get_card_count(next_cardface))
+      {
+        do
+        {
+          next_cardface = CardFace(next_cardface + 1);
+          if(next_cardface == CardFace::LAST) break;
+        }while(!m_deck->get_card_count(next_cardface));
+
+        if(next_cardface == CardFace::LAST) break;
+      }
+
+      //vvvv THE MEAT vvvv
+
+      get_odds(next_row, next_spot_in_row, next_cardface);
+
+      //^^^^ THE MEAT ^^^^
+
+      next_cardface = CardFace(next_cardface + 1);
+
+    }while(next_cardface != CardFace::LAST);
+
+    if(current_row == 5)
+    {
+      this->print_tower();
+      //cout << endl << "Possibilities so far: ";
+      m_total_possibilities->print();
+      cout << endl;
+      //cout << endl << "***********************" << endl;
+    }
+
+    //put the card back into the deck
+    m_deck->put_card_back(current_card);
+    m_tower[current_row][current_spot_in_row] = NULL;
+
+    return;
+  }
+  else //it is the savior card. do the status update and move back up
+  {
+    m_savior_card = m_deck->deal_card_by_face(current_cardface);
+
+    //handle the first conflict
+
+    //evaluate each row and update the total winnings of each row
+
+    m_total_possibilities->add(1);
+
+
+    //put the card back into the deck
+    m_deck->put_card_back(m_savior_card);
+    m_savior_card = NULL;
+
+    return;
+  }
 }
 
 void Table::announce_bet(int bet)

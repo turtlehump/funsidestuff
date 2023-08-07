@@ -42,15 +42,21 @@ int main()
   string name;
   cout << "Whats your name? ";
   cin >> name;
-  Player* player = new Player(name);
 
-  play_game(table, player);
+  if(name == "odds") table->get_full_odds_breakdown();
+  else
+  {
+    Player* player = new Player(name);
 
-  cout << endl << endl;
-  player->print();
-  cout << endl;
+    play_game(table, player);
 
-  delete player;
+    cout << endl << endl;
+    player->print();
+    cout << endl;
+
+    delete player;
+  }
+
   delete table;
   return 0;
 }
