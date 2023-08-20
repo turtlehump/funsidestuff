@@ -724,36 +724,58 @@ void Table::get_odds(long unsigned int current_row,
         if(i < first_conflict_row)
         {
           m_winning_sum_by_row[i]->add(this->evaluate_winnings(i));
-          continue;
+          continue; //Saves us 2 "if"s
         }
 
         if(i == first_conflict_row)
         {
           //Handle conflict
-	  // - NOTE: We can only get here if(first_conflict_row < second_conflict_row)
-          //         (there is only one conflict on the first_conflict_row)
-          // - changing out the first conflict card resolves the conflict
-          if(handle_conflict_for_odds(first_conflict_row, first_conflict_index))
+	  // - NOTE: We can only flow here if(first_conflict_row < second_conflict_row)
+          //       - There is only one conflict on the first_conflict_row)
+
+          // - NOTE: evaluate_winnings(i) requires the savior card to be moved into the row
+          //       - Must keep track of the original_conflicted_card so we can replace it back after row payout evaluation
+          Card* original_conflicted_card = m_tower[first_conflict_row][first_conflict_index];
+
+          //Changing out the first conflict card does not resolves the conflict
+          //   - Loss on current row -> do not add current row winnings to cumulative row payouts
+          if(!handle_conflict_for_odds(first_conflict_row, first_conflict_index))
+          {
+            //Put the original_conflict_card back in the tower before recursing back up
+            m_tower[first_conflict_row][first_conflict_index] = original_conflicted_card;
+
+            break;
+          }
+
+          //Changing out the first conflict card resolves the conflict
+          else
           {
             m_winning_sum_by_row[i]->add(this->evaluate_winnings(i));
 
             //Need to check if the new card created a conflict in the next row
+            //  -NOTE: We know its not a Jackpot because we already checked for that
+            //       - There is a row below us to check against
+            //         - There is always a left and right child
+            Card* left_child  = m_tower[first_conflict_row + 1][first_conflict_index];
+            Card* right_child = m_tower[first_conflict_row + 1][first_conflict_index + 1];
 
-            continue;
-          }
+            if(this->conflict(left_child, m_tower[first_conflict_row][first_conflict_index]))
+              second_conflict_row = first_conflict_row + 1;
 
-          // - changing out the savior card does not resolve the conflict - loss on current row
-          else
-          {
-            m_max_row_before_loss[i - 1]->add(1);
-            break;
+            if(this->conflict(right_child, m_tower[first_conflict_row][first_conflict_index]))
+              second_conflict_row = first_conflict_row + 1;
+
+            //Row payout evaluated -> Put the original_conficted_card back into the tower
+            m_tower[first_conflict_row][first_conflict_index] = original_conflicted_card;
+
+            continue; //Saves us an "if"
           }
         }
 
-        //first conflict row resolved and we are between first and second conflict row
-        //
-        //if(i > first_conflict_row)
-        m_winning_sum_by_row[i]->add(this->evaluate_winnings(i));
+        //First conflict row resolved and didnt create a conflict below it
+        //  - We are between first and second conflict row
+        //if(i > first_conflict_row)    - process of elimination -> dont need to ask
+          m_winning_sum_by_row[i]->add(this->evaluate_winnings(i));
       }
 
       m_max_row_before_loss[second_conflict_row - 1]->add(1);
@@ -761,7 +783,7 @@ void Table::get_odds(long unsigned int current_row,
 
     m_total_possibilities->add(1);
 
-    //put the card back into the deck
+    //Put the card back into the deck
     m_deck->put_card_back(m_savior_card);
     m_savior_card = NULL;
 
@@ -769,11 +791,32 @@ void Table::get_odds(long unsigned int current_row,
   }
 }
 
-bool Table::handle_conflict_for_odds(long unsigned int first_conflict_row,
-                                     long unsigned int first_conflict_index)
+//This will only get called once the Savior card has been dealt
+//This redirects the conflict card's pointer to the savior card
+//  - Needs to happen to evaluate the payout on a succeful resolve
+//  - Need to keep track of the card we redrected from before calling this
+//return true means the redirect resolves the conflict
+//return false means the redirect does not resolve the conflict
+bool Table::handle_conflict_for_odds(long unsigned int conflict_row,
+                                     long unsigned int conflict_index)
 {
-  //This will only get called if the first and second conflicts are on different rows
-  return true;
+  m_tower[conflict_row][conflict_index] = m_savior_card;
+
+  if(conflict_index == 0)
+  {
+    return !(this->conflict(m_tower[conflict_row][0], m_tower[conflict_row - 1][0]));
+  }
+  else if(conflict_index == (m_tower[conflict_row].size() - 1))
+  {
+    return !(this->conflict(m_tower[conflict_row][conflict_index], m_tower[conflict_row - 1][conflict_index - 1]));
+  }
+  else
+  {
+    if(this->conflict(m_tower[conflict_row][conflict_index], m_tower[conflict_row - 1][conflict_index]))     return false;
+    if(this->conflict(m_tower[conflict_row][conflict_index], m_tower[conflict_row - 1][conflict_index - 1])) return false;
+
+    return true;
+  }
 }
 
 void Table::announce_bet(int bet)
