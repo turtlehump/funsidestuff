@@ -6,7 +6,7 @@ Deck::Deck()
 
   //Only 1 card initializer but 2 pointers
   //m_deck is for shuffling and to play the game
-  //m_card_counts is to run stats on the odds
+  //m_cards_by_faces is to run stats on the odds
   // - need the actual card objects because thats
   //   what gets inserted into the tower and the table
   //   object is what identifies conflicts
@@ -153,6 +153,8 @@ void Deck::print()
   return;
 }
 
+//For playing the game vvvvvvvvvvvv
+
 //technically this is a wash, not a shuffle
 vector<Card*> Deck::shuffle()
 {
@@ -168,8 +170,6 @@ vector<Card*> Deck::shuffle()
 
   return m_deck;
 }
-
-//For playing the game vvvvvvvvvvvv
 
 Card* Deck::deal_top_card()
 {

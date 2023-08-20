@@ -2,8 +2,9 @@
 
 Table::Table()
 {
-  m_deck = NULL;
+  m_TOWER_SIZE = m_tower.size();
   m_savior_card = NULL;
+  m_deck = NULL;
 
   return;
 }
@@ -487,11 +488,20 @@ void Table::get_full_odds_breakdown()
 
   //check for progress file and update progress
 
-  m_total_possibilities = new BigInt(0);
+  m_total_possibilities       = new BigInt(0);
+  for(long unsigned int i = 0; i < m_tower.size(); i++)
+  {
+    m_winning_sum_by_row.push_back(new BigInt(0));
+    m_max_row_before_loss.push_back(new BigInt(0));
+  }
+  m_possible_jackpots         = new BigInt(0);
+  m_jackpots_payouts_sum      = new BigInt(0);
+  m_possible_mega_jackpots    = new BigInt(0);
+  m_mega_jackpots_payouts_sum = new BigInt(0);
 
   for(CardFace cardface = ONE; cardface != LAST; cardface = CardFace(cardface + 1))
   {
-    this->get_odds(0, 0, cardface);
+    this->get_odds(0, 0, cardface, 0, 0, 0);
 
     cout << "Completed m_tower[0][0] of " << cardface << endl;
     cout << "Total possibilities of " << m_total_possibilities->str_value() << " (cumulative)" << endl << endl;
@@ -505,17 +515,88 @@ void Table::get_full_odds_breakdown()
   return;
 }
 
-void Table::get_odds(long unsigned int current_row, long unsigned int current_spot_in_row, CardFace current_cardface)
+void Table::get_odds(long unsigned int current_row,
+                     long unsigned int current_spot_in_row,
+                     CardFace          current_cardface,
+                     long unsigned int first_conflict_row,
+                     long unsigned int first_conflict_index,
+                     long unsigned int second_conflict_row)
 {
-  if(current_row < m_tower.size())
+  //Called on a card within the tower
+  // - we still need to deal more cards
+  if(current_row < m_TOWER_SIZE)
   {
     Card* current_card = m_deck->deal_card_by_face(current_cardface);
 
     m_tower[current_row][current_spot_in_row] = current_card;
 
-    //did this new card cause a conflict? take note of each conflict index
+    //Did this new card cause a conflict? Take note of each conflict row
+    //We can skip the checks if we have already found 2 conflicts in the tower
+    if(second_conflict_row == 0)
+    {
+      if(current_row > 0)
+      {
+        if(current_spot_in_row == 0)
+        {
+          if(conflict(current_card, m_tower[current_row - 1][current_spot_in_row]))
+          {
+            if(!first_conflict_row)
+            {
+              first_conflict_row  = current_row;
+              first_conflict_index = current_spot_in_row;
+            }
+            else
+            {
+              second_conflict_row = current_row;
+            }
+          }
+        }
+        else if(current_spot_in_row == m_tower[current_row].size() - 1)
+        {
+          if(conflict(current_card, m_tower[current_row - 1][current_spot_in_row - 1]))
+          {
+            if(!first_conflict_row)
+            {
+              first_conflict_row  = current_row;
+              first_conflict_index = current_spot_in_row;
+            }
+            else
+            {
+              second_conflict_row = current_row;
+            }
+          }
+        }
+        else
+        {
+          if(conflict(current_card, m_tower[current_row - 1][current_spot_in_row - 1]))
+          {
+            if(!first_conflict_row)
+            {
+              first_conflict_row  = current_row;
+              first_conflict_index = current_spot_in_row;
+            }
+            else
+            {
+              second_conflict_row = current_row;
+            }
+          }
+          else if(conflict(current_card, m_tower[current_row - 1][current_spot_in_row]))
+          {
+            if(!first_conflict_row)
+            {
+              first_conflict_row  = current_row;
+              first_conflict_index = current_spot_in_row;
+            }
+            else
+            {
+              second_conflict_row = current_row;
+            }
+          }
+        }
+      }
+    }
 
-    //make next_iteration variables
+    //Make next iteration variables
     long unsigned int next_spot_in_row = current_spot_in_row + 1;
     long unsigned int next_row = current_row;
     if(next_spot_in_row == m_tower[current_row].size()) //row is full and we need to go to the next row
@@ -524,12 +605,12 @@ void Table::get_odds(long unsigned int current_row, long unsigned int current_sp
       next_spot_in_row = 0;
     }
 
-    //go through every possible next card
+    //Go through every possible next card
     CardFace next_cardface = CardFace::ONE;
     do
     {
-      //if there are no more of this card in the deck
-      //pick the next available card
+      //If there are no more of this card in the deck
+      //Pick the next available card
       if(!m_deck->get_card_count(next_cardface))
       {
         do
@@ -543,7 +624,12 @@ void Table::get_odds(long unsigned int current_row, long unsigned int current_sp
 
       //vvvv THE MEAT vvvv
 
-      get_odds(next_row, next_spot_in_row, next_cardface);
+      get_odds(next_row,
+               next_spot_in_row,
+               next_cardface,
+               first_conflict_row,
+               first_conflict_index,
+               second_conflict_row);
 
       //^^^^ THE MEAT ^^^^
 
@@ -551,31 +637,129 @@ void Table::get_odds(long unsigned int current_row, long unsigned int current_sp
 
     }while(next_cardface != CardFace::LAST);
 
-    if(current_row == 5)
+    //Progress updates shows the stats after the current last-shown-card has been exhausted
+    if(current_row < (m_TOWER_SIZE - 1))
     {
       this->print_tower();
-      //cout << endl << "Possibilities so far: ";
+
+      cout << "Total possibilities: ";
       m_total_possibilities->print();
       cout << endl;
-      //cout << endl << "***********************" << endl;
+
+      cout << "First conflict row: " << first_conflict_row << endl;
+      cout << "First conflict index: " << first_conflict_index << endl;
+      cout << "Second conflict row: " << second_conflict_row << endl;
+
+      for(long unsigned int i = 0; i < m_TOWER_SIZE; i++)
+      {
+        cout << "Row " << i << " highest_row_before_loss: ";
+        m_max_row_before_loss[i]->print();
+        cout << endl;
+        cout << "Row " << i << " cumulative payouts:      ";
+        m_winning_sum_by_row[i]->print();
+
+        cout << endl;
+      }
+
+      cout << "Total Jackpot possibilities:      ";
+      m_possible_jackpots->print();
+      cout << endl;
+
+      cout << "Total Jackpot payouts:            ";
+      m_jackpots_payouts_sum->print();
+      cout << endl;
+
+      cout << "Total Mega-Jackpot possibilities: ";
+      m_possible_mega_jackpots->print();
+      cout << endl;
+
+      cout << "Total Mega-Jackpot payouts:       ";
+      m_mega_jackpots_payouts_sum->print();
+      cout << endl;
+
+      cout << endl;
     }
 
-    //put the card back into the deck
+    //Put the current card back into the deck
     m_deck->put_card_back(current_card);
     m_tower[current_row][current_spot_in_row] = NULL;
 
     return;
   }
-  else //it is the savior card. do the status update and move back up
+
+  //It is the savior card
+  //- Solve the conflict
+  //- Then do stats updates
+  else
   {
     m_savior_card = m_deck->deal_card_by_face(current_cardface);
 
-    //handle the first conflict
+    if(second_conflict_row == 0) //JACKPOT OPPORTUNITY
+    {
+      if(first_conflict_row == 0) //MEGA JACKPOT OPPORTUNITY!!!
+      {
+        m_possible_mega_jackpots->add(1);
+        int payout = MEGA_JACKPOT_MULTIPLIER * evaluate_winnings(m_TOWER_SIZE);
+        m_mega_jackpots_payouts_sum->add(payout);
 
-    //evaluate each row and update the total winnings of each row
+      }
+      else
+      {
+        m_possible_jackpots->add(1);
+        int payout = JACKPOT_MULTIPLIER * evaluate_winnings(m_TOWER_SIZE);
+        m_jackpots_payouts_sum->add(payout);
+      }
+
+      //Update the stats for the rest of the rows
+      for(long unsigned int i = 0; i < m_TOWER_SIZE; i++)
+      {
+        m_winning_sum_by_row[i]->add(this->evaluate_winnings(i));
+      }
+    }
+    else
+    {
+      //Update winning stats for all rows before the second conflict row
+      for(long unsigned int i = 0; i < second_conflict_row; i++)
+      {
+        if(i < first_conflict_row)
+        {
+          m_winning_sum_by_row[i]->add(this->evaluate_winnings(i));
+          continue;
+        }
+
+        if(i == first_conflict_row)
+        {
+          //Handle conflict
+	  // - NOTE: We can only get here if(first_conflict_row < second_conflict_row)
+          //         (there is only one conflict on the first_conflict_row)
+          // - changing out the first conflict card resolves the conflict
+          if(handle_conflict_for_odds(first_conflict_row, first_conflict_index))
+          {
+            m_winning_sum_by_row[i]->add(this->evaluate_winnings(i));
+
+            //Need to check if the new card created a conflict in the next row
+
+            continue;
+          }
+
+          // - changing out the savior card does not resolve the conflict - loss on current row
+          else
+          {
+            m_max_row_before_loss[i - 1]->add(1);
+            break;
+          }
+        }
+
+        //first conflict row resolved and we are between first and second conflict row
+        //
+        //if(i > first_conflict_row)
+        m_winning_sum_by_row[i]->add(this->evaluate_winnings(i));
+      }
+
+      m_max_row_before_loss[second_conflict_row - 1]->add(1);
+    }
 
     m_total_possibilities->add(1);
-
 
     //put the card back into the deck
     m_deck->put_card_back(m_savior_card);
@@ -583,6 +767,13 @@ void Table::get_odds(long unsigned int current_row, long unsigned int current_sp
 
     return;
   }
+}
+
+bool Table::handle_conflict_for_odds(long unsigned int first_conflict_row,
+                                     long unsigned int first_conflict_index)
+{
+  //This will only get called if the first and second conflicts are on different rows
+  return true;
 }
 
 void Table::announce_bet(int bet)

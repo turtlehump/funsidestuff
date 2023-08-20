@@ -11,6 +11,9 @@
 
 using namespace std;
 
+const int JACKPOT_MULTIPLIER      = 10;
+const int MEGA_JACKPOT_MULTIPLIER = 50;
+
 class Table
 {
   public:
@@ -24,6 +27,9 @@ class Table
 
     void  clear_screen() {for(int i = 0; i < 70; i++) cout << endl;}
     void  print_tower();
+
+    //  vvvvvv Playing Game vvvvvv
+
     void  delete_cards_in_tower();
 
     int   get_bet(Player* player, int base_bet);
@@ -36,7 +42,7 @@ class Table
     bool    conflict(Card* lower, Card* upper);
     bool    handle_conflicts(int current_row);  //called only when there is a conflict
     void      announce_handling_conflict();
-    int     evaluate_winnings(int current_row); //called only when there is a conflict
+    int     evaluate_winnings(int current_row);
 
     bool  continue_or_payout(int win_payment);
 
@@ -45,7 +51,14 @@ class Table
     void      reveal_all_cards();
     void    announce_loss();
 
-    void  get_odds(long unsigned int row, long unsigned int spot_in_row, CardFace cardface);
+    void  get_odds(long unsigned int row,
+                   long unsigned int spot_in_row,
+                   CardFace          cardface,
+                   long unsigned int first_conflict_row,
+                   long unsigned int first_conflict_index,
+                   long unsigned int second_conflict_row);
+    bool    handle_conflict_for_odds(long unsigned int first_conflict_row,
+                                     long unsigned int first_conflict_index);
 
     vector<vector<Card*>> m_tower
     {
@@ -58,10 +71,20 @@ class Table
              {NULL, NULL, NULL, NULL, NULL, NULL, NULL}    //7 in row 7
     };
 
+    long unsigned int m_TOWER_SIZE = 0;
+
     Card* m_savior_card;
 
     Deck* m_deck;
 
     BigInt* m_total_possibilities = NULL;
+
+    vector<BigInt*> m_winning_sum_by_row;
+    vector<BigInt*> m_max_row_before_loss;
+    BigInt*         m_possible_jackpots;
+    BigInt*         m_jackpots_payouts_sum;
+    BigInt*         m_possible_mega_jackpots;
+    BigInt*         m_mega_jackpots_payouts_sum;
+
 };
 #endif
