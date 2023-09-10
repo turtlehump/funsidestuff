@@ -33,6 +33,7 @@ class Card
     void     make_conflicted()         {m_conflicted = true;}
     bool     is_conflicted()           {return m_conflicted;}
     void     fixed_conflict()          {m_conflicted = false;}
+    bool     is_special()              {return m_special;}
 
     int      money_value()             {return m_money_value;}
 

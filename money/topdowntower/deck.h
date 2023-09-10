@@ -16,6 +16,7 @@ class Deck
 
         void          print();
 
+        void          reseed()      {srand((int) time(0));}
         vector<Card*> shuffle();
 
         //for playing the game
@@ -24,7 +25,7 @@ class Deck
         //for calculating the odds
         void          reveal_all_for_odds();
         Card*         deal_card_by_face(CardFace face);
-        void          put_card_back(Card* card);
+        void          put_card_back(Card* card, bool playing);
         int           get_card_count(CardFace cardface) { return m_cards_by_faces[cardface].size(); }
 
     private:

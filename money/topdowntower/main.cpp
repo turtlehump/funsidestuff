@@ -43,7 +43,7 @@ int main()
   cout << "Whats your name? ";
   cin >> name;
 
-  if(name == "odds") table->get_full_odds_breakdown();
+  if(name == "odds") table->get_odds();
   else
   {
     Player* player = new Player(name);
@@ -56,6 +56,8 @@ int main()
 
     delete player;
   }
+
+  cout << "Thanks for playing, " << name << endl;
 
   delete table;
   return 0;

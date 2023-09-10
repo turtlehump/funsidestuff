@@ -60,6 +60,7 @@ void Table::delete_cards_in_tower()
 void Table::play_round(Player* player)
 {
   m_deck = new Deck(); //new deck must be deleted
+  m_deck->reseed();
 
   int round_multiplier = this->get_bet(player, 15);
 
@@ -481,46 +482,340 @@ void Table::reveal_all_cards()
   return;
 }
 
-void Table::get_full_odds_breakdown()
-{
-  m_deck = new Deck(); //new deck must be deleted
-  m_deck->reveal_all_for_odds();
 
-  //check for progress file and update progress
+void Table::get_odds()
+{
+  string r_or_bf;
+  bool random_odds;
+  do
+  {
+    cout << "Random (r) or Brute Force (bf)? ";
+    cin >> r_or_bf;
+    if(r_or_bf == "r")  random_odds = true;
+    if(r_or_bf == "bf") random_odds = false;
+  }while(!(r_or_bf == "r" || r_or_bf == "bf"));
 
   m_total_possibilities       = new BigInt(0);
   for(long unsigned int i = 0; i < m_tower.size(); i++)
   {
     m_winning_sum_by_row.push_back(new BigInt(0));
     m_max_row_before_loss.push_back(new BigInt(0));
+    m_num_losses_by_row.push_back(new BigInt(0));
+    m_num_wins_by_row.push_back(new BigInt(0));
+    m_highest_payout_by_row.push_back(0);
   }
-  m_possible_jackpots         = new BigInt(0);
-  m_jackpots_payouts_sum      = new BigInt(0);
-  m_possible_mega_jackpots    = new BigInt(0);
-  m_mega_jackpots_payouts_sum = new BigInt(0);
+  m_highest_payout_per_deal_sum = new BigInt(0);
+  m_possible_jackpots           = new BigInt(0);
+  m_jackpots_payouts_sum        = new BigInt(0);
+  m_highest_jackpot_payout      = 0;
+  m_possible_mega_jackpots      = new BigInt(0);
+  m_mega_jackpots_payouts_sum   = new BigInt(0);
+  m_highest_mega_jackpot_payout = 0;
 
-  for(CardFace cardface = ONE; cardface != LAST; cardface = CardFace(cardface + 1))
+  if(random_odds)
   {
-    this->get_odds(0, 0, cardface, 0, 0, 0);
-
-    cout << "Completed m_tower[0][0] of " << cardface << endl;
-    cout << "Total possibilities of " << m_total_possibilities->str_value() << " (cumulative)" << endl << endl;
-
+    this->random_odds();
   }
-  cout << "DONE" << endl;
+  else
+  {
+    m_deck = new Deck(); //new deck must be deleted
+    m_deck->reveal_all_for_odds();
 
-  //print odds by row
+    //check for progress file and update progress
 
-  delete m_deck;
+    for(CardFace cardface = ONE; cardface != LAST; cardface = CardFace(cardface + 1))
+    {
+      this->bf_odds(0, 0, cardface, 0, 0, 0);
+
+      cout << "Completed m_tower[0][0] of " << cardface << endl;
+      cout << "Total possibilities of " << m_total_possibilities->str_value() << " (cumulative)" << endl << endl;
+    }
+    cout << "DONE" << endl;
+
+    //print odds by row
+    delete m_deck;
+  }
+
+  cout << endl << "DONE" << endl;
   return;
 }
 
-void Table::get_odds(long unsigned int current_row,
-                     long unsigned int current_spot_in_row,
-                     CardFace          current_cardface,
-                     long unsigned int first_conflict_row,
-                     long unsigned int first_conflict_index,
-                     long unsigned int second_conflict_row)
+void Table::random_odds()
+{
+  m_deck = new Deck(); //new deck must be deleted
+  m_deck->reseed();
+
+  BigInt* sample_size = new BigInt(string("50000"));
+  int     base_bet = 15;
+
+  cout << "Going to run ";
+  sample_size->print();
+  cout << " itterations and get the stats" << endl << endl;
+
+  BigInt* i = new BigInt(0);
+  for(; i->less_than(sample_size); i->add(1))
+  {
+    m_deck->shuffle();
+    this->deal();
+
+    int highest_payout_of_deal = 0;
+    for(long unsigned int j = 0; j < m_tower.size(); j++)
+    {
+      int row_payment = this->play_row_for_random_odds(j);
+      this->update_random_odds_stats_by_row(row_payment, j);
+
+      if(!row_payment)
+        break;
+      else
+      {
+        if(row_payment > highest_payout_of_deal)
+          highest_payout_of_deal = row_payment;
+      }
+    }
+    m_highest_payout_per_deal_sum->add(highest_payout_of_deal);
+
+    this->put_tower_cards_back_in_deck();
+  }
+
+  this->print_random_odds_stats(sample_size, base_bet);
+
+  delete sample_size;
+  delete i;
+  delete m_deck;
+}
+
+int Table::play_row_for_random_odds(long unsigned int current_row)
+{
+  if(current_row == 0)
+  {
+    //special things for wilds and multipliers on the first card
+    switch(m_tower[0][0]->get_face())
+    {
+      case WILD:  return 10;
+      case XTWO:  return 10;
+      case XFIVE: return 15;
+      case XTEN:  return 25;
+      default:    return m_tower[0][0]->money_value();
+    }
+  }
+
+  int winnings = 0;
+  int multiplier = 1;
+  for(unsigned long int i = 0; i < m_tower[current_row].size(); i++)
+  {
+    Card* current_card = m_tower[current_row][i];
+    bool conflict = false;
+
+    if(current_card->is_special())
+    {
+      if(current_card->get_face() == XTWO)  multiplier *= 2;
+      else if(current_card->get_face() == XFIVE) multiplier *= 5;
+      else if(current_card->get_face() == XTEN)  multiplier *= 10;
+    }
+    else
+    {
+      if(i == 0)                                      //far left card
+      {
+        if(this->conflict(current_card, m_tower[current_row - 1][i])) conflict = true;
+      }
+      else if(i == m_tower[current_row].size() - 1)  //far right card
+      {
+        if(this->conflict(current_card, m_tower[current_row - 1][i - 1])) conflict = true;
+      }
+      else                                           //cards in the middle - check both "parents"
+      {
+        if(this->conflict(current_card, m_tower[current_row - 1][i])) conflict = true;
+        if(this->conflict(current_card, m_tower[current_row - 1][i - 1])) conflict = true;
+      }
+      if(conflict)
+      {
+        if(!m_savior_card)
+        {
+          return 0;
+        }
+        else
+        {
+          //Swap out card with savior card
+          m_deck->put_card_back(m_tower[current_row][i], true);
+          m_tower[current_row][i] = m_savior_card;
+          current_card = m_savior_card;
+          m_savior_card = NULL;
+
+          //Check the new current card
+          if(current_card->is_special())
+          {
+            if(current_card->get_face() == XTWO) {multiplier *= 2;   continue;}
+            if(current_card->get_face() == XFIVE){multiplier *= 5;   continue;}
+            if(current_card->get_face() == XTEN) {multiplier *= 10;  continue;}
+          }
+
+          if(i == 0)                                     //far left card
+          {
+            if(this->conflict(current_card, m_tower[current_row - 1][i])) return 0;
+          }
+          else if(i == m_tower[current_row].size() - 1)  //far right card
+          {
+            if(this->conflict(current_card, m_tower[current_row - 1][i - 1])) return 0;
+          }
+          else                                           //cards in the middle - check both "parents"
+          {
+            if(this->conflict(current_card, m_tower[current_row - 1][i]))     return 0;
+            if(this->conflict(current_card, m_tower[current_row - 1][i - 1])) return 0;
+          }
+        }
+      }
+      winnings += m_tower[current_row][i]->money_value();
+    }
+  }
+
+  if(winnings == 0) //Full row of multiplers
+    winnings = current_row * current_row;
+
+  if(current_row == m_tower.size() - 1)
+  {
+     if(!m_savior_card) //JACKPOT
+       winnings = winnings * 2;
+     else               //MEGA JACKPOT!!
+       winnings = winnings * 5;
+  }
+
+  return winnings * multiplier;
+}
+
+void Table::update_random_odds_stats_by_row(int win_payment, long unsigned int row)
+{
+  if(win_payment)
+  {
+    m_num_wins_by_row[row]->add(1);
+
+    if(row < m_tower.size())
+    {
+      m_winning_sum_by_row[row]->add(win_payment);
+      if(win_payment > m_highest_payout_by_row[row])
+        m_highest_payout_by_row[row] = win_payment;
+    }
+
+    //Breakdown the last row
+    if(row == m_tower.size() - 1)
+    {
+      if(!m_savior_card) //JACKPOT
+      {
+        m_possible_jackpots->add(1);
+        m_jackpots_payouts_sum->add(win_payment);
+        if(win_payment > m_highest_jackpot_payout)
+          m_highest_jackpot_payout = win_payment;
+      }
+      else               //MEGA JACKPOT!!
+      {
+        m_possible_mega_jackpots->add(1);
+        m_mega_jackpots_payouts_sum->add(win_payment);
+        if(win_payment > m_highest_mega_jackpot_payout)
+          m_highest_mega_jackpot_payout = win_payment;
+      }
+    }
+  }
+  else
+  {
+    m_max_row_before_loss[row - 1]->add(1);
+    while(row < m_tower.size())
+    {
+      m_num_losses_by_row[row]->add(1);
+      row++;
+    }
+  }
+}
+
+void Table::print_random_odds_stats(BigInt* sample_size, int base_bet)
+{
+  cout << "Ran ";
+  sample_size->print();
+  cout << " random deals with the following deck breakdown:" << endl;
+
+  for(CardFace i = CardFace::ONE; i != CardFace::LAST; i = CardFace(i + 1))
+  {
+    cout << i << ": " << m_deck->get_card_count(i) << endl;
+  }
+  cout << "****************" << endl;
+
+  BigInt* total_money_input = new BigInt(sample_size);
+  total_money_input->multiply(base_bet);
+
+  cout << "It costs ";
+  total_money_input->print();
+  cout << " to get dealt ";
+  sample_size->print();
+  cout << " times (base bet: " << base_bet << ")" << endl << endl;
+
+  for(long unsigned int j = 0; j < m_tower.size(); j++)
+  {
+    cout << "Row " << j << endl;
+
+    cout << "-  Furthest row: ";
+    m_max_row_before_loss[j]->print();
+    cout << endl;
+
+    cout << "-  Losses: ";
+    m_num_losses_by_row[j]->print();
+    cout << endl;
+
+    cout << "-  Wins: ";
+    m_num_wins_by_row[j]->print();
+    cout << endl;
+
+    cout << "-  Winnings: ";
+    m_winning_sum_by_row[j]->print();
+    if(m_winning_sum_by_row[j]->greater_than(total_money_input))
+      cout << "\t\t<- Problem";
+    cout << endl;
+
+    cout << "-  Highest Payout: " << m_highest_payout_by_row[j] << endl;
+
+    cout << endl;
+  }
+  //The surviving to the last row is either a Jackpot or a MEGA Jackpot
+  cout << "- JACKPOTS" << endl;
+  cout << "- - Wins: ";
+  m_possible_jackpots->print();
+  cout << endl;
+  cout << "- - Winnings: ";
+  m_jackpots_payouts_sum->print();
+  cout << endl;
+  cout << "- - Highest Payout: " << m_highest_jackpot_payout << endl;
+  cout << endl;
+
+  cout << "- MEGA JACKPOTS" << endl;
+  cout << "- - Wins: ";
+  m_possible_mega_jackpots->print();
+  cout << endl;
+  cout << "- - Winnings: ";
+  m_mega_jackpots_payouts_sum->print();
+  cout << endl;
+  cout << "- - Highest Payout: " << m_highest_mega_jackpot_payout << endl;
+  cout << endl;
+
+  cout << "Payout if you took the best payout every time: ";
+  m_highest_payout_per_deal_sum->print();
+  cout << endl;
+}
+
+void Table::put_tower_cards_back_in_deck()
+{
+  for(long unsigned int i = 0; i < m_tower.size(); i++)
+  {
+    for(long unsigned int j = 0; j < m_tower[i].size(); j++)
+    {
+      m_deck->put_card_back(m_tower[i][j], true);
+    }
+  }
+  if(m_savior_card) m_deck->put_card_back(m_savior_card, true);
+}
+
+void Table::bf_odds(long unsigned int current_row,
+                    long unsigned int current_spot_in_row,
+                    CardFace          current_cardface,
+                    long unsigned int first_conflict_row,
+                    long unsigned int first_conflict_index,
+                    long unsigned int second_conflict_row)
 {
   //Called on a card within the tower
   // - we still need to deal more cards
@@ -624,12 +919,12 @@ void Table::get_odds(long unsigned int current_row,
 
       //vvvv THE MEAT vvvv
 
-      get_odds(next_row,
-               next_spot_in_row,
-               next_cardface,
-               first_conflict_row,
-               first_conflict_index,
-               second_conflict_row);
+      bf_odds(next_row,
+              next_spot_in_row,
+              next_cardface,
+              first_conflict_row,
+              first_conflict_index,
+              second_conflict_row);
 
       //^^^^ THE MEAT ^^^^
 
@@ -681,7 +976,7 @@ void Table::get_odds(long unsigned int current_row,
     }
 
     //Put the current card back into the deck
-    m_deck->put_card_back(current_card);
+    m_deck->put_card_back(current_card, false);
     m_tower[current_row][current_spot_in_row] = NULL;
 
     return;
@@ -739,7 +1034,7 @@ void Table::get_odds(long unsigned int current_row,
 
           //Changing out the first conflict card does not resolves the conflict
           //   - Loss on current row -> do not add current row winnings to cumulative row payouts
-          if(!handle_conflict_for_odds(first_conflict_row, first_conflict_index))
+          if(!handle_conflict_for_bf(first_conflict_row, first_conflict_index))
           {
             //Put the original_conflict_card back in the tower before recursing back up
             m_tower[first_conflict_row][first_conflict_index] = original_conflicted_card;
@@ -784,7 +1079,7 @@ void Table::get_odds(long unsigned int current_row,
     m_total_possibilities->add(1);
 
     //Put the card back into the deck
-    m_deck->put_card_back(m_savior_card);
+    m_deck->put_card_back(m_savior_card, false);
     m_savior_card = NULL;
 
     return;
@@ -797,8 +1092,8 @@ void Table::get_odds(long unsigned int current_row,
 //  - Need to keep track of the card we redrected from before calling this
 //return true means the redirect resolves the conflict
 //return false means the redirect does not resolve the conflict
-bool Table::handle_conflict_for_odds(long unsigned int conflict_row,
-                                     long unsigned int conflict_index)
+bool Table::handle_conflict_for_bf(long unsigned int conflict_row,
+                                   long unsigned int conflict_index)
 {
   m_tower[conflict_row][conflict_index] = m_savior_card;
 

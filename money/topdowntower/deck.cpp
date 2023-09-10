@@ -158,7 +158,6 @@ void Deck::print()
 //technically this is a wash, not a shuffle
 vector<Card*> Deck::shuffle()
 {
-  srand((int) time(0));
   vector<Card*> new_deck;
   while(!m_deck.empty())
   {
@@ -204,10 +203,13 @@ Card* Deck::deal_card_by_face(CardFace cardface)
   return card;
 }
 
-void Deck::put_card_back(Card* card)
+//The playing bool is true when you are playing the game or when you are doing the general odds
+//The playing bool is false when you are brute forcing
+void Deck::put_card_back(Card* card, bool playing)
 {
   m_size++;
-  m_cards_by_faces[card->get_face()].push_back(card);
+  m_deck.push_back(card);
+  if(!playing) m_cards_by_faces[card->get_face()].push_back(card);
 }
 
 //For calculating the odds  ^^^^^^^^^^^^^
