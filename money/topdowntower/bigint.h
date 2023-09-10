@@ -13,6 +13,7 @@ class BigInt
   public:
     BigInt();
     BigInt(int tmp);
+    BigInt(string tmp);
     BigInt(BigInt* tmp);
 
     void set(int tmp);
@@ -29,6 +30,15 @@ class BigInt
 
     void multiply(int multiplier);
     //void multiply(BigInt* multiplier);
+
+    bool equal_to(int operand);
+    bool equal_to(BigInt* operand);
+
+    bool greater_than(int operand);
+    bool greater_than(BigInt* operand);
+
+    bool less_than(int operand);
+    bool less_than(BigInt* operand);
 
   private:
     std::array<int, BIGINT_MAXDIGITS> m_int = {0};

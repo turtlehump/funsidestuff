@@ -13,6 +13,26 @@ BigInt::BigInt(int tmp)
   return;
 }
 
+BigInt::BigInt(string tmp)
+{
+  int digit = 0;
+  for(int i = tmp.size() - 1; i >= 0; i--)
+  {
+    if(isdigit(tmp[i]))
+    {
+      m_int[digit] = tmp[i] - '0';
+      digit++;
+    }
+    else
+    {
+      cout << "Trying to initiate a BigInt with a non-int string" << endl;
+      return;
+    }
+  }
+
+  return;
+}
+
 BigInt::BigInt(BigInt* tmp)
 {
   for(int i = 0; i < BIGINT_MAXDIGITS; i++)
@@ -250,3 +270,141 @@ void BigInt::multiply(BigInt* multiplier)
   return;
 }
 */
+
+bool BigInt::equal_to(int operand)
+{
+  //A BigInt cannot be negative
+  //Will always be NOT EQUAL to any negative number
+  if(operand < 0) return false;
+
+  int magnitude = this->magnitude();
+  for(int i = 0; i < magnitude; i++)
+  {
+    if(m_int[i] != operand % 10) return false;
+  }
+
+  //Made it throough the whole number without missing
+  return true;
+}
+
+bool BigInt::equal_to(BigInt* operand)
+{
+  int magnitude = this->magnitude();
+  if(magnitude != operand->magnitude()) return false;
+
+  for(int i = 0; i < magnitude; i++)
+  {
+    if(m_int[i] != operand->get_digit(i)) return false;
+  }
+
+  //Made it throough the whole number without missing
+  return true;
+}
+
+bool BigInt::greater_than(int operand)
+{
+  //A BigInt cannot be negative
+  //Will always be greater than any negative number
+  if(operand < 0) return true;
+
+  bool answer;
+  bool dominance_set = false;
+  int magnitude = this->magnitude();
+
+  for(int i = 0; i < magnitude; i++)
+  {
+    int operand_digit = operand % 10;
+    if(m_int[i] > operand_digit)
+    {
+      dominance_set = true;
+      answer = true;
+    }
+    if(m_int[i] < operand_digit)
+    {
+      dominance_set = true;
+      answer = false;
+    }
+    /*
+    if(m_int[i] == operand_digit)
+    {
+      nothing changes
+    }
+    */
+
+    operand = operand / 10;
+    if(operand == 0) return true;
+  }
+  if(operand >= 10) return false;
+
+  //they are the same magnitude
+
+  if(dominance_set) return answer;
+  else /* the numbers are equal */ return false;
+}
+
+bool BigInt::greater_than(BigInt* operand)
+{
+  for(int i = BIGINT_MAXDIGITS - 1; i >= 0; i--)
+  {
+    if(m_int[i] == operand->get_digit(i)) continue;
+    if(m_int[i] >  operand->get_digit(i)) return true;
+    if(m_int[i] <  operand->get_digit(i)) return false;
+  }
+
+  //Got through the whole thing without returning -> numbers are equal
+  return false;
+}
+
+bool BigInt::less_than(int operand)
+{
+  //A BigInt cannot be negative
+  //Will always be greater than any negative number
+  if(operand < 0) return false;
+
+  bool answer;
+  bool dominance_set = false;
+  int magnitude = this->magnitude();
+
+  for(int i = 0; i < magnitude; i++)
+  {
+    int operand_digit = operand % 10;
+    if(m_int[i] > operand_digit)
+    {
+      dominance_set = true;
+      answer = false;
+    }
+    if(m_int[i] < operand_digit)
+    {
+      dominance_set = true;
+      answer = true;
+    }
+    /*
+    if(m_int[i] == tmp_digit)
+    {
+      nothing changes
+    }
+    */
+
+    operand = operand / 10;
+    if(operand == 0) return true;
+  }
+  if(operand >= 10) return false;
+
+  //they are the same magnitude
+
+  if(dominance_set) return answer;
+  else /* the numbers are equal */ return false;
+}
+
+bool BigInt::less_than(BigInt* operand)
+{
+  for(int i = BIGINT_MAXDIGITS - 1; i >= 0; i--)
+  {
+    if(m_int[i] == operand->get_digit(i)) continue;
+    if(m_int[i] >  operand->get_digit(i)) return false;
+    if(m_int[i] <  operand->get_digit(i)) return true;
+  }
+
+  //Got through the whole thing without returning -> numbers are equal
+  return false;
+}
