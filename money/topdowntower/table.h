@@ -27,6 +27,7 @@ class Table
 
     //  vvvvvv Playing Game vvvvvv
 
+    void  Instructions();
 
     void  play_round(Player* player, int base_bet);
     int     get_bet(Player* player, int base_bet);

@@ -61,6 +61,16 @@ void Table::delete_cards_in_tower()
 
 void Table::play_game(Player* player, int base_bet)
 {
+  string play_or_instructions;
+  do
+  {
+    cout << "Play or Instructions? (P/I)" << endl;
+    cin >> play_or_instructions;
+    if(play_or_instructions == "p" || play_or_instructions == "P")      {break;}
+    else if(play_or_instructions == "i" || play_or_instructions == "I") {this->Instructions(); break;}
+    else cout << endl << "Valid options are \"P\" or \"I\"." << endl << endl;
+  }while(420);
+
   bool again;
   do
   {
@@ -74,7 +84,7 @@ void Table::play_game(Player* player, int base_bet)
       do
       {
         string play_again;
-        cout << "Do you want to play again? (y/n)" << endl;
+        cout << "Do you want to play again? (Y/N)" << endl;
         cin >> play_again;
 
         if     (play_again == "y" || play_again == "Y") {valid = true; again = true;}
@@ -1558,5 +1568,54 @@ void Table::announce_handling_conflict()
   cout << "    ###    ###      ###      ###    ###     ## ###  ###         ########  ###     ###    ###       ###"      << endl;
   cout << "      ######          ########      ###     ######  ###         ########  ###       ######         ###"      << endl;
 
+  return;
+}
+
+void Table::Instructions()
+{
+  this->clear_screen();
+  cout << "Welcome to the Money Tower!" << endl << endl;
+  cout << "The payout is not determined at the time of the deal." << endl << endl;
+  cout << "*** YOU DECIDE WHEN YOU WANT TO GET PAID! ***" << endl << endl;
+
+  cout << "The tower looks like this:"  << endl << endl;
+  cout << "              -"             << endl;
+  cout << "            -   -"           << endl;
+  cout << "          -   -   -"         << endl;
+  cout << "        -   -   -   -"       << endl;
+  cout << "      -   -   -   -   -"     << endl;
+  cout << "    -   -   -   -   -   -"   << endl;
+  cout << "  -   -   -   -   -   -   -" << endl;
+  cout << "              -"             << endl << endl << endl;
+
+  cout << "START:" << endl;
+  cout << "* Decide on the multiplier for the round and pay the ante to get dealt." << endl << endl;
+
+  cout << "WINNING:" << endl;
+  cout << "* The entire row flips at once." << endl;
+  cout << "* The number on the card is the number of units won." << endl;
+  cout << "* You can accept a payout at the end of any row, or you can continue on and hope for a better payout." << endl;
+  cout << "* The payment only counts the cards in the most-recenetly-flipped row." << endl << endl;
+
+  cout << "LOSING:" << endl;
+  cout << " - CONFLICTS:" << endl;
+  cout << "   * A \"Conflict\" happens when a parent-child card-pair have the same value." << endl;
+  cout << "   * WILD cards and MULTIPLIER cards do not cause Conflicts." << endl;
+  cout << "* The card at the bottom of the tower is called the \"Savior Card\"." << endl;
+  cout << "* The first Conflicted Card will be replaced by the Savior Card." << endl;
+  cout << "* A Loss happens if there is another Conflict after the savior card has been used." << endl;
+  sleep(60);
+
+  cout << "SPECIALS:" << endl;
+  cout << " - WILD (W) cards:" << endl;
+  cout << "   * Does not Conflict with other W's." << endl;
+  cout << "   * Even Money if dealt as the first row." << endl;
+  cout << "   * Money value of SEVEN (7) when on any row other than the first row." << endl;
+  cout << " - MULTIPLIERS:" << endl;
+  cout << "   * X2" << endl;
+  cout << "   * X5" << endl;
+  cout << "   * X10" << endl;
+  cout << "   * Multipliers build off eachother." << endl;
+  cout << "   * " << endl;
   return;
 }
