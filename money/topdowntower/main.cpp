@@ -4,40 +4,13 @@
 
 using namespace std;
 
-void clear_screen()
+int main()
 {
   for(int i = 0; i < 70; i++)
     cout << endl;
-  return;
-}
-
-void play_game(Table* table, Player* player)
-{
-  string play_again;
-  do
-  {
-    clear_screen();
-
-    table->play_round(player);
-
-    cout << "Do you want to play again? (y/n)" << endl;
-    cin >> play_again;
-
-    if     (play_again == "y" || play_again == "Y") continue;
-    else if(play_again == "n" || play_again == "N") break;
-    else
-      cout << endl << "That is not a valid input." << endl << endl;
-
-  }while(1);
-
-  return;
-}
-
-int main()
-{
-  clear_screen();
 
   Table* table = new Table();
+  int base_bet = 15;
 
   string name;
   cout << "Whats your name? ";
@@ -48,11 +21,11 @@ int main()
   {
     Player* player = new Player(name);
 
-    play_game(table, player);
+    table->play_game(player, base_bet);
 
     cout << endl << endl;
     player->print();
-    cout << endl;
+    cout << endl << endl;
 
     delete player;
   }

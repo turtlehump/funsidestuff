@@ -19,6 +19,7 @@ Table::~Table()
 
 void Table::print_tower()
 {
+  //Print Tower
   for(unsigned long int i = 0; i < m_tower.size(); i++)
   {
     cout << i + 1 << ":";
@@ -30,11 +31,12 @@ void Table::print_tower()
     {
       cout << " ";
       if(m_tower[i][j]) cout << m_tower[i][j]->display_value();
-      else cout << " X ";
+      else              cout << " X ";
     }
     cout << endl;
   }
 
+  //Print Savior Card
   cout << "s: ";
   for(unsigned long int i = 0; i < m_tower.size(); i++)
     cout << "  ";
@@ -57,12 +59,45 @@ void Table::delete_cards_in_tower()
   return;
 }
 
-void Table::play_round(Player* player)
+void Table::play_game(Player* player, int base_bet)
+{
+  bool again;
+  do
+  {
+    this->clear_screen();
+
+    this->play_round(player, base_bet);
+
+    bool valid = false;
+    if(player->can_afford(base_bet))
+    {
+      do
+      {
+        string play_again;
+        cout << "Do you want to play again? (y/n)" << endl;
+        cin >> play_again;
+
+        if     (play_again == "y" || play_again == "Y") {valid = true; again = true;}
+        else if(play_again == "n" || play_again == "N") {valid = true; again = false;}
+        else cout << endl << "Valid options are \"Y\" or \"N\"." << endl << endl;
+      }while(!valid);
+    }
+    else
+    {
+      cout << endl << "You do not have enough money to play again";
+      break;
+    }
+  }while(again);
+
+  return;
+}
+
+void Table::play_round(Player* player, int base_bet)
 {
   m_deck = new Deck(); //new deck must be deleted
   m_deck->reseed();
 
-  int round_multiplier = this->get_bet(player, 15);
+  int round_multiplier = this->get_bet(player, base_bet);
 
   m_deck->shuffle();
   this->deal();        //cards move from deck to tower -> must delete them
@@ -71,8 +106,8 @@ void Table::play_round(Player* player)
   this->print_tower();
   cout << endl;
 
-  int current_row = 0, next_row = 1, win_payment = 0;
-  bool press_luck;
+  int win_payment = 0;
+  long unsigned int current_row = 0;
   do
   {
     sleep(1);
@@ -82,36 +117,43 @@ void Table::play_round(Player* player)
     this->announce_row(current_row);
     cout << endl << endl;
 
-    win_payment = this->play_row(current_row) * round_multiplier;
-
-    if(win_payment == 0) //LOSS
-    {
-      sleep(1);
-      break;
-    }
+    int row_payment = this->play_row_for_game(current_row);
 
     this->print_tower();
 
-    if(current_row < 7)
-      press_luck = this->continue_or_payout(win_payment);
-    else //JACKPOT! - Survived row 7
+    win_payment = row_payment * round_multiplier;
+
+    if(row_payment == 0) //LOSS
     {
-      press_luck = false;
-      if(m_savior_card) // MEGA JACKPOT!!
-      {
-         win_payment *= 25;
-      }
+      cout << endl;
       sleep(1);
+      break;
     }
-
-    current_row = next_row;
-    next_row++;
-
-  }while(current_row < 7 && press_luck);
+    else
+    {
+      if(current_row < m_tower.size() - 1)
+      {
+        if(this->continue_or_payout(win_payment))
+        {
+          current_row++;
+        }
+        else
+        {
+          sleep(1);
+          break;
+        }
+      }
+      else //JACKPOT!
+      {
+        sleep(1);
+        break;
+      }
+    }
+  }while(1);
 
   this->clear_screen();
 
-  display_winnings(win_payment, current_row);
+  display_winnings(win_payment, current_row, (base_bet * round_multiplier));
 
   player->give_money(win_payment);
   this->delete_cards_in_tower();
@@ -135,30 +177,26 @@ int Table::get_bet(Player* player, int base_bet)
      return 0;
   }
 
-  int round_multiplier, bet;
   do
   {
+    string round_multiplier_str;
+    int round_multiplier;
+    bool valid = false;
     do
     {
       cout << "Your bet will be in multiples of $" << base_bet << endl;
       cout << "How many multiples? (1-5) " << endl;
-      cin >> round_multiplier;
+      cin >> round_multiplier_str;
 
-      if(round_multiplier < 1)
-      {
-        cout << endl << endl;
-        cout << "You must bet a positive number of units.";
-        cout << endl;
-      }
-      if(round_multiplier > 5)
-      {
-        cout << endl << endl;
-        cout << "You must bet less than 5 units.";
-        cout << endl;
-      }
-    }while(round_multiplier < 1 || round_multiplier > 5);
+      if     (round_multiplier_str == "1") {valid = true; round_multiplier = 1;}
+      else if(round_multiplier_str == "2") {valid = true; round_multiplier = 2;}
+      else if(round_multiplier_str == "3") {valid = true; round_multiplier = 3;}
+      else if(round_multiplier_str == "4") {valid = true; round_multiplier = 4;}
+      else if(round_multiplier_str == "5") {valid = true; round_multiplier = 5;}
+      else cout << endl << "Valid entries are 1 - 5" << endl << endl;
+    }while(!valid);
 
-    bet = round_multiplier * base_bet;
+    int bet = round_multiplier * base_bet;
 
     if(player->can_afford(bet))
     {
@@ -190,7 +228,7 @@ void Table::deal()
 }
 
 //returns total winning value for the row
-int Table::play_row(int current_row)
+int Table::play_row_for_game(long unsigned int current_row)
 {
   bool conflicts = false;
   int winnings = 0, multiplier = 1;
@@ -202,24 +240,26 @@ int Table::play_row(int current_row)
     //special things for wilds and multipliers on the first card
     switch(m_tower[0][0]->get_face())
     {
-      case WILD:  return 10;
-      case XTWO:  return 10;
-      case XFIVE: return 15;
+      case WILD:  return 15;
+      case XTWO:  return 15;
+      case XFIVE: return 20;
       case XTEN:  return 25;
       default:    return m_tower[0][0]->money_value();
     }
   }
 
   //vvvvvvvvvvvv  THE MEAT vvvvvvvvvvvvvvv 
-  else
-  {
+  //else
+  //{
     for(unsigned long int i = 0; i < m_tower[current_row].size(); i++)
     {
-      m_tower[current_row][i]->reveal();
+      Card* current_card = m_tower[current_row][i];
 
-      winnings += m_tower[current_row][i]->money_value();
+      current_card->reveal();
 
-      switch(m_tower[current_row][i]->get_face())
+      winnings += current_card->money_value();
+
+      switch(current_card->get_face())
       {
         case XTWO:  multiplier *= 2;  break;
         case XFIVE: multiplier *= 5;  break;
@@ -227,62 +267,61 @@ int Table::play_row(int current_row)
         default:    break;
       }
 
-      if(i == 0)  //far left card
+      if(i == 0)                                     //far left card
       {
-        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
+        if(this->conflict(current_card, m_tower[current_row - 1][i]))
         {
-          m_tower[current_row][i]->make_conflicted();
+          current_card->make_conflicted();
           m_tower[current_row - 1][i]->make_conflicted();
           conflicts = true;
         }
       }
       else if(i == m_tower[current_row].size() - 1)  //far right card
       {
-        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
+        if(this->conflict(current_card, m_tower[current_row - 1][i - 1]))
         {
-          m_tower[current_row][i]->make_conflicted();
+          current_card->make_conflicted();
           m_tower[current_row - 1][i - 1]->make_conflicted();
           conflicts = true;
         }
       }
-      else if(i < m_tower[current_row].size())  //cards in the middle - check both "parents"
+      else                                           //cards in the middle - check both "parents"
       {
-        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
+        if(this->conflict(current_card, m_tower[current_row - 1][i]))
         {
-          m_tower[current_row][i]->make_conflicted();
+          current_card->make_conflicted();
           m_tower[current_row - 1][i]->make_conflicted();
           conflicts = true;
         }
-        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
+        if(this->conflict(current_card, m_tower[current_row - 1][i - 1]))
         {
-          m_tower[current_row][i]->make_conflicted();
+          current_card->make_conflicted();
           m_tower[current_row - 1][i - 1]->make_conflicted();
           conflicts = true;
         }
       }
     }
 
-    if(winnings == 0) //full row of multiplers
-      return 50 * current_row;
-  }
-
-  if(conflicts)
-  {
-    if(!m_savior_card) return 0;
-
-    bool fixed = handle_conflicts(current_row);
-    if(fixed)
-    {
-      this->clear_screen();
-      this->announce_row(current_row);
-      cout << endl << endl;
-      return evaluate_winnings(current_row);
-    }
+    if(!conflicts)
+      return winnings_calc(winnings, multiplier, current_row);
     else
-      return 0;
-  }
-  //else
-  return winnings * multiplier;
+    {
+      if(!m_savior_card)
+        return 0;
+
+      bool fixed = handle_conflicts(current_row);
+      this->clear_screen();
+
+      if(fixed)
+      {
+        this->announce_row(current_row);
+        cout << endl << endl;
+        return evaluate_winnings(current_row);
+      }
+      else
+        return 0;
+    }
+  //}
 }
 // ^^^^^^^^^^ THE MEAT ^^^^^^^^^^^^^^^^^
 
@@ -308,7 +347,7 @@ bool Table::conflict(Card* lower, Card* upper)
   return false;
 }
 
-bool Table::handle_conflicts(int current_row)
+bool Table::handle_conflicts(long unsigned int current_row)
 {
   cout << endl;
   this->print_tower();
@@ -321,106 +360,154 @@ bool Table::handle_conflicts(int current_row)
   cout << endl;
   sleep(1);
 
-  //HANDLE THE CONFLICT HERE
-
-  //Savior Card had already been used in a previous row
-  if(!this->m_savior_card)
-    return false;
-
-  //The Savior Card had not been used yet
-  m_savior_card->reveal();
-
-  this->clear_screen();
-  this->announce_handling_conflict();
-  cout << endl << endl;
-  this->print_tower();
-  cout << endl;
-  sleep(1);
-
-  for(unsigned long int i = 0; i < m_tower[current_row].size(); i++)
+  if(!m_savior_card) return false;
+  else
   {
-    if(m_tower[current_row][i]->is_conflicted())
+    m_savior_card->reveal();
+
+    this->clear_screen();
+    this->announce_handling_conflict();
+    cout << endl << endl;
+    this->print_tower();
+    cout << endl;
+    sleep(1);
+
+    for(unsigned long int i = 0; i < m_tower[current_row].size(); i++)
     {
-      if(!m_savior_card)
-        return false;
-
-      delete m_tower[current_row][i];
-      m_tower[current_row][i] = m_savior_card;
-      m_savior_card = NULL;
-
-      //check for new conflicts
-      if(i == 0)  //far left card
+      Card* current_card = m_tower[current_row][i];
+      if(current_card->is_conflicted())
       {
-        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
-        {
-          m_tower[current_row][i]->make_conflicted();
+        if(!m_savior_card)
           return false;
-        }
-        else m_tower[current_row - 1][i]->fixed_conflict();
-      }
-      else if(i == m_tower[current_row].size() - 1)  //far right card
-      {
-        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
-        {
-          m_tower[current_row][i]->make_conflicted();
-          return false;
-        }
-        else m_tower[current_row - 1][i - 1]->fixed_conflict();
-      }
-      else if(i < m_tower[current_row].size())  //cards in the middle - check both "parents"
-      {
-        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i]))
-        {
-          m_tower[current_row][i]->make_conflicted();
-          m_tower[current_row - 1][i]->make_conflicted();
-          return false;
-        }
-        else m_tower[current_row - 1][i]->fixed_conflict();
 
-        if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
-        {
-          m_tower[current_row][i]->make_conflicted();
-          m_tower[current_row - 1][i - 1]->make_conflicted();
-          return false;
-        }
-        else m_tower[current_row - 1][i - 1]->fixed_conflict();
-      }
+        delete current_card;
+        m_tower[current_row][i] = m_savior_card;
+        current_card = m_savior_card;
+        m_savior_card = NULL;
 
-      this->clear_screen();
-      this->announce_handling_conflict();
-      cout << endl << endl;
-      this->print_tower();
-      cout << endl;
-      sleep(1);
+        bool still_conflicted = false;
+        //check for new conflicts
+        if(i == 0)                                     //far left card
+        {
+          if(this->conflict(current_card, m_tower[current_row - 1][i]))
+          {
+            current_card->make_conflicted();
+            m_tower[current_row - 1][i]->make_conflicted();
+            still_conflicted = true;
+          }
+          else
+          {
+            if(!this->conflict(m_tower[current_row][i + 1], m_tower[current_row - 1][i]))
+              m_tower[current_row - 1][i]->fixed_conflict();
+          }
+        }
+        else if(i == m_tower[current_row].size() - 1)  //far right card
+        {
+          if(this->conflict(current_card, m_tower[current_row - 1][i - 1]))
+          {
+            current_card->make_conflicted();
+            m_tower[current_row - 1][i - 1]->make_conflicted();
+            still_conflicted = true;
+          }
+          else
+          {
+            if(!this->conflict(m_tower[current_row][i - 1], m_tower[current_row - 1][i - 1]))
+              m_tower[current_row - 1][i - 1]->fixed_conflict();
+          }
+        }
+        else                                           //cards in the middle - check both "parents"
+        {
+          //Right Parent
+          if(this->conflict(current_card, m_tower[current_row - 1][i]))
+          {
+            current_card->make_conflicted();
+            m_tower[current_row - 1][i]->make_conflicted();
+            still_conflicted = true;
+          }
+          else
+          {
+            if(!this->conflict(m_tower[current_row][i + 1], m_tower[current_row - 1][i]))
+              m_tower[current_row - 1][i]->fixed_conflict();
+          }
+
+          //Left Parent
+          if(this->conflict(m_tower[current_row][i], m_tower[current_row - 1][i - 1]))
+          {
+            m_tower[current_row][i]->make_conflicted();
+            m_tower[current_row - 1][i - 1]->make_conflicted();
+            still_conflicted = true;
+          }
+          else
+          {
+            if(!this->conflict(m_tower[current_row][i - 1], m_tower[current_row - 1][i - 1]))
+              m_tower[current_row - 1][i - 1]->fixed_conflict();
+          }
+        }
+
+        this->clear_screen();
+        this->announce_handling_conflict();
+        cout << endl << endl;
+        this->print_tower();
+        cout << endl;
+        sleep(1);
+
+        if(still_conflicted) return false;
+      }
     }
-  }
 
-  return true;
+    return true;
+  }
 }
 
-//Only gets called if the savior card saved the row
-int Table::evaluate_winnings(int current_row)
+int Table::evaluate_winnings(long unsigned int current_row)
 {
   int winnings = 0, multiplier = 1;
   for(unsigned long int i = 0; i < m_tower[current_row].size(); i++)
   {
-    winnings += m_tower[current_row][i]->money_value();
+    Card* current_card = m_tower[current_row][i];
+    int card_winnings = current_card->money_value();
 
-    switch(m_tower[current_row][i]->get_face())
+    if(card_winnings)
+      winnings += card_winnings;
+    else //Its a multiplier of some kind
     {
-      case XTWO:  multiplier *= 2;  break;
-      case XFIVE: multiplier *= 5;  break;
-      case XTEN:  multiplier *= 10; break;
-      default:    break;
+      CardFace cardface = current_card->get_face();
+      if(cardface == XTWO)  {multiplier *=  2; continue;}
+      if(cardface == XFIVE) {multiplier *=  5; continue;}
+      if(cardface == XTEN)  {multiplier *= 10; continue;}
     }
   }
 
+  return winnings_calc(winnings, multiplier, current_row);
+}
+
+int Table::winnings_calc(int winnings, int multiplier, long unsigned int current_row)
+{
   if(winnings == 0) //full row of multiplers
-    return 50 * current_row;
+    return (current_row + 1) * multiplier;
+
+  if(current_row == m_tower.size() - 4)          //4th-to-Last Row
+    winnings = winnings + (winnings / 10);       // +10%
+
+  if(current_row == m_tower.size() - 3)          //3rd-to-Last Row
+    winnings = winnings + (winnings / 4);        // +25%
+
+  if(current_row == m_tower.size() - 2)          //2nd-to-Last Row
+    winnings = winnings + ((winnings * 3) / 4);  // +75%
+
+  if(current_row == m_tower.size() - 1)          //Last Row
+  {
+     if(!m_savior_card)                          ////JACKPOT
+       winnings = winnings * 3;                  //// 300%
+     else                                        ////MEGA JACKPOT!!
+       winnings = winnings * 7;                  //// 700%
+  }
 
   return winnings * multiplier;
 }
 
+//Return true for continue
+//Return false for payout
 bool Table::continue_or_payout(int takehome_payment)
 {
   string should_continue;
@@ -429,20 +516,16 @@ bool Table::continue_or_payout(int takehome_payment)
     cout << "Continue or payout $" << takehome_payment << "? (c/p)" << endl;
     cin >> should_continue;
   
-    if(should_continue == "c" || should_continue == "C")
-      return true;
-    else if(should_continue == "p" || should_continue == "P")
-      return false;
-    else
-      cout << endl << "That is an invalid option."  << endl << endl;
+    if     (should_continue == "c" || should_continue == "C") return true;
+    else if(should_continue == "p" || should_continue == "P") return false;
+    else cout << endl << "Valid entries are \"C\" and \"P\""  << endl << endl;
 
-  }while(!(should_continue == "c" || should_continue == "C" ||
-           should_continue == "p" || should_continue == "P"));
+  }while(1);
 
   return 420; //:D
 }
 
-void Table::display_winnings(int win_payment, int current_row)
+void Table::display_winnings(int win_payment, long unsigned int current_row, int bet)
 {
   if(win_payment == 0)
   {
@@ -453,21 +536,37 @@ void Table::display_winnings(int win_payment, int current_row)
   }
   else
   {
-    this->announce_win();
-    cout << endl << endl;
-    this->print_tower();
-    cout << endl;
-    sleep(1);
+    if(current_row < m_tower.size() - 1)
+    {
+      if(win_payment >= (bet * 2))
+        this->announce_big_win();
+      else
+        this->announce_win();
+      cout << endl << endl;
+      this->print_tower();
+      cout << endl;
+      sleep(1);
 
-    this->reveal_all_cards();
+      this->reveal_all_cards();
 
-    this->clear_screen();
-    this->announce_win();
-    cout << endl << endl;
-    this->print_tower();
-    cout << "Payout of $" << win_payment << " from row " << current_row + 1 << endl;
+      this->clear_screen();
+      if(win_payment >= (bet * 2))
+        this->announce_big_win();
+      else
+        this->announce_win();
+      cout << endl << endl;
+      this->print_tower();
+      cout << "Payout of $" << win_payment << " from row " << current_row + 1 << endl;
+    }
+    else //if(current_row == m_tower.size() - 1)
+    {
+      if(!m_savior_card) this->announce_jackpot();
+      else               this->announce_mega_jackpot();
+      cout << endl << endl;
+      this->print_tower();
+      cout << "JACKPOT of $" << win_payment << "!!!" << endl;
+    }
   }
-
   return;
 }
 
@@ -545,7 +644,7 @@ void Table::random_odds()
   m_deck = new Deck(); //new deck must be deleted
   m_deck->reseed();
 
-  BigInt* sample_size = new BigInt(string("50000"));
+  BigInt* sample_size = new BigInt(string("1000000"));
   int     base_bet = 15;
 
   cout << "Going to run ";
@@ -591,9 +690,9 @@ int Table::play_row_for_random_odds(long unsigned int current_row)
     //special things for wilds and multipliers on the first card
     switch(m_tower[0][0]->get_face())
     {
-      case WILD:  return 10;
-      case XTWO:  return 10;
-      case XFIVE: return 15;
+      case WILD:  return 15;
+      case XTWO:  return 15;
+      case XFIVE: return 20;
       case XTEN:  return 25;
       default:    return m_tower[0][0]->money_value();
     }
@@ -668,18 +767,7 @@ int Table::play_row_for_random_odds(long unsigned int current_row)
     }
   }
 
-  if(winnings == 0) //Full row of multiplers
-    winnings = current_row * current_row;
-
-  if(current_row == m_tower.size() - 1)
-  {
-     if(!m_savior_card) //JACKPOT
-       winnings = winnings * 2;
-     else               //MEGA JACKPOT!!
-       winnings = winnings * 5;
-  }
-
-  return winnings * multiplier;
+  return winnings_calc(winnings, multiplier, current_row);
 }
 
 void Table::update_random_odds_stats_by_row(int win_payment, long unsigned int row)
@@ -748,7 +836,7 @@ void Table::print_random_odds_stats(BigInt* sample_size, int base_bet)
 
   for(long unsigned int j = 0; j < m_tower.size(); j++)
   {
-    cout << "Row " << j << endl;
+    cout << "Row " << j + 1 << endl;
 
     cout << "-  Furthest row: ";
     m_max_row_before_loss[j]->print();
@@ -989,24 +1077,24 @@ void Table::bf_odds(long unsigned int current_row,
   {
     m_savior_card = m_deck->deal_card_by_face(current_cardface);
 
-    if(second_conflict_row == 0) //JACKPOT OPPORTUNITY
+    if(second_conflict_row == 0)  //JACKPOT OPPORTUNITY
     {
       if(first_conflict_row == 0) //MEGA JACKPOT OPPORTUNITY!!!
       {
         m_possible_mega_jackpots->add(1);
-        int payout = MEGA_JACKPOT_MULTIPLIER * evaluate_winnings(m_TOWER_SIZE);
+        int payout = evaluate_winnings(m_tower.size() - 1);
         m_mega_jackpots_payouts_sum->add(payout);
 
       }
-      else
+      else                        //JACKPOT OPPORTUNITY
       {
         m_possible_jackpots->add(1);
-        int payout = JACKPOT_MULTIPLIER * evaluate_winnings(m_TOWER_SIZE);
+        int payout = evaluate_winnings(m_tower.size() - 1);
         m_jackpots_payouts_sum->add(payout);
       }
 
       //Update the stats for the rest of the rows
-      for(long unsigned int i = 0; i < m_TOWER_SIZE; i++)
+      for(long unsigned int i = 0; i < m_tower.size(); i++)
       {
         m_winning_sum_by_row[i]->add(this->evaluate_winnings(i));
       }
@@ -1278,7 +1366,7 @@ void Table::announce_bet(int bet)
   return;
 }
 
-void Table::announce_row(int current_row)
+void Table::announce_row(long unsigned int current_row)
 {
   switch(current_row)
   {
@@ -1389,6 +1477,54 @@ void Table::announce_win()
   cout << "      ### ###     ### ###      ###  ###    ##  ###" << endl;
   cout << "      ### ###     ### ###      ###  ###     ## ###" << endl;
   cout << "       #####       #####       ###  ###     ######" << endl;
+
+  return;
+}
+
+void Table::announce_big_win()
+{
+  cout << "  ########     ###      #####          ###                     ###  ###  #####      ###" << endl;
+  cout << "  ###    ##    ###    ###   ###        ###                     ###  ###  ### ##     ###" << endl;
+  cout << "  ###     ##   ###   ###     ###        ###        ###        ###   ###  ###  ##    ###" << endl;
+  cout << "  ###    ##    ###  ###                  ###      ######     ###    ###  ###  ##    ###" << endl;
+  cout << "  ########     ###  ###                  ###     ### ###     ###    ###  ###   ##   ###" << endl;
+  cout << "  ###    ##    ###  ###                   ###   ###   ###   ###     ###  ###   ##   ###" << endl;
+  cout << "  ###     ##   ###  ###    ######         ###   ###   ###   ###     ###  ###    ##  ###" << endl;
+  cout << "  ###      ##  ###   ###      ###          ### ###     ### ###      ###  ###    ##  ###" << endl;
+  cout << "  ###     ##   ###    ###   ### #          ### ###     ### ###      ###  ###     ## ###" << endl;
+  cout << "  #########    ###      #####   #           #####       #####       ###  ###     ######" << endl;
+
+  return;
+}
+
+void Table::announce_jackpot()
+{
+  cout << "         ###    ########        ######     ###     ###  #########         ########     #############" << endl;
+  cout << "         ###   ###    ###     ###    ###   ###     ###  ###########     ###      ###   #############" << endl;
+  cout << "         ###  ###      ###   ###      ###  ###    ###   ###      ###   ###        ###       ###"      << endl;
+  cout << "         ###  ###      ###  ###            ###   ###    ###       ##  ###          ###      ###"      << endl;
+  cout << "         ###  ###      ###  ###            ### ###      ###      ###  ###          ###      ###"      << endl;
+  cout << "         ###  ############  ###            ######       ###########   ###          ###      ###"      << endl;
+  cout << "         ###  ############  ###            ### ###      #########     ###          ###      ###"      << endl;
+  cout << "  ###    ###  ###      ###   ###      ###  ###   ###    ###            ###        ###       ###"      << endl;
+  cout << "   ###  ###   ###      ###    ###    ###   ###    ###   ###             ###      ###        ###"      << endl;
+  cout << "     #####    ###      ###      ######     ###     ###  ###               ########          ###"      << endl;
+
+  return;
+}
+
+void Table::announce_mega_jackpot()
+{
+  cout << "  ######       #####  ###########     #####        ########         #####      #####      #####"   << endl;
+  cout << "  #######     ######  ###########   ###   ###     ###     ###      ### ###    ### ###    ### ###"  << endl;
+  cout << "  ###  ###   ### ###  ###          ###     ###   ###       ###    ###   ###  ###   ###  ###   ###" << endl;
+  cout << "  ###   ### ###  ###  ###         ###            ###       ###    ###   ###  ###   ###  ###   ###" << endl;
+  cout << "  ###    #####   ###  #######     ###            ###       ###    ###   ###  ###   ###  ###   ###" << endl;
+  cout << "  ###            ###  #######     ###            #############     ### ###    ### ###    ### ###"  << endl;
+  cout << "  ###            ###  ###         ###    ######  #############      #####      #####      #####"   << endl;
+  cout << "  ###            ###  ###          ###      ###  ###       ###"                                    << endl;
+  cout << "  ###            ###  ###########   ###   ### #  ###       ###       ###        ###        ###"    << endl;
+  cout << "  ###            ###  ###########     #####   #  ###       ###       ###        ###        ###"    << endl;
 
   return;
 }

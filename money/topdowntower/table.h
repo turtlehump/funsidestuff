@@ -11,16 +11,13 @@
 
 using namespace std;
 
-const int JACKPOT_MULTIPLIER      = 10;
-const int MEGA_JACKPOT_MULTIPLIER = 50;
-
 class Table
 {
   public:
     Table();
     ~Table();
 
-    void  play_round(Player* player);
+    void  play_game(Player* player, int base_bet);
     void  get_odds();
 
   private:
@@ -30,27 +27,33 @@ class Table
 
     //  vvvvvv Playing Game vvvvvv
 
+
+    void  play_round(Player* player, int base_bet);
+    int     get_bet(Player* player, int base_bet);
+    void      announce_bet(int round_multiplier);
+
+    void    deal(); 
+
+    int     play_row_for_game(long unsigned int current_row);  //returns payout value
+    void      announce_row(long unsigned int current_row);
+    bool      conflict(Card* lower, Card* upper);
+    bool      handle_conflicts(long unsigned int current_row);  //called only when there is a conflict
+    void        announce_handling_conflict();
+    int         evaluate_winnings(long unsigned int current_row);
+
+    int     winnings_calc(int winnings, int multiplier, long unsigned int current_row);
+    bool    continue_or_payout(int win_payment);
+
+    void    display_winnings(int win_payment, long unsigned int current_row, int bet);
+    void      announce_win();
+    void      announce_big_win();
+    void      announce_jackpot();
+    void      announce_mega_jackpot();
+    void        reveal_all_cards();
+    void      announce_loss();
+
     void  delete_cards_in_tower();
     void  put_tower_cards_back_in_deck();
-
-    int   get_bet(Player* player, int base_bet);
-    void    announce_bet(int round_multiplier);
-
-    void  deal(); 
-
-    int   play_row(int current_row);  //returns payout value
-    void    announce_row(int current_row);
-    bool    conflict(Card* lower, Card* upper);
-    bool    handle_conflicts(int current_row);  //called only when there is a conflict
-    void      announce_handling_conflict();
-    int     evaluate_winnings(int current_row);
-
-    bool  continue_or_payout(int win_payment);
-
-    void  display_winnings(int win_payment, int current_row);
-    void    announce_win();
-    void      reveal_all_cards();
-    void    announce_loss();
 
     //  ^^^^^^ Playing Game ^^^^^^
 
@@ -71,6 +74,7 @@ class Table
                                    long unsigned int first_conflict_index);
     //  ^^^^^^ Getting Odds ^^^^^^
 
+    long unsigned int m_TOWER_SIZE = 0;  //Gets set in constructor
     vector<vector<Card*>> m_tower
     {
                                {NULL},                     //1 in row 1
@@ -81,15 +85,11 @@ class Table
                 {NULL, NULL, NULL, NULL, NULL, NULL},      //6 in row 6
              {NULL, NULL, NULL, NULL, NULL, NULL, NULL}    //7 in row 7
     };
-
-    long unsigned int m_TOWER_SIZE = 0;
-
-    Card* m_savior_card;
+                        Card* m_savior_card;
 
     Deck* m_deck;
 
-    BigInt* m_total_possibilities = NULL;
-
+    //vvvvv For Odds Calculations vvvvv
     vector<BigInt*> m_winning_sum_by_row;
     vector<BigInt*> m_max_row_before_loss;
     vector<BigInt*> m_num_losses_by_row;
@@ -104,5 +104,7 @@ class Table
     BigInt*         m_possible_mega_jackpots;
     BigInt*         m_mega_jackpots_payouts_sum;
     int             m_highest_mega_jackpot_payout;
+
+    BigInt*         m_total_possibilities;
 };
 #endif
