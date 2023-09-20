@@ -62,7 +62,7 @@ class Table
 
     void  random_odds();
     int     play_row_for_random_odds(long unsigned int row);
-    void    update_random_odds_stats_by_row(int win_payment, long unsigned int row);
+    void    update_random_odds_stats_by_row(int win_payment, long unsigned int row, int base_bet);
     void    print_random_odds_stats(BigInt* sample_size, int base_bet);
 
     void  bf_odds(long unsigned int row,
@@ -95,6 +95,8 @@ class Table
     vector<BigInt*> m_max_row_before_loss;
     vector<BigInt*> m_num_losses_by_row;
     vector<BigInt*> m_num_wins_by_row;
+    vector<BigInt*> m_num_profitable_wins_by_row;
+    BigInt*         m_never_profitable_deals;
     vector<int>     m_highest_payout_by_row;
     BigInt*         m_highest_payout_per_deal_sum;
 

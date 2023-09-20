@@ -611,8 +611,10 @@ void Table::get_odds()
     m_max_row_before_loss.push_back(new BigInt(0));
     m_num_losses_by_row.push_back(new BigInt(0));
     m_num_wins_by_row.push_back(new BigInt(0));
+    m_num_profitable_wins_by_row.push_back(new BigInt(0));
     m_highest_payout_by_row.push_back(0);
   }
+  m_never_profitable_deals      = new BigInt(0);
   m_highest_payout_per_deal_sum = new BigInt(0);
   m_possible_jackpots           = new BigInt(0);
   m_jackpots_payouts_sum        = new BigInt(0);
@@ -671,7 +673,7 @@ void Table::random_odds()
     for(long unsigned int j = 0; j < m_tower.size(); j++)
     {
       int row_payment = this->play_row_for_random_odds(j);
-      this->update_random_odds_stats_by_row(row_payment, j);
+      this->update_random_odds_stats_by_row(row_payment, j, base_bet);
 
       if(!row_payment)
         break;
@@ -682,6 +684,9 @@ void Table::random_odds()
       }
     }
     m_highest_payout_per_deal_sum->add(highest_payout_of_deal);
+
+    if(highest_payout_of_deal < base_bet)
+      m_never_profitable_deals->add(1);
 
     this->put_tower_cards_back_in_deck();
   }
@@ -717,7 +722,7 @@ int Table::play_row_for_random_odds(long unsigned int current_row)
 
     if(current_card->is_special())
     {
-      if(current_card->get_face() == XTWO)  multiplier *= 2;
+      if(current_card->get_face() == XTWO)       multiplier *= 2;
       else if(current_card->get_face() == XFIVE) multiplier *= 5;
       else if(current_card->get_face() == XTEN)  multiplier *= 10;
     }
@@ -780,11 +785,14 @@ int Table::play_row_for_random_odds(long unsigned int current_row)
   return winnings_calc(winnings, multiplier, current_row);
 }
 
-void Table::update_random_odds_stats_by_row(int win_payment, long unsigned int row)
+void Table::update_random_odds_stats_by_row(int win_payment, long unsigned int row, int base_bet)
 {
   if(win_payment)
   {
     m_num_wins_by_row[row]->add(1);
+
+    if(win_payment >= base_bet)
+      m_num_profitable_wins_by_row[row]->add(1);
 
     if(row < m_tower.size())
     {
@@ -860,7 +868,11 @@ void Table::print_random_odds_stats(BigInt* sample_size, int base_bet)
     m_num_wins_by_row[j]->print();
     cout << endl;
 
-    cout << "-  Winnings: ";
+    cout << "-  Profitable Wins: ";
+    m_num_profitable_wins_by_row[j]->print();
+    cout << endl;
+
+    cout << "-  Total Winnings: ";
     m_winning_sum_by_row[j]->print();
     if(m_winning_sum_by_row[j]->greater_than(total_money_input))
       cout << "\t\t<- Problem";
@@ -893,6 +905,10 @@ void Table::print_random_odds_stats(BigInt* sample_size, int base_bet)
 
   cout << "Payout if you took the best payout every time: ";
   m_highest_payout_per_deal_sum->print();
+  cout << endl << endl;;
+
+  cout << "Number of deals that would never offer a profit: ";
+  m_never_profitable_deals->print();
   cout << endl;
 }
 
